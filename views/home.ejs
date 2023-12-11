@@ -1,0 +1,34 @@
+<!-- views/home.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAR EAST FUEL CORPORATION</title>
+    <link rel="stylesheet" type="text/css" href="/css/main-css/main.css">
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Add other stylesheets as needed -->
+    <style>
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <%- include('navbar.ejs') %>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2>Welcome to FAR EAST FUEL CORPORATION</h2>
+                <p>Choose an action:</p>
+                <a href="/auth/signup" class="btn btn-primary">Sign Up</a>
+                <a href="/auth/login" class="btn btn-primary">Log In</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

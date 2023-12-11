@@ -1,0 +1,34 @@
+<!-- views/dashboard.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="/css/main-css/main.css">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <!-- Add your custom stylesheets as needed -->
+</head>
+<body>
+    <%- include('navbar.ejs') %>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="/dashboard">Home</a>
+        <a href="/dashboard/profile">Profile</a>
+        <a href="/dashboard/settings">Settings</a>
+        <a href="/logout">Logout</a>
+        <!-- Add more links as needed -->
+    </div>
+
+    <!-- Page content -->
+    <div class="content">
+        <!-- Your dashboard content goes here -->
+        <h2>Welcome to the Dashboard</h2>
+    </div>
+
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
