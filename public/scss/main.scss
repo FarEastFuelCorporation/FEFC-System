@@ -25,9 +25,14 @@ body {
     margin: 0;
 }
 
+.container-fluid{
+    padding: 0 10px !important;
+}
+
 .navbar {
     background-color: $darkgray !important;
     padding: 5px 0 !important;
+    height: 50px;
 }
 
 .fixed-top{
@@ -45,31 +50,74 @@ body {
     color: $accent1;
 }
 
+.navbar-brand span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .navbar-brand img {
-    height: 50px;
+    height: 20px;
+}
+
+.sidebar-container {
+    display: flex;
 }
 
 .sidebar {
     position: fixed;
-    top: 60px;
+    top: 50px;
     left: 0;
     height: 100%;
     width: 250px;
     padding-top: 15px;
     background-color: #343a40;
     color: #fff;
+    transition: width 0.3s ease;
+    overflow-x: hidden;
+}
+
+.sidebar.shrink {
+    width: 50px;
 }
 
 .sidebar a {
-    padding: 15px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
     text-decoration: none;
     color: #fff;
-    display: block;
     transition: background-color 0.3s;
+}
+
+.sidebar a span {
+    display: inline;
+}
+
+.sidebar.shrink a span {
+    display: none;
+}
+
+.sidebar a i {
+    margin-right: 10px; /* Adjust the margin as needed */
+    font-size: 1.2rem; /* Adjust the font size as needed */
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar a:hover {
     background-color: #555;
+}
+
+/* Additional styling for the toggle button */
+#toggleButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    margin-left: -15px; /* Adjust the margin as needed */
+    z-index: 2; /* Ensure a higher z-index value */
 }
 
 .content {

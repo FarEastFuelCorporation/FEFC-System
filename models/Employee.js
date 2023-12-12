@@ -147,6 +147,10 @@ const Employee = sequelize.define(
     reasonOfResignation: {
     type: DataTypes.STRING,
     },
+    picture: {
+        type: DataTypes.STRING,
+        allowNull: true, // Adjust the allowNull based on your requirements
+    },
     submittedBy: {
         type: DataTypes.STRING,
     },

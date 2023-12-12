@@ -11,18 +11,48 @@
     <title>Dashboard</title>
     <link rel="stylesheet" type="text/css" href="/css/main-css/main.css">
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" />
     <!-- Add your custom stylesheets as needed -->
 </head>
 <body>
     <%- include('navbar.ejs') %>
 
     <!-- Sidebar -->
-    <div class="sidebar">
-        <a href="/dashboard">Dashboard</a>
-        <a href="/dashboard/profile">Profile</a>
-        <a href="/dashboard/settings">Settings</a>
-        <a href="/logout">Logout</a>
-        <!-- Add more links as needed -->
+    <div class="sidebar-container">
+        <div class="sidebar" id="sidebar">
+            <a href="/dashboard">
+                <i class="fas fa-th-large"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="/dashboard/booked_transactions">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span class="link-text">Booked Transactions</span>
+            </a>
+            <a href="/dashboard/clients">
+                <i class="fa-solid fa-users"></i>
+                <span class="link-text">Clients</span>
+            </a>
+            <a href="/dashboard/type_of_waste">
+                <i class="fa-solid fa-table-list"></i>
+                <span class="link-text">Type of Wastes</span>
+            </a>
+            <a href="/dashboard/quotations">
+                <i class="fa-solid fa-file-circle-plus"></i>
+                <span class="link-text">Quotations</span>
+            </a>
+            <a href="/dashboard/commissions">
+                <i class="fa-solid fa-sack-dollar"></i>
+                <span class="link-text">Commissions</span>
+            </a>
+            <a href="/logout">
+                <i class="fa-solid fa-power-off"></i>
+                <span class="link-text">Logout</span>
+            </a>
+        </div>
+        <!-- Toggle Button -->
+        <button onclick="toggleSidebar()" id="toggleButton">
+            <i class="fas fa-bars"></i>
+        </button>
     </div>
 
     <!-- Page content -->
@@ -33,8 +63,44 @@
 
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.href);
+        const sidebar = document.getElementById('sidebar');
+        const span_data = sidebar.querySelectorAll('span');
+        
+        sidebar.addEventListener('mouseenter', () => {
+            if (sidebar.classList.contains('shrink')) {
+                sidebar.style.width = "250px";
+                span_data.forEach(span => {
+                    span.style.display = "block";
+                });
+            }
+        });
+
+        sidebar.addEventListener('mouseleave', () => {
+            if (sidebar.classList.contains('shrink')) {
+                sidebar.style.width = "50px";
+                span_data.forEach(span => {
+                    span.style.display = "none";
+                });
+            }
+        });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if(sidebar.classList.contains('shrink')){
+                sidebar.classList.remove('shrink');
+                sidebar.style.width = "250px";
+                span_data.forEach(span => {
+                    span.style.display = "block";
+                });
+            }
+            else{
+                sidebar.classList.toggle('shrink');
+                sidebar.classList.add('shrink');
+                sidebar.style.width = "50px";
+                span_data.forEach(span => {
+                    span.style.display = "none";
+                });
+            }
         }
     </script>
 </body>
