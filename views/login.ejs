@@ -5,6 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Sign Up</title>
     <link rel="stylesheet" type="text/css" href="/css/main-css/main.css">
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -30,8 +33,14 @@
                 <input type="password" id="password" name="password" class="form-control" required autocomplete="off">
             </div>
             <a href="/" class="btn btn-primary">Back</a>
+            <button type="reset" class="btn btn-primary btn-block">Clear</button>
             <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
     </div>
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
 </html>

@@ -21,6 +21,12 @@ app.use(express.static(path.join(__dirname, 'views')));
 // Serve Bootstrap files from the 'node_modules' folder
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
 
+// Set Cache-Control header to prevent caching
+app.use((req, res, next) => {
+    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    next();
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 // Use express-session middleware
 app.use(session({
