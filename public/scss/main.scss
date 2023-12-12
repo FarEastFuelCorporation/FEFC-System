@@ -32,17 +32,12 @@ body {
 .navbar {
     background-color: $darkgray !important;
     padding: 5px 0 !important;
-    height: 50px;
+    height: 60px;
 }
 
 .fixed-top{
     background-color: $darkgray !important;
     padding: 5px 0 !important;
-}
-
-.navbar-brand > div {
-    display: flex;
-    align-items: center;
 }
 
 .navbar-brand h2 {
@@ -55,25 +50,27 @@ body {
     align-items: center;
     justify-content: center;
 }
+
 .navbar-brand img {
     height: 20px;
 }
 
 .sidebar-container {
+    position: relative;
     display: flex;
 }
 
 .sidebar {
     position: fixed;
-    top: 50px;
+    top: 0;
     left: 0;
     height: 100%;
     width: 250px;
-    padding-top: 15px;
     background-color: #343a40;
     color: #fff;
     transition: width 0.3s ease;
     overflow-x: hidden;
+    z-index: 2000;
 }
 
 .sidebar.shrink {
@@ -97,7 +94,8 @@ body {
     display: none;
 }
 
-.sidebar a i {
+.sidebar a i,
+.sidebar a img {
     margin-right: 10px; /* Adjust the margin as needed */
     font-size: 1.2rem; /* Adjust the font size as needed */
     width: 20px;
@@ -116,8 +114,11 @@ body {
     border: none;
     cursor: pointer;
     padding: 10px;
-    margin-left: -15px; /* Adjust the margin as needed */
-    z-index: 2; /* Ensure a higher z-index value */
+    position: fixed;
+    top: 10px;
+    left: 260px;
+    color: white;
+    z-index: 2000; /* Ensure a higher z-index value */
 }
 
 .content {
