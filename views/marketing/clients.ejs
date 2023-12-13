@@ -1,0 +1,176 @@
+<!-- views/dashboard.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Dashboard</title>
+    <link rel="shortcut icon" href="/images/logo.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="/css/main-css/main.css">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" />
+    <!-- Add your custom stylesheets as needed -->
+</head>
+<body>
+    <%- include('../navbar.ejs') %>
+
+    <!-- Sidebar -->
+    <div class="sidebar-container">
+        <div class="sidebar" id="sidebar">
+            <a href="#" style="height: 60px; background-color: #303030">
+                <img src="/images/logo.png" alt="Logo">
+                <span>
+                    <h6 class="d-flex align-center ps-2 fw-bold" style="color: #ffbf00; font-family: Times New Roman;">FAR EAST FUEL<br>CORPORATION</h6>
+                </span>
+            </a>
+
+            <a href="/dashboard">
+                <i class="fas fa-th-large"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="/dashboard/booked_transactions">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span class="link-text">Booked Transactions</span>
+            </a>
+            <a href="/dashboard/clients" class="active">
+                <i class="fa-solid fa-users"></i>
+                <span class="link-text">Clients</span>
+            </a>
+            <a href="/dashboard/type_of_waste">
+                <i class="fa-solid fa-table-list"></i>
+                <span class="link-text">Type of Wastes</span>
+            </a>
+            <a href="/dashboard/quotations">
+                <i class="fa-solid fa-file-circle-plus"></i>
+                <span class="link-text">Quotations</span>
+            </a>
+            <a href="/dashboard/commissions">
+                <i class="fa-solid fa-sack-dollar"></i>
+                <span class="link-text">Commissions</span>
+            </a>
+            <a href="/logout">
+                <i class="fa-solid fa-power-off"></i>
+                <span class="link-text">Logout</span>
+            </a>
+        </div>
+        <!-- Toggle Button -->
+        <button onclick="toggleSidebar()" id="toggleButton">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Page content -->
+    <div class="content">
+        <div class="col-xs-12">
+            <!-- client_list -->
+            <section class="marketing" id="client_list_section">
+                <h4>CLIENTS</h4><br>
+                <div>
+                    <label class="d-flex gap-3">
+                        <button type="button" id="new_employee_button" class="form-control fw-bold bg-success text-white">
+                            <h6>NEW CLIENT FORM</h6>
+                        </button>
+                        <button type="button" id="update_record_button" class="form-control fw-bold bg-danger text-white">
+                            <h6>UPDATE RECORD</h6>
+                        </button>
+                    </label>
+                </div>
+                <div class="container-fluid">
+                    <div class="table-container">
+                        <!-- Table Header -->
+                        <div class="table-header">
+                            <div class="form-group">
+                                <label for="showEntries">Show entries</label>
+                                <select class="form-control" id="showEntries">
+                                    <option>10</option>
+                                    <option>25</option>
+                                    <option>50</option>
+                                    <option>100</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search">
+                            </div>
+                        </div>
+                
+                        <!-- Table -->
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>CLIENT ID</th>
+                                <th>CLIENT</th>
+                                <th>ADDRESS</th>
+                                <th>NATURE OF BUSINESS</th>
+                                <th>CONTACT NUMBER</th>
+                                <th>BILLER NAME</th>
+                                <th>BILLER ADDRESS</th>
+                                <th>BILLER CONTACT PERSON</th>
+                                <th>BILLER CONTACT NUMBER</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% clients.forEach((client, index) => { %>
+                                <tr>
+                                    <td><%= index + 1 %></td>
+                                    <td><%= client.clientId %></td>
+                                    <td><%= client.clientName %></td>
+                                    <td><%= client.address %></td>
+                                    <td><%= client.natureOfBusiness %></td>
+                                    <td><%= client.contactNumber %></td>
+                                    <td><%= client.billerName %></td>
+                                    <td><%= client.billerAddress %></td>
+                                    <td><%= client.billerContactPerson %></td>
+                                    <td><%= client.billerContactNumber %></td>
+                                    <!-- Add more cells for other fields -->
+                                </tr>
+                            <% }); %>
+                            </tbody>
+                        </table>
+                
+                    <!-- Pagination -->
+                    <div class="table-pagination">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end">
+                                <% if (currentPage > 1) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" onclick="changePage(<%= currentPage - 1 %>)" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                <% } %>
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <% if (currentPage < totalPages) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </nav>
+                    </div>
+                    </div>
+                </div>
+                
+            </section>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.37.1/apexcharts.min.js"></script>
+    <%- include('../scripts.ejs') %>
+    <%- include('marketing_scripts.ejs') %>
+</body>
+</html>

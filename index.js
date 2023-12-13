@@ -5,8 +5,13 @@ const session = require('express-session');
 const path = require('path');  // Import the 'path' module
 const bodyParser = require('body-parser');
 const sequelize = require('./config/config'); // Adjust the path based on your project structure
-const User = require('./models/User');
 const Employee = require('./models/Employee');
+const User = require('./models/User');
+const Client = require('./models/Client');
+const TypeOfWaste = require('./models/TypeOfWaste');
+const TreatmentProcess = require('./models/TreatmentProcess');
+const VehicleType = require('./models/VehicleType');
+const Vehicle = require('./models/Vehicle');
 
 const app = express();
 const port = 3000;

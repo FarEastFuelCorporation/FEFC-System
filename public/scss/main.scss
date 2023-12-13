@@ -111,6 +111,7 @@ body {
     // background-color: #4CAF50; /* Active link background color */
     color: white; /* Active link text color */
     border-left: 3px solid #ffbf00;
+    font-weight: bold;
 }
 
 /* Additional styling for the toggle button */
@@ -182,4 +183,104 @@ body {
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
     padding: 10px;
+}
+
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.booked .card {
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    flex: 1; /* Set flex to distribute available space evenly among cards */
+    min-width: calc((100% - 60px) / 5); /* Set a minimum width for each card */
+    max-width: calc((100% - 60px) / 5);
+    display: flex;
+    flex-direction: row !important;
+    justify-content: space-between;
+}
+
+.card .icon-box {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card i {
+    font-size: 40px;
+    width: 50px;
+    text-align: center;
+}
+
+.card .number {
+    font-size: 20px;
+}
+
+.row {
+    padding: 0 15px !important;
+}
+
+.row > * {
+    padding: 0 !important;
+}
+
+.chart {
+    padding: 0;
+    padding-left: 15px !important;
+}
+
+.chart > div {
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 100% !important;
+    height: 100%;
+}
+
+.apexcharts-legend {
+    top: 0 !important;
+}
+
+button {
+    width: fit-content !important;
+}
+
+
+.table-container {
+    margin-top: 20px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.table-pagination {
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+}
+
+th {
+    vertical-align: middle;
+    text-align: center !important;
 }

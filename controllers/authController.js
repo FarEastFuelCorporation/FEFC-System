@@ -1,6 +1,7 @@
 // controllers/authController.js
 
 const User = require("../models/User");
+const bcrypt = require('bcrypt')
 
 async function getSignupController(req, res){
     res.render('signup'); // Assuming you have a signup.ejs file in your views folder
