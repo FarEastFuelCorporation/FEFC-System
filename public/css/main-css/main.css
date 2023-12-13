@@ -2,7 +2,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: "Times New Roman", serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -11,7 +10,7 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   padding-top: 60px;
-  background-color: #c3c3c3 !important;
+  background-color: #ECF0F5 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -76,7 +75,7 @@ body {
   align-items: center;
   padding: 10px;
   text-decoration: none;
-  color: #fff;
+  color: #B8C7CE;
   transition: background-color 0.3s;
 }
 
@@ -102,6 +101,11 @@ body {
   background-color: #555;
 }
 
+.sidebar a.active {
+  color: white; /* Active link text color */
+  border-left: 3px solid #ffbf00;
+}
+
 /* Additional styling for the toggle button */
 #toggleButton {
   background: none;
@@ -113,11 +117,7 @@ body {
   left: 260px;
   color: white;
   z-index: 2000; /* Ensure a higher z-index value */
-}
-
-.content {
-  margin-left: 250px;
-  padding: 16px;
+  transition: left 0.3s;
 }
 
 .signup-container,
@@ -138,4 +138,41 @@ body {
 .login-container h2 {
   margin-bottom: 20px;
   text-align: center;
+}
+
+.content {
+  width: 100%;
+  height: calc(100vh - 60px);
+  margin-left: 250px;
+  padding: 15px;
+  transition: margin-left 0.3s ease;
+}
+
+.box {
+  position: relative;
+  border-radius: 3px;
+  background-color: #ffffff;
+  margin-bottom: 20px;
+  width: 100%;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.box-header {
+  color: #444;
+  display: block;
+  padding: 10px;
+  position: relative;
+}
+
+.box-header .box-title {
+  display: inline-block;
+  font-size: 14px;
+}
+
+.box-body {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  padding: 10px;
 }/*# sourceMappingURL=main.css.map */

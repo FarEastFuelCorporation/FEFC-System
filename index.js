@@ -16,7 +16,6 @@ app.set('view engine', 'ejs');
 
 // Set the public folder as the location for static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'views')));
 
 // Serve Bootstrap files from the 'node_modules' folder
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
@@ -46,9 +45,6 @@ async function initializeApp() {
     try {
         // Sync the models with the database (this will create tables if they don't exist)
         await sequelize.sync();
-
-        // Find all users
-        const allUsers = await User.findAll();
     } catch (error) {
         console.error('Error:', error);
     }
@@ -57,32 +53,25 @@ async function initializeApp() {
 // Call the function to initialize the application
 initializeApp();
 
-
 // Middleware to check authentication
-function isAuthenticated(req, res, next) {
-    if (req.session && req.session.user) {
-        return next();
-    } else {
-        return res.status(401).redirect('/login');
-    }
-}
+const { isAuthenticated } = require('./middlewares/auth');
+app.use('/dashboard', isAuthenticated);
 
-// Protect a route with authentication
-const dashboardRoutes = require('./routes/dashboard');
-app.get('/dashboard', isAuthenticated, (req, res) => {
-    // Only accessible to authenticated users
-    res.render('dashboard');
-});
 
 // Include your routes
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes); // Mount auth routes at /auth
+
+
+// Protect a route with authentication
+const dashboardRoutes = require('./routes/dashboard');
 app.use('/dashboard', dashboardRoutes);
 
 
 // Include the logout route
 const logoutRoute = require('./routes/logout');
 app.use(logoutRoute);
+
 
 // Define a route for the home view
 app.get('/', (req, res) => {

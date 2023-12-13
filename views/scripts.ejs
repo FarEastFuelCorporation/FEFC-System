@@ -1,0 +1,59 @@
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const span_data = sidebar.querySelectorAll('span');
+    const toggleButton = document.querySelector('#toggleButton');
+    const content = document.querySelector('.content');
+    
+    sidebar.addEventListener('mouseenter', () => {
+        if (sidebar.classList.contains('shrink')) {
+            sidebar.style.width = "250px";                
+            content.classList.toggle('expand');
+            content.classList.add('expand');
+            content.style.marginLeft = "250px";
+            span_data.forEach(span => {
+                span.style.display = "block";
+            });
+            toggleButton.style.left = "260px";
+        }
+    });
+
+    sidebar.addEventListener('mouseleave', () => {
+        if (sidebar.classList.contains('shrink')) {
+            sidebar.style.width = "50px";                
+            content.classList.toggle('expand');
+            content.classList.add('expand');
+            content.style.marginLeft = "50px";
+            span_data.forEach(span => {
+                span.style.display = "none";
+            });
+            toggleButton.style.left = "60px";
+        }
+    });
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        if(sidebar.classList.contains('shrink')){
+            sidebar.classList.remove('shrink');
+            sidebar.style.width = "250px";                
+            content.classList.toggle('expand');
+            content.classList.add('expand');
+            content.style.marginLeft = "250px";
+            span_data.forEach(span => {
+                span.style.display = "block";
+            });
+            toggleButton.style.left = "260px";
+        }
+        else{
+            sidebar.classList.toggle('shrink');
+            sidebar.classList.add('shrink');
+            sidebar.style.width = "50px";
+            content.classList.toggle('expand');
+            content.classList.add('expand');
+            content.style.marginLeft = "50px";
+            span_data.forEach(span => {
+                span.style.display = "none";
+            });
+            toggleButton.style.left = "60px";
+        }
+    }
+</script>
