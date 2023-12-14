@@ -196,6 +196,7 @@
 
                     document.querySelector('.content').style.marginLeft = '0';
                     document.querySelector('.content').style.width = '100%';
+                    document.querySelector('.content').style.padding = '0%';
                 }
             })
             .catch(error => {
@@ -211,7 +212,7 @@
         }
 
         function performSearch() {
-            const currentPage = 1; // Reset to the first page when performing a new search
+            const currentPage = <%= currentPage %>;
             changePage(currentPage);
         }
     </script>
