@@ -156,6 +156,14 @@ body {
     transition: margin-left 0.3s ease;
 }
 
+.content.expand {
+    width: calc(100% - 50px);
+    height: calc(100vh - 60px);
+    margin-left: 50px;
+    padding: 15px;
+    transition: margin-left 0.3s ease;
+}
+
 .content > div {
     width: 100%;
     height: calc(100vh - 60px);
@@ -208,6 +216,8 @@ body {
     display: flex;
     flex-direction: row !important;
     justify-content: space-between;
+    transition: min-width 0.3s ease;
+    transition: max-width 0.3s ease;
 }
 
 .card .icon-box {

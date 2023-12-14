@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { dashboardController, bookedTransactionsController, clientsController } = require('../controllers/dashboardControllers');
+const { dashboardController, bookedTransactionsController, clientsController, typeOfWasteController } = require('../controllers/dashboardControllers');
 
 // Dashboard route
 router.get('/', isAuthenticated, dashboardController);
@@ -15,9 +15,7 @@ router.get('/booked_transactions', bookedTransactionsController);
 router.get('/clients', clientsController);
 
 // Type of Wastes route
-router.get('/type_of_waste', (req, res) => {
-    res.render('type_of_waste');
-});
+router.get('/type_of_waste', typeOfWasteController);
 
 // Quotations route
 router.get('/quotations', (req, res) => {

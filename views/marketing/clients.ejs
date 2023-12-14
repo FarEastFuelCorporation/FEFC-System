@@ -83,7 +83,7 @@
                     <div class="table-container">
                         <!-- Table Header -->
                         <div class="table-header">
-                            <div class="form-group">
+                            <div class="form-group d-flex">
                                 <label for="showEntries">Show entries</label>
                                 <select class="form-control" id="showEntries" onchange="changeEntriesPerPage(this)">
                                     <option value="10" <%= entriesPerPage === 10 ? 'selected' : '' %>>10</option>
@@ -92,8 +92,8 @@
                                     <option value="100" <%= entriesPerPage === 100 ? 'selected' : '' %>>100</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search" id="searchInput" value="<%= searchQuery %>">
+                            <div class="form-group d-flex">
+                                <input type="text" class="form-control" placeholder="Search Client" id="searchInput" value="<%= searchQuery %>">
                                 <button class="btn btn-primary" onclick="performSearch()">Search</button>
                             </div>
                         </div>
@@ -212,9 +212,36 @@
         }
 
         function performSearch() {
-            const currentPage = <%= currentPage %>;
-            changePage(currentPage);
+            const searchInput = document.getElementById('searchInput');
+            const searchQuery = searchInput.value.trim(); // Get the trimmed search query
+
+            const entriesPerPage = document.getElementById('showEntries').value;
+
+            // Make an AJAX request to the server with the search query and current page
+            fetch(`/dashboard/clients?page=${<%= currentPage %>}&entriesPerPage=${entriesPerPage}&search=${searchQuery}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Update the content of the container with the new data
+                const clientListSection = document.getElementById('client_list_section');
+                if (clientListSection) {
+                    clientListSection.innerHTML = data;
+
+                    document.querySelector('.content').style.marginLeft = '0';
+                    document.querySelector('.content').style.width = '100%';
+                    document.querySelector('.content').style.padding = '0%';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle errors as needed
+            });
         }
+
     </script>
     
 </body>

@@ -12,6 +12,7 @@ const TypeOfWaste = require('./models/TypeOfWaste');
 const TreatmentProcess = require('./models/TreatmentProcess');
 const VehicleType = require('./models/VehicleType');
 const Vehicle = require('./models/Vehicle');
+const Quotation = require('./models/Quotation');
 
 const app = express();
 const port = 3000;
