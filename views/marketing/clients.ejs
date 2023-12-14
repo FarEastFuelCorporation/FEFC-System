@@ -85,15 +85,16 @@
                         <div class="table-header">
                             <div class="form-group">
                                 <label for="showEntries">Show entries</label>
-                                <select class="form-control" id="showEntries">
-                                    <option>10</option>
-                                    <option>25</option>
-                                    <option>50</option>
-                                    <option>100</option>
+                                <select class="form-control" id="showEntries" onchange="changeEntriesPerPage(this)">
+                                    <option value="10" <%= entriesPerPage === 10 ? 'selected' : '' %>>10</option>
+                                    <option value="25" <%= entriesPerPage === 25 ? 'selected' : '' %>>25</option>
+                                    <option value="50" <%= entriesPerPage === 50 ? 'selected' : '' %>>50</option>
+                                    <option value="100" <%= entriesPerPage === 100 ? 'selected' : '' %>>100</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search">
+                                <input type="text" class="form-control" placeholder="Search" id="searchInput" value="<%= searchQuery %>">
+                                <button class="btn btn-primary" onclick="performSearch()">Search</button>
                             </div>
                         </div>
                 
@@ -114,9 +115,10 @@
                             </tr>
                             </thead>
                             <tbody>
+                            <% const startIndex = (currentPage - 1) * entriesPerPage; %>
                             <% clients.forEach((client, index) => { %>
                                 <tr>
-                                    <td><%= index + 1 %></td>
+                                    <td><%= startIndex + index + 1 %></td>
                                     <td><%= client.clientId %></td>
                                     <td><%= client.clientName %></td>
                                     <td><%= client.address %></td>
@@ -132,32 +134,33 @@
                             </tbody>
                         </table>
                 
-                    <!-- Pagination -->
-                    <div class="table-pagination">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-end">
-                                <% if (currentPage > 1) { %>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" onclick="changePage(<%= currentPage - 1 %>)" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                <% } %>
-                                <% for (let i = 1; i <= totalPages; i++) { %>
-                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                        <a class="page-link" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
-                                    </li>
-                                <% } %>
-                                <% if (currentPage < totalPages) { %>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                <% } %>
-                            </ul>
-                        </nav>
-                    </div>
+                        <!-- Pagination -->
+                        <div class="table-pagination">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-end">
+                                    <% if (currentPage > 1) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#" onclick="changePage(<%= currentPage - 1 %>)" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    <% } %>
+                                    <% for (let i = 1; i <= totalPages; i++) { %>
+                                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                            <a class="page-link" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
+                                        </li>
+                                    <% } %>
+                                    <% if (currentPage < totalPages) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    <% } %>
+                                </ul>
+                            </nav>
+                        </div>
+
                     </div>
                 </div>
                 
@@ -172,5 +175,46 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.37.1/apexcharts.min.js"></script>
     <%- include('../scripts.ejs') %>
     <%- include('marketing_scripts.ejs') %>
+    <script>
+        // Function to change the page
+        function changePage(pageNumber) {
+            const entriesPerPage = document.getElementById('showEntries').value;
+    
+            // Make an AJAX request to the server with the updated page number
+            fetch(`/dashboard/clients?page=${pageNumber}&entriesPerPage=${entriesPerPage}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Update the content of the container with the new data
+                const clientListSection = document.getElementById('client_list_section');
+                if (clientListSection) {
+                    clientListSection.innerHTML = data;
+
+                    document.querySelector('.content').style.marginLeft = '0';
+                    document.querySelector('.content').style.width = '100%';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle errors as needed
+            });
+        }
+    
+        function changeEntriesPerPage(selectElement) {
+            const selectedValue = selectElement.value;
+            const currentPage = <%= currentPage %>; // Get the current page
+            window.location.href = `/dashboard/clients?page=${currentPage}&entriesPerPage=${selectedValue}`;
+        }
+
+        function performSearch() {
+            const currentPage = 1; // Reset to the first page when performing a new search
+            changePage(currentPage);
+        }
+    </script>
+    
 </body>
 </html>
