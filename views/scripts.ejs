@@ -1,6 +1,47 @@
-
-
+<!-- views/scripts -->
 <script>
+    function getCurrentRoute() {
+        const fullPath = window.location.pathname;
+        const parts = fullPath.split('/');
+
+        // Get the first part of the route (after removing the leading slash)
+        let baseRoute = parts[2] || '';
+
+        // Remove the hash if it exists
+        if (baseRoute.includes('#')) {
+            baseRoute = baseRoute.split('#')[0];
+        }
+        return `/${baseRoute}`;
+    }
+
+    // Function to update the "active" class based on the current route
+    function updateActiveClass() {
+        const currentRoute = getCurrentRoute();
+
+        // Remove the "active" class from all links
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // Add the "active" class to the link with a matching route
+        const activeLink = document.getElementById(currentRoute);
+        if (activeLink) {
+            activeLink.classList.add('active');
+            console.log(activeLink)
+        }
+    }
+
+    // Add click event listeners to all sidebar links
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        if(link){
+            link.addEventListener('click', updateActiveClass);
+        }
+    });
+
+    // Update the "active" class on page load
+    window.addEventListener('load', updateActiveClass);
+
+
     const sidebar = document.getElementById('sidebar');
     const span_data = sidebar.querySelectorAll('span');
     const toggleButton = document.querySelector('#toggleButton');
@@ -59,5 +100,77 @@
         }
     }
 
+    // Function to change the page
+    function changePage(pageNumber) {
+        const entriesPerPage = document.getElementById('showEntries').value;
+
+        // Make an AJAX request to the server with the updated page number
+        fetch(`/dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.text())
+        .then(data => {
+            // Update the content of the container with the new data
+            const clientListSection = document.getElementById('client_list_section');
+            if (clientListSection) {
+                clientListSection.innerHTML = data;
+
+                document.querySelector('.content').style.marginLeft = '0';
+                document.querySelector('.content').style.width = '100%';
+                document.querySelector('.content').style.padding = '0%';
+                updateActiveClass()
+            }
+
+            // Update the URL to reflect the current page
+            const newUrl = `/dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`;
+            history.pushState({ page: pageNumber, entriesPerPage }, '', newUrl);
+            
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle errors as needed
+        });
+    }
+
+    function changeEntriesPerPage(selectElement) {
+        const selectedValue = selectElement.value;
+        const currentPage = <%= currentPage %> // Get the current page
+        window.location.href = `/dashboard/<%= route %>?page=${currentPage}&entriesPerPage=${selectedValue}`;
+    }
+
+    function performSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const searchQuery = searchInput.value.trim(); // Get the trimmed search query
+
+        const entriesPerPage = document.getElementById('showEntries').value;
+
+        // Make an AJAX request to the server with the search query and current page
+        fetch(`/dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.text())
+        .then(data => {
+            // Update the content of the container with the new data
+            const clientListSection = document.getElementById('client_list_section');
+            if (clientListSection) {
+                clientListSection.innerHTML = data;
+
+                document.querySelector('.content').style.marginLeft = '0';
+                document.querySelector('.content').style.width = '100%';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle errors as needed
+        });
+    }
 
 </script>
+</body>
+</html>

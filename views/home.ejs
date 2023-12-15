@@ -1,27 +1,7 @@
 <!-- views/home.ejs -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>FAR EAST FUEL CORPORATION</title>
-    <link rel="shortcut icon" href="/images/logo.png" type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="/css/main-css/main.css">
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" />
-    <!-- Add other stylesheets as needed -->
-    <style>
-        .container {
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <%- include('navbar.ejs') %>
+<%- include('head.ejs') %>
+<%- include('navbar.ejs') %>
 
     <div class="container-fluid">
         <div class="row">
@@ -34,7 +14,6 @@
         </div>
     </div>
 
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);

@@ -1,0 +1,111 @@
+<!-- views/marketing/marketing_dashboard.ejs -->
+
+<div class="content">
+    <div class="col-xs-12">
+    <!-- dashboard -->
+    <section class="marketing" id="marketing_dashboard">
+        <h4>DASHBOARD</h4><br>
+        <h5>BOOKING SUMMARY</h5>
+        <div class="row">
+            <div class="cards col-9 booked">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="booked_transactions">0</div>
+                        <div class="card-name">Booked</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_hauling">0</div>
+                        <div class="card-name">For Hauling</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-truck"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_receiving">0</div>
+                        <div class="card-name">For Receiving</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_warehousing">0</div>
+                        <div class="card-name">For Warehousing</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-warehouse"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_sorting">0</div>
+                        <div class="card-name">For Sorting</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-shuffle"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_treatment">0</div>
+                        <div class="card-name">For Treatment</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-fire-burner"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_certification">0</div>
+                        <div class="card-name">For Certification</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-stamp"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_billing">0</div>
+                        <div class="card-name">For Billing</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="for_collection">0</div>
+                        <div class="card-name">For Collection</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="number" id="finished">0</div>
+                        <div class="card-name">Finished</div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="chart col-3">
+                <div style="position: relative; width: calc(100% - 20px);">
+                    <div id="pieChart">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </div>
+</div>

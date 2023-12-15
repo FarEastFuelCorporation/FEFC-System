@@ -11,9 +11,23 @@ async function dashboardController(req, res) {
         // Retrieve data from the database or perform other logic
         const employeeId = req.session.employeeId;
         const employee = await Employee.findOne({ where: { employeeId } });
-
+        var currentPage, totalPages, entriesPerPage, searchQuery
+        
+        
         // Render the dashboard view with data
-        res.render('dashboard', { employee });
+        const viewsData = {
+            pageTitle: 'Marketing User - Dashboard',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/marketing_dashboard',
+            route: 'marketing_dashboard',
+            general_scripts: 'marketing/marketing_scripts',
+            employee,
+            currentPage,
+            totalPages,
+            entriesPerPage,
+            searchQuery,
+        };
+        res.render('dashboard', viewsData);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -23,7 +37,10 @@ async function dashboardController(req, res) {
 // Booked Transactions controller
 async function bookedTransactionsController(req, res) {
     try {
-        res.render('booked_transactions');
+        const viewsData = {
+            pageTitle: 'Marketing User - Booked Transactions',
+        };
+        res.render('booked_transactions', viewsData);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -60,19 +77,124 @@ async function clientsController(req, res) {
         const paginatedClients = filteredClients.slice(startIndex, endIndex);
 
         // Render the 'marketing/clients' view and pass the necessary data
-        res.render('marketing/clients', {
+        const viewsData = {
+            pageTitle: 'Marketing User - Clients',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/clients',
+            route: 'clients',
+            general_scripts: 'marketing/marketing_scripts',
             clients: paginatedClients,
             currentPage,
             totalPages,
             entriesPerPage,
-            searchQuery, // Pass the search query to update the search input on the client side
-            // ... other data
-        });
+            searchQuery,
+        };
+        res.render('dashboard', viewsData);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
     }
 }
+
+// newClientsController function
+async function newClientsController(req, res) {
+    var currentPage, totalPages, entriesPerPage, searchQuery
+        
+    // Render the dashboard view with data
+    const viewsData = {
+        pageTitle: 'Marketing User - New Client Form',
+        sidebar: 'marketing/marketing_sidebar',
+        content: 'marketing/new_client',
+        route: 'marketing_dashboard',
+        general_scripts: 'marketing/marketing_scripts',
+        currentPage,
+        totalPages,
+        entriesPerPage,
+        searchQuery,
+    };
+    res.render('dashboard', viewsData);
+}
+
+// newClientsController function
+async function updateClientsController(req, res) {
+    var currentPage, totalPages, entriesPerPage, searchQuery
+        
+    // Render the dashboard view with data
+    const viewsData = {
+        pageTitle: 'Marketing User - Update Client Form',
+        sidebar: 'marketing/marketing_sidebar',
+        content: 'marketing/new_client',
+        route: 'marketing_dashboard',
+        general_scripts: 'marketing/marketing_scripts',
+        currentPage,
+        totalPages,
+        entriesPerPage,
+        searchQuery,
+    };
+    res.render('dashboard', viewsData);
+}
+
+// controllers/clientsController.js
+const createClient = async (req, res) => {
+    try {
+        // Extracting data from the request body
+        const {
+            clientName,
+            address,
+            natureOfBusiness,
+            contactNumber,
+            billerName,
+            billerAddress,
+            billerContactPerson,
+            billerContactNumber,
+        } = req.body;
+
+        // Creating a new client
+        const newClient = await Client.create({
+            clientName,
+            address,
+            natureOfBusiness,
+            contactNumber,
+            billerName,
+            billerAddress,
+            billerContactPerson,
+            billerContactNumber,
+            clientId: generateClientId(), // You need to implement this function to generate a unique client ID
+        });
+
+        // Sending a success response
+        res.status(201).json({ message: 'Client created successfully', data: newClient });
+    } catch (error) {
+        // Handling errors
+        console.error('Error creating client:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// Function to generate a unique client ID (You need to implement this)
+const generateClientId = async () => {
+    try {
+        // Find the last created client
+        const lastClient = await Client.findOne({
+            order: [['clientId', 'DESC']], // Order by clientId in descending order
+        });
+
+        // Extract the counter from the last client's ID
+        const lastCounter = lastClient ? parseInt(lastClient.clientId.slice(-4), 10) : 0;
+
+        // Increment the counter
+        const counter = lastCounter + 1;
+
+        // Generate the new client ID
+        const currentYear = new Date().getFullYear();
+        const clientId = `C${currentYear}${counter.toString().padStart(4, '0')}`;
+
+        return clientId;
+    } catch (error) {
+        console.error('Error generating client ID:', error);
+        throw error; // Handle the error appropriately in your application
+    }
+};
 
 async function typeOfWasteController(req, res) {
     try {
@@ -105,15 +227,19 @@ async function typeOfWasteController(req, res) {
         const endIndex = currentPage * entriesPerPage;
         const paginatedTypesOfWaste = filteredTypesOfWaste.slice(startIndex, endIndex);
 
-        // Render the 'dashboard/type_of_waste' view and pass the necessary data
-        res.render('marketing/type_of_waste', {
+        const viewsData = {
+            pageTitle: 'Marketing User - Type of Waste',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/type_of_waste',
+            route: 'type_of_waste',
+            general_scripts: 'marketing/marketing_scripts',
             typesOfWaste: paginatedTypesOfWaste,
             currentPage,
             totalPages,
             entriesPerPage,
-            searchQuery, // Pass the search query to update the search input on the client side
-            // ... other data
-        });
+            searchQuery,
+        };
+        res.render('dashboard', viewsData);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -121,4 +247,4 @@ async function typeOfWasteController(req, res) {
 }
 
 
-module.exports = { dashboardController, bookedTransactionsController, clientsController, typeOfWasteController };
+module.exports = { dashboardController, bookedTransactionsController, clientsController, typeOfWasteController, newClientsController, updateClientsController, createClient };

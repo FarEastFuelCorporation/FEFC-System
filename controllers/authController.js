@@ -1,10 +1,14 @@
 // controllers/authController.js
 
+const Employee = require("../models/Employee");
 const User = require("../models/User");
 const bcrypt = require('bcrypt')
 
 async function getSignupController(req, res){
-    res.render('signup'); // Assuming you have a signup.ejs file in your views folder
+    const viewsData = {
+        pageTitle: 'Sign Up',
+    };
+    res.render('signup', viewsData); // Assuming you have a signup.ejs file in your views folder
 }
 
 // Example controller function for handling signup
@@ -17,7 +21,11 @@ async function postSignupController(req, res) {
 
         if (!existingEmployee) {
             // Employee ID is not valid, render the signup page with an error message
-            res.render('signup', { error: 'Invalid Employee ID' });
+            const viewsData = {
+                pageTitle: 'Sign Up',
+                error: 'Invalid Employee ID'
+            };
+            res.render('signup', viewsData);
             return;
         }
 
@@ -26,7 +34,11 @@ async function postSignupController(req, res) {
 
         if (existingUser) {
             // Employee is already registered, render the signup page with an error message
-            res.render('signup', { error: 'Employee is already registered' });
+            const viewsData = {
+                pageTitle: 'Sign Up',
+                error: 'Employee is already registered'
+            };
+            res.render('signup', viewsData);
         } else {
             // Hash the password before storing it in the database
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -46,7 +58,10 @@ async function postSignupController(req, res) {
 }
 
 async function getLoginController(req, res){
-    res.render('login'); // Assuming you have a login.ejs file in your views folder
+    const viewsData = {
+        pageTitle: 'Login',
+    };
+    res.render('login', viewsData); // Assuming you have a login.ejs file in your views folder
 }
 
 // Example controller function for handling login
@@ -65,7 +80,11 @@ async function postLoginController(req, res) {
             res.redirect(`/dashboard`);
         } else {
             // Display an error message for incorrect credentials
-            res.render('login', { error: 'Invalid employee ID or password' });
+            const viewsData = {
+                pageTitle: 'Login',
+                error: 'Invalid employee ID or password',
+            };
+            res.render('login', viewsData);
         }
     } catch (error) {
         console.error('Error:', error);

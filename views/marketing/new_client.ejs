@@ -1,0 +1,84 @@
+<!-- views/marketing/new_client.ejs -->
+
+<div class="content">
+    <div class="col-xs-12">
+        <!-- client_list -->
+        <section class="marketing" id="client_list_section">
+            <h4>CLIENTS</h4><br>
+            <div>
+                <label class="d-flex gap-3">
+                    <a href="/dashboard/clients/new">
+                        <button type="button" id="new_employee_button" class="form-control fw-bold bg-success text-white">
+                            <h6>NEW CLIENT FORM</h6>
+                        </button>
+                    </a>
+                    <a href="/dashboard/clients/update">
+                        <button type="button" id="update_record_button" class="form-control fw-bold bg-danger text-white">
+                            <h6>UPDATE CLIENT FORM</h6>
+                        </button>
+                    </a>
+                </label>
+            </div>
+            
+            <div id="new_client_form_tab">
+                <h5>NEW CLIENT FORM</h5><br>
+                <form>
+                    <label for="client_id">
+                        <i class="fa-solid fa-user"></i>
+                        Client ID
+                        </label><br>
+                    <input type="text" name="client_id" id="client_id" autocomplete="off" class="form-control form" required readonly><br>
+                    <label for="client_name">
+                        <i class="fa-solid fa-user"></i>
+                        Client
+                        </label><br>
+                    <input type="text" name="client_name" id="client_name" autocomplete="off" class="form-control" required placeholder="Input Client's Name..."><br>
+                    <label for="address">
+                        <i class="fa-solid fa-house-user"></i>
+                        Address
+                    </label><br>
+                    <input type="text" name="address" id="address" autocomplete="off" class="form-control" required placeholder="Input Client's Address..."><br>
+                    <label for="nature_of_business">
+                        <i class="fa-solid fa-table-list"></i>
+                        Nature of Business
+                    </label><br>
+                    <input type="text" name="nature_of_business" id="nature_of_business" autocomplete="off" class="form-control" required placeholder="Input Client's Nature of Business..."><br>
+                    <label for="contact_number">
+                        <i class="fa-solid fa-square-phone"></i>
+                        Contact Number
+                    </label><br>
+                    <input type="text" name="contact_number" id="contact_number" autocomplete="off" class="form-control" required placeholder="Input Client's Contact Number..."><br>
+                    <label for="biller_name">
+                        <i class="fa-solid fa-user"></i>
+                        Biller Name
+                        </label><br>
+                    <input type="text" name="biller_name" id="biller_name" autocomplete="off" class="form-control" required placeholder="Input Biller's Name..."><br>
+                    <label for="biller_address">
+                        <i class="fa-solid fa-house-user"></i>
+                        Biller Address
+                    </label><br>
+                    <input type="text" name="biller_address" id="biller_address" autocomplete="off" class="form-control" required placeholder="Input Biller's Address..."><br>
+                    <label for="biller_contact_person">
+                        <i class="fa-solid fa-square-phone"></i>
+                        Biller Contact Person
+                    </label><br>
+                    <input type="text" name="biller_contact_person" id="biller_contact_person" autocomplete="off" class="form-control" required placeholder="Input Biller's Contact Person..."><br>    
+                    <label for="biller_contact_number">
+                        <i class="fa-solid fa-square-phone"></i>
+                        Biller Contact Number
+                    </label><br>
+                    <input type="text" name="biller_contact_number" id="biller_contact_number" autocomplete="off" class="form-control" required placeholder="Input Biller's Contact Number..."><br>
+                    <div class="buttons">
+                        <button type="submit" id="submit_btn" class="form-control" >
+                            Submit
+                        </button>
+                        <button type="reset" id="reset" class="form-control" >
+                            Clear
+                        </button>
+                    </div>    
+                </form>
+            </div>
+            
+        </section>
+    </div>
+</div>

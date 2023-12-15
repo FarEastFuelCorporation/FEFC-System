@@ -85,7 +85,11 @@ app.get('/', (req, res) => {
     const username = req.session.username || 'Guest';
 
     // Render the 'home' view and pass the session data
-    res.render('home', { username });
+    const viewsData = {
+        pageTitle: 'FAR EAST FUEL CORPORATION',
+        username,
+    };
+    res.render('home', viewsData);
 });
 
 
