@@ -3,32 +3,32 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { dashboardController, bookedTransactionsController, clientsController, typeOfWasteController, newClientsController, updateClientsController, createClient } = require('../controllers/dashboardControllers');
+const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController } = require('../controllers/dashboardControllers');
 
 // Dashboard route
-router.get('/', isAuthenticated, dashboardController);
+router.get('/', isAuthenticated, getDashboardController);
 
 // Booked Transactions route
-router.get('/booked_transactions', bookedTransactionsController);
+router.get('/booked_transactions', getBookedTransactionsController);
 
 // Clients route
-router.get('/clients', clientsController);
+router.get('/clients', getClientsController);
 
 // New Client Form route
-router.get('/clients/new', newClientsController);
+router.get('/clients/new', getNewClientController);
 
-router.post('/clients/new', createClient);
+router.post('/clients/new', postNewClientController);
 
 // Clients route
-router.get('/clients/update', updateClientsController);
+router.get('/clients/update', getUpdateClientController);
+
+router.post('/clients/update', postUpdateClientController);
 
 // Type of Wastes route
-router.get('/type_of_waste', typeOfWasteController);
+router.get('/type_of_waste', getTypeOfWasteController);
 
 // Quotations route
-router.get('/quotations', (req, res) => {
-    res.render('quotations');
-});
+router.get('/quotations', getQuotationsController);
 
 // Commissions route
 router.get('/commissions', (req, res) => {

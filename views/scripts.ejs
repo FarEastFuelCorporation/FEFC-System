@@ -144,11 +144,11 @@
     function performSearch() {
         const searchInput = document.getElementById('searchInput');
         const searchQuery = searchInput.value.trim(); // Get the trimmed search query
-
+        const pageNumber = 1;
         const entriesPerPage = document.getElementById('showEntries').value;
 
         // Make an AJAX request to the server with the search query and current page
-        fetch(`/dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`, {
+        fetch(`/dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}&search=${searchQuery}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

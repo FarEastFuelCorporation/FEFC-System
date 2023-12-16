@@ -1,9 +1,23 @@
-<!-- views/marketing/type_of_waste.ejs -->
+<!-- views/marketing/quotations.ejs -->
 
 <div class="content">
     <div class="col-xs-12">
         <section>
-            <h4>TYPE OF WASTES</h4><br>
+            <h4>QUOTATIONS</h4><br>
+            <div>
+                <label class="d-flex gap-3">
+                    <a href="/dashboard/quotations/new">
+                        <button type="button" class="form-control fw-bold bg-success text-white">
+                            <h6>QUOTATION FORM</h6>
+                        </button>
+                    </a>
+                </label>
+            </div>
+            <% if (successMessage) { %>
+                <div class="alert alert-success" role="alert">
+                    <%= successMessage %>
+                </div>
+            <% } %>
             <div class="container-fluid">
                 <div class="table-container">
                     <!-- Table Header -->
@@ -18,7 +32,7 @@
                             </select>
                         </div>
                         <div class="form-group d-flex">
-                            <input type="text" class="form-control" placeholder="Search Type of Waste" id="searchInput" value="<%= searchQuery %>">
+                            <input type="text" class="form-control" placeholder="Search Quotations" id="searchInput" value="<%= searchQuery %>">
                             <button class="btn btn-primary" onclick="performSearch()">
                                 <h6>Search</h6>
                             </button>
@@ -28,27 +42,45 @@
                     <!-- Table -->
                     <table class="table table-bordered">
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>WASTE ID</th>
-                            <th>WASTE CODE</th>
-                            <th>WASTE NAME</th>
-                            <th>TREATMENT PROCESS</th>
-                            <th>CATEGORY</th>
-                        </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>CLIENT ID</th>
+                                <th>CLIENT</th>
+                                <th>ADDRESS</th>
+                                <th>NATURE OF BUSINESS</th>
+                                <th>CONTACT NUMBER</th>
+                                <th>BILLER NAME</th>
+                                <th>BILLER ADDRESS</th>
+                                <th>BILLER CONTACT PERSON</th>
+                                <th>BILLER CONTACT NUMBER</th>
+                                <th>UPDATE</th> <!-- New column for Update button -->
+                            </tr>
                         </thead>
                         <tbody>
-                        <% const startIndex = (currentPage - 1) * entriesPerPage; %>
-                        <% typesOfWaste.forEach((typeOfWaste, index) => { %>
-                            <tr>
-                                <td><%= startIndex + index + 1 %></td>
-                                <td><%= typeOfWaste.wasteId %></td>
-                                <td><%= typeOfWaste.wasteCode %></td>
-                                <td><%= typeOfWaste.wasteName %></td>
-                                <td><%= typeOfWaste.TreatmentProcess.treatmentProcess %></td>
-                                <td><%= typeOfWaste.category %></td>
-                            </tr>
-                        <% }); %>
+                            <% const startIndex = (currentPage - 1) * entriesPerPage; %>
+                            <% quotationsWastes.forEach((quotationsWaste, index) => { %>
+                                <tr>
+                                    <td><%= startIndex + index + 1 %></td>
+                                    <td><%= quotationsWaste.quotationCode %></td>
+                                    <td><%= quotationsWaste.Quotation.wasteId %></td>
+                                    <td><%= quotationsWaste.wasteName %></td>
+                                    <td><%= quotationsWaste.address %></td>
+                                    <td><%= quotationsWaste.natureOfBusiness %></td>
+                                    <td><%= quotationsWaste.contactNumber %></td>
+                                    <td><%= quotationsWaste.billerName %></td>
+                                    <td><%= quotationsWaste.billerAddress %></td>
+                                    <td><%= quotationsWaste.billerContactPerson %></td>
+                                    <td><%= quotationsWaste.billerContactNumber %></td>
+                                    <td>
+                                        <!-- Update button -->
+                                        <a href="/dashboard/quotations/update?quotationCode=<%= quotation.quotationCode %>">
+                                            <button type="button" class="btn btn-primary">
+                                                <h6>Update</h6>
+                                            </button>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
                         </tbody>
                     </table>
             

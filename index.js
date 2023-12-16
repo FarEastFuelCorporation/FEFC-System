@@ -13,6 +13,8 @@ const TreatmentProcess = require('./models/TreatmentProcess');
 const VehicleType = require('./models/VehicleType');
 const Vehicle = require('./models/Vehicle');
 const Quotation = require('./models/Quotation');
+const QuotationWaste = require('./models/QuotationWaste');
+const QuotationTransportation = require('./models/QuotationTransportation');
 
 const app = express();
 const port = 3000;

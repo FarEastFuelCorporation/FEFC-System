@@ -2,21 +2,22 @@
 
 <div class="content">
     <div class="col-xs-12">
-        <!-- client_list -->
-        <section class="marketing" id="client_list_section">
+        <section>
             <h4>CLIENTS</h4><br>
             <div>
                 <label class="d-flex gap-3">
                     <a href="/dashboard/clients/new">
-                        <button type="button" id="new_employee_button" class="form-control fw-bold bg-success text-white">
+                        <button type="button" class="form-control fw-bold bg-success text-white">
                             <h6>NEW CLIENT FORM</h6>
                         </button>
                     </a>
-                    <button type="button" id="update_record_button" class="form-control fw-bold bg-danger text-white">
-                        <h6>UPDATE CLIENT FORM</h6>
-                    </button>
                 </label>
             </div>
+            <% if (successMessage) { %>
+                <div class="alert alert-success" role="alert">
+                    <%= successMessage %>
+                </div>
+            <% } %>
             <div class="container-fluid">
                 <div class="table-container">
                     <!-- Table Header -->
@@ -32,43 +33,53 @@
                         </div>
                         <div class="form-group d-flex">
                             <input type="text" class="form-control" placeholder="Search Client" id="searchInput" value="<%= searchQuery %>">
-                            <button class="btn btn-primary" onclick="performSearch()">Search</button>
+                            <button class="btn btn-primary" onclick="performSearch()">
+                                <h6>Search</h6>
+                            </button>
                         </div>
                     </div>
             
                     <!-- Table -->
                     <table class="table table-bordered">
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>CLIENT ID</th>
-                            <th>CLIENT</th>
-                            <th>ADDRESS</th>
-                            <th>NATURE OF BUSINESS</th>
-                            <th>CONTACT NUMBER</th>
-                            <th>BILLER NAME</th>
-                            <th>BILLER ADDRESS</th>
-                            <th>BILLER CONTACT PERSON</th>
-                            <th>BILLER CONTACT NUMBER</th>
-                        </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>CLIENT ID</th>
+                                <th>CLIENT</th>
+                                <th>ADDRESS</th>
+                                <th>NATURE OF BUSINESS</th>
+                                <th>CONTACT NUMBER</th>
+                                <th>BILLER NAME</th>
+                                <th>BILLER ADDRESS</th>
+                                <th>BILLER CONTACT PERSON</th>
+                                <th>BILLER CONTACT NUMBER</th>
+                                <th>UPDATE</th> <!-- New column for Update button -->
+                            </tr>
                         </thead>
                         <tbody>
-                        <% const startIndex = (currentPage - 1) * entriesPerPage; %>
-                        <% clients.forEach((client, index) => { %>
-                            <tr>
-                                <td><%= startIndex + index + 1 %></td>
-                                <td><%= client.clientId %></td>
-                                <td><%= client.clientName %></td>
-                                <td><%= client.address %></td>
-                                <td><%= client.natureOfBusiness %></td>
-                                <td><%= client.contactNumber %></td>
-                                <td><%= client.billerName %></td>
-                                <td><%= client.billerAddress %></td>
-                                <td><%= client.billerContactPerson %></td>
-                                <td><%= client.billerContactNumber %></td>
-                                <!-- Add more cells for other fields -->
-                            </tr>
-                        <% }); %>
+                            <% const startIndex = (currentPage - 1) * entriesPerPage; %>
+                            <% clients.forEach((client, index) => { %>
+                                <tr>
+                                    <td><%= startIndex + index + 1 %></td>
+                                    <td><%= client.clientId %></td>
+                                    <td><%= client.clientName %></td>
+                                    <td><%= client.address %></td>
+                                    <td><%= client.natureOfBusiness %></td>
+                                    <td><%= client.contactNumber %></td>
+                                    <td><%= client.billerName %></td>
+                                    <td><%= client.billerAddress %></td>
+                                    <td><%= client.billerContactPerson %></td>
+                                    <td><%= client.billerContactNumber %></td>
+                                    <td>
+                                        <!-- Update button -->
+                                        <a href="/dashboard/clients/update?clientId=<%= client.clientId %>">
+                                            <button type="button" class="btn btn-primary">
+                                                <h6>Update</h6>
+                                            </button>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
                         </tbody>
                     </table>
             
