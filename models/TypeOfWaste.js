@@ -15,7 +15,7 @@ const TypeOfWaste = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        wasteName: {
+        wasteDescription: {
             type: DataTypes.STRING,
             allowNull: false,
         },

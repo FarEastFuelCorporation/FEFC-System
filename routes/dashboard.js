@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController } = require('../controllers/dashboardControllers');
+const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController } = require('../controllers/dashboardControllers');
 
 // Dashboard route
 router.get('/', isAuthenticated, getDashboardController);
@@ -29,6 +29,9 @@ router.get('/type_of_waste', getTypeOfWasteController);
 
 // Quotations route
 router.get('/quotations', getQuotationsController);
+
+// New Client Form route
+router.get('/quotations/new', getNewQuotationController);
 
 // Commissions route
 router.get('/commissions', (req, res) => {

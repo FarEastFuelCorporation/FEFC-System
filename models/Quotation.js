@@ -2,7 +2,6 @@
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/config');
-const Client = require('./Client'); // Import the Client model
 
 const Quotation = sequelize.define(
     'Quotation',
@@ -49,8 +48,5 @@ const Quotation = sequelize.define(
         },
     },
 );
-
-// Define the association between Quotation and Client
-Quotation.belongsTo(Client, { foreignKey: 'clientId', targetKey: 'clientId' });
 
 module.exports = Quotation;

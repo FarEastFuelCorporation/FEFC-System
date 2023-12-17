@@ -2,7 +2,6 @@
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/config');
-const VehicleType = require('./VehicleType');
 
 const Vehicle = sequelize.define(
     'Vehicle', {
@@ -39,8 +38,5 @@ const Vehicle = sequelize.define(
         },
     },
 );
-
-// Define associations
-Vehicle.belongsTo(VehicleType, { foreignKey: 'vehicleId', targetKey: 'vehicleId' });
 
 module.exports = Vehicle;

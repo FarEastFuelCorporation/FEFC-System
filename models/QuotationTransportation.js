@@ -1,7 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/config');
-const VehicleType = require('./VehicleType');
-const Quotation = require('./Quotation');
 
 const QuotationTransportation = sequelize.define(
     'QuotationTransportation', {
@@ -57,9 +55,5 @@ const QuotationTransportation = sequelize.define(
         },
     },
 );
-
-// Define associations
-QuotationTransportation.belongsTo(Quotation, { foreignKey: 'quotationCode', targetKey: 'quotationCode' });
-QuotationTransportation.belongsTo(VehicleType, { foreignKey: 'vehicleId', targetKey: 'vehicleId' });
 
 module.exports = QuotationTransportation;

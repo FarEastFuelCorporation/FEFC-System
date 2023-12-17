@@ -263,8 +263,9 @@ body {
     top: 0 !important;
 }
 
-button {
+button h6{
     width: fit-content !important;
+    font-size: 12px !important;
 }
 
 
@@ -298,4 +299,8 @@ th, td {
 th {
     vertical-align: middle;
     text-align: center !important;
+}
+
+.form-control {
+    border: 1px solid black !important;
 }

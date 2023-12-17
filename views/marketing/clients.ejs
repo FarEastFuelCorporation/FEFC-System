@@ -33,7 +33,7 @@
                         </div>
                         <div class="form-group d-flex">
                             <input type="text" class="form-control" placeholder="Search Client" id="searchInput" value="<%= searchQuery %>">
-                            <button class="btn btn-primary" onclick="performSearch()">
+                            <button class="btn btn-success" onclick="performSearch()">
                                 <h6>Search</h6>
                             </button>
                         </div>
@@ -53,7 +53,7 @@
                                 <th>BILLER ADDRESS</th>
                                 <th>BILLER CONTACT PERSON</th>
                                 <th>BILLER CONTACT NUMBER</th>
-                                <th>UPDATE</th> <!-- New column for Update button -->
+                                <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,7 +73,7 @@
                                     <td>
                                         <!-- Update button -->
                                         <a href="/dashboard/clients/update?clientId=<%= client.clientId %>">
-                                            <button type="button" class="btn btn-primary">
+                                            <button type="button" class="btn btn-success">
                                                 <h6>Update</h6>
                                             </button>
                                         </a>
@@ -95,13 +95,13 @@
                                     </li>
                                 <% } %>
                                 <% for (let i = 1; i <= totalPages; i++) { %>
-                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                        <a class="page-link" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
+                                    <li class="page-item <%= i === currentPage ? 'custom-active' : 'custom-non-active' %>">
+                                        <a class="page-link <%= i === currentPage ? 'bg-success text-white border-success' : 'text-success' %>" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
                                     </li>
                                 <% } %>
                                 <% if (currentPage < totalPages) { %>
                                     <li class="page-item">
-                                        <a class="page-link" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
+                                        <a class="page-link text-success" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>

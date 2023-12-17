@@ -3,9 +3,12 @@
 const Client = require("../models/Client");
 const Employee = require("../models/Employee");
 const Quotation = require("../models/Quotation");
+const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const TreatmentProcess = require("../models/TreatmentProcess");
 const TypeOfWaste = require("../models/TypeOfWaste");
+const User = require("../models/User");
+const VehicleType = require("../models/VehicleType");
 
 // Dashboard controller
 async function getDashboardController(req, res) {
@@ -288,8 +291,7 @@ async function getTypeOfWasteController(req, res) {
         const filteredTypesOfWaste = typesOfWaste.filter(typeOfWaste => {
             // Customize this logic based on how you want to perform the search
             return (
-                typeOfWaste.wasteCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                typeOfWaste.wasteName.toLowerCase().includes(searchQuery.toLowerCase())
+                typeOfWaste.wasteDescription.toLowerCase().includes(searchQuery.toLowerCase())
                 // Add more fields if needed
             );
         });
@@ -325,11 +327,12 @@ async function getTypeOfWasteController(req, res) {
 // Quotations controller
 async function getQuotationsController(req, res) {
     try {
-        // Fetch all types of wastes from the database
-        const quotationWastes = await QuotationWaste.findAll({
+        // Fetch all quotations from the database
+        const quotations = await Quotation.findAll({
             include: [
-                { model: Quotation, as: 'Quotation' },
-                { model: TypeOfWaste, as: 'TypeOfWaste' },
+                { model: Client, as: 'Client' },
+                { model: QuotationWaste, as: 'QuotationWaste' },
+                { model: QuotationTransportation, as: 'QuotationTransportation', include: [{ model: VehicleType, as: 'VehicleType' }] },
             ],
         });
 
@@ -339,22 +342,23 @@ async function getQuotationsController(req, res) {
         const searchQuery = req.query.search || ''; // Default to an empty string if no search query
 
         // Additional logic to filter types of waste based on the search query
-        const filteredQuotationWastes = quotationWastes.filter(quotationWaste => {
+        const filteredQuotations = quotations.filter(quotation => {
             // Customize this logic based on how you want to perform the search
+            const clientName = quotation.Client.clientName;
             return (
-                quotationWaste.wasteName.toLowerCase().includes(searchQuery.toLowerCase())
+                clientName.toLowerCase().includes(searchQuery.toLowerCase())
                 // Add more fields if needed
             );
         });
 
         // Calculate total pages based on the total number of filtered types of waste and entries per page
-        const totalFilteredQuotationWastes = filteredQuotationWastes.length;
-        const totalPages = Math.ceil(totalFilteredQuotationWastes / entriesPerPage);
+        const totalFilteredQuotations = filteredQuotations.length;
+        const totalPages = Math.ceil(totalFilteredQuotations / entriesPerPage);
 
         // Implement pagination and send the filtered types of waste to the view
         const startIndex = (currentPage - 1) * entriesPerPage;
         const endIndex = currentPage * entriesPerPage;
-        const paginatedQuotationWastes = filteredQuotationWastes.slice(startIndex, endIndex);
+        const paginatedQuotations = filteredQuotations.slice(startIndex, endIndex);
 
         // Check for the success query parameter
         let successMessage;
@@ -370,7 +374,7 @@ async function getQuotationsController(req, res) {
             content: 'marketing/quotations',
             route: 'quotations',
             general_scripts: 'marketing/marketing_scripts',
-            quotationsWastes: paginatedQuotationWastes,
+            quotations: paginatedQuotations,
             currentPage,
             totalPages,
             entriesPerPage,
@@ -384,5 +388,28 @@ async function getQuotationsController(req, res) {
     }
 }
 
+// New Quotation controller
+async function getNewQuotationController(req, res) {
+    var currentPage, totalPages, entriesPerPage, searchQuery
+    const employeeId = req.session.employeeId;
 
-module.exports = { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController };
+    const employee = await Employee.findOne({ where: { employeeId } });
+        
+    // Render the dashboard view with data
+    const viewsData = {
+        pageTitle: 'Marketing User - New Quotation Form',
+        sidebar: 'marketing/marketing_sidebar',
+        content: 'marketing/new_quotation',
+        route: 'marketing_dashboard',
+        general_scripts: 'marketing/marketing_scripts',
+        currentPage,
+        totalPages,
+        entriesPerPage,
+        searchQuery,
+        employee,
+    };
+    res.render('dashboard', viewsData);
+}
+
+
+module.exports = { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController };

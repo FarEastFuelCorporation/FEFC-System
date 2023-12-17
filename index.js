@@ -2,19 +2,11 @@
 
 const express = require('express');
 const session = require('express-session');
-const path = require('path');  // Import the 'path' module
+require('events').EventEmitter.defaultMaxListeners = 15;
+require('./utils/associations');
+const path = require('path');
 const bodyParser = require('body-parser');
-const sequelize = require('./config/config'); // Adjust the path based on your project structure
-const Employee = require('./models/Employee');
-const User = require('./models/User');
-const Client = require('./models/Client');
-const TypeOfWaste = require('./models/TypeOfWaste');
-const TreatmentProcess = require('./models/TreatmentProcess');
-const VehicleType = require('./models/VehicleType');
-const Vehicle = require('./models/Vehicle');
-const Quotation = require('./models/Quotation');
-const QuotationWaste = require('./models/QuotationWaste');
-const QuotationTransportation = require('./models/QuotationTransportation');
+const sequelize = require('./config/config');
 
 const app = express();
 const port = 3000;
@@ -47,19 +39,20 @@ app.use(session({
     },
 }));
 
-
 // Define a simple function to initialize the application
 async function initializeApp() {
     try {
-        // Sync the models with the database (this will create tables if they don't exist)
+        console.log('Syncing models to the database...');
         await sequelize.sync();
+        console.log('Models synced successfully.');
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error syncing models:', error);
     }
 }
 
 // Call the function to initialize the application
 initializeApp();
+
 
 // Middleware to check authentication
 const { isAuthenticated } = require('./middlewares/auth');

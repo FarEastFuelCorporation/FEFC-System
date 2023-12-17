@@ -256,9 +256,10 @@ body {
   top: 0 !important;
 }
 
-button {
+button h6 {
   width: -moz-fit-content !important;
   width: fit-content !important;
+  font-size: 12px !important;
 }
 
 .table-container {
@@ -291,4 +292,8 @@ th, td {
 th {
   vertical-align: middle;
   text-align: center !important;
+}
+
+.form-control {
+  border: 1px solid black !important;
 }/*# sourceMappingURL=main.css.map */

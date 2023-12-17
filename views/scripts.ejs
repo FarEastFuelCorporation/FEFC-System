@@ -27,7 +27,6 @@
         const activeLink = document.getElementById(currentRoute);
         if (activeLink) {
             activeLink.classList.add('active');
-            console.log(activeLink)
         }
     }
 
@@ -114,9 +113,9 @@
         .then(response => response.text())
         .then(data => {
             // Update the content of the container with the new data
-            const clientListSection = document.getElementById('client_list_section');
-            if (clientListSection) {
-                clientListSection.innerHTML = data;
+            const section = document.querySelector('section');
+            if (section) {
+                section.innerHTML = data;
 
                 document.querySelector('.content').style.marginLeft = '0';
                 document.querySelector('.content').style.width = '100%';
@@ -157,9 +156,9 @@
         .then(response => response.text())
         .then(data => {
             // Update the content of the container with the new data
-            const clientListSection = document.getElementById('client_list_section');
-            if (clientListSection) {
-                clientListSection.innerHTML = data;
+            const section = document.querySelector('section');
+            if (section) {
+                section.innerHTML = data;
 
                 document.querySelector('.content').style.marginLeft = '0';
                 document.querySelector('.content').style.width = '100%';

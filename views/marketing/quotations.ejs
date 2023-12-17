@@ -32,8 +32,8 @@
                             </select>
                         </div>
                         <div class="form-group d-flex">
-                            <input type="text" class="form-control" placeholder="Search Quotations" id="searchInput" value="<%= searchQuery %>">
-                            <button class="btn btn-primary" onclick="performSearch()">
+                            <input type="text" class="form-control" placeholder="Search Client" id="searchInput" value="<%= searchQuery %>">
+                            <button class="btn btn-success" onclick="performSearch()">
                                 <h6>Search</h6>
                             </button>
                         </div>
@@ -44,38 +44,35 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>CLIENT ID</th>
+                                <th>QUOTATION<br>CODE</th>
+                                <th>VALIDITY</th>
                                 <th>CLIENT</th>
-                                <th>ADDRESS</th>
-                                <th>NATURE OF BUSINESS</th>
-                                <th>CONTACT NUMBER</th>
-                                <th>BILLER NAME</th>
-                                <th>BILLER ADDRESS</th>
-                                <th>BILLER CONTACT PERSON</th>
-                                <th>BILLER CONTACT NUMBER</th>
-                                <th>UPDATE</th> <!-- New column for Update button -->
+                                <th>TERMS CHARGE</th>
+                                <th>TERMS BUYING</th>
+                                <th>SCOPE OF WORK</th>
+                                <th>REMARKS</th>
+                                <th>SUBMITTED BY</th>
+                                <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% const startIndex = (currentPage - 1) * entriesPerPage; %>
-                            <% quotationsWastes.forEach((quotationsWaste, index) => { %>
+                            <% quotations.forEach((quotation, index) => { %>
                                 <tr>
                                     <td><%= startIndex + index + 1 %></td>
-                                    <td><%= quotationsWaste.quotationCode %></td>
-                                    <td><%= quotationsWaste.Quotation.wasteId %></td>
-                                    <td><%= quotationsWaste.wasteName %></td>
-                                    <td><%= quotationsWaste.address %></td>
-                                    <td><%= quotationsWaste.natureOfBusiness %></td>
-                                    <td><%= quotationsWaste.contactNumber %></td>
-                                    <td><%= quotationsWaste.billerName %></td>
-                                    <td><%= quotationsWaste.billerAddress %></td>
-                                    <td><%= quotationsWaste.billerContactPerson %></td>
-                                    <td><%= quotationsWaste.billerContactNumber %></td>
+                                    <td><%= quotation.quotationCode %></td>
+                                    <td><%= new Date(quotation.validity).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></td>
+                                    <td><%= quotation.Client.clientName %></td>
+                                    <td><%= quotation.termsCharge %></td>
+                                    <td><%= quotation.termsBuying %></td>
+                                    <td><%= quotation.scopeOfWork %></td>
+                                    <td><%= quotation.remarks %></td>
+                                    <td><%= quotation.submittedBy %></td>
                                     <td>
                                         <!-- Update button -->
                                         <a href="/dashboard/quotations/update?quotationCode=<%= quotation.quotationCode %>">
-                                            <button type="button" class="btn btn-primary">
-                                                <h6>Update</h6>
+                                            <button type="button" class="btn btn-success">
+                                                <h6>View</h6>
                                             </button>
                                         </a>
                                     </td>
@@ -96,13 +93,13 @@
                                     </li>
                                 <% } %>
                                 <% for (let i = 1; i <= totalPages; i++) { %>
-                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                        <a class="page-link" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
+                                    <li class="page-item <%= i === currentPage ? 'custom-active' : 'custom-non-active' %>">
+                                        <a class="page-link <%= i === currentPage ? 'bg-success text-white border-success' : 'text-success' %>" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
                                     </li>
                                 <% } %>
                                 <% if (currentPage < totalPages) { %>
                                     <li class="page-item">
-                                        <a class="page-link" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
+                                        <a class="page-link text-success" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>
