@@ -7,6 +7,8 @@ require('./utils/associations');
 const path = require('path');
 const bodyParser = require('body-parser');
 const sequelize = require('./config/config');
+const qr = require('qr-image');
+const puppeteer = require('puppeteer');
 
 const app = express();
 const port = 3000;
@@ -85,6 +87,37 @@ app.get('/', (req, res) => {
         username,
     };
     res.render('home', viewsData);
+});
+
+app.use(express.json()); // Middleware to parse JSON request bodies
+
+app.post('/generate-image', async (req, res) => {
+  try {
+    const htmlContent = req.body.htmlContent;
+
+    // Use puppeteer to convert HTML content to a Data URL
+    const browser = await puppeteer.launch({
+      headless: 'new', // Opt into the new headless mode
+    });
+    const page = await browser.newPage();
+    await page.setContent(htmlContent);
+
+    // Get the HTML content as Data URL
+    const dataUrl = await page.evaluate(() => {
+      return new Promise((resolve) => {
+        resolve(document.documentElement.outerHTML);
+      });
+    });
+
+    // Close the browser
+    await browser.close();
+
+    // Send the Data URL as the response
+    res.json({ dataUrl });
+  } catch (error) {
+    console.error('Error generating image:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 

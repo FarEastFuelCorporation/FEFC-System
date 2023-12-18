@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController } = require('../controllers/dashboardControllers');
+const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails } = require('../controllers/dashboardControllers');
 
 // Dashboard route
 router.get('/', isAuthenticated, getDashboardController);
@@ -13,6 +13,8 @@ router.get('/booked_transactions', getBookedTransactionsController);
 
 // Clients route
 router.get('/clients', getClientsController);
+
+router.get('/clients/:clientId', getClientDetails);
 
 // New Client Form route
 router.get('/clients/new', getNewClientController);

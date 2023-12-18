@@ -192,6 +192,29 @@ async function generateClientId(req, res) {
     }
 };
 
+async function getClientDetails (req, res) {
+    try {
+        const clientId = req.params.clientId;
+
+        // Find the client by ID
+        const client = await Client.findOne({
+            where: {
+            clientId: clientId,
+            },
+        });
+
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+
+        // Respond with client details
+        return res.status(200).json(client);
+    } catch (error) {
+        console.error('Error fetching client details:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 // Update Client controller
 async function getUpdateClientController(req, res) {
     var currentPage, totalPages, entriesPerPage, searchQuery
@@ -394,6 +417,33 @@ async function getNewQuotationController(req, res) {
     const employeeId = req.session.employeeId;
 
     const employee = await Employee.findOne({ where: { employeeId } });
+    const typesOfWastes = await TypeOfWaste.findAll();
+    const clients = await Client.findAll();
+    const vehicleTypes = await VehicleType.findAll();
+
+    // Function to convert a string to proper case
+    function toProperCase(str) {
+        return str.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
+
+    // Apply the function to the employee's first and last names
+    const employeeName = `${toProperCase(employee.firstName)} ${toProperCase(employee.lastName)}`;
+
+    // Sorting the clients array by clientName
+    clients.sort((clientA, clientB) => {
+        const nameA = clientA.clientName.toUpperCase(); // Convert names to uppercase for case-insensitive sorting
+        const nameB = clientB.clientName.toUpperCase();
+
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+        return 0; // Names are equal
+    });
         
     // Render the dashboard view with data
     const viewsData = {
@@ -406,10 +456,13 @@ async function getNewQuotationController(req, res) {
         totalPages,
         entriesPerPage,
         searchQuery,
-        employee,
+        employeeName,
+        typesOfWastes,
+        clients,
+        vehicleTypes,
     };
     res.render('dashboard', viewsData);
 }
 
 
-module.exports = { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController };
+module.exports = { getDashboardController, getBookedTransactionsController, getClientsController, getClientDetails, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController };

@@ -170,6 +170,28 @@
         });
     }
 
+    function formatNumber(amount) {
+        // Use toLocaleString to add commas as separators for thousands
+        // and toFixed(2) to ensure two decimal places
+        return parseFloat(amount).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 
+        });
+    }
+
+    // Date and Time Decoder
+    function date_decoder(utcTime) {
+        var utcDate = new Date(utcTime);
+        var options = {
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        };
+        var utcPlus8Time = utcDate.toLocaleString('en-US', options);
+        
+        return utcPlus8Time;
+    }
+
 </script>
 </body>
 </html>
