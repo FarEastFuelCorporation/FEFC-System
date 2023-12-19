@@ -8,10 +8,7 @@
     "start": "node index.js"
   },
   "author": "",
-  "license": "ISC",  
-  "engines": {
-    "node": "14.x"
-  },
+  "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
