@@ -110,6 +110,30 @@ async function getClientsController(req, res) {
     }
 }
 
+async function getClientDetails (req, res) {
+    try {
+        const clientId = req.params.clientId;
+
+        // Find the client by ID
+        const client = await Client.findOne({
+            where: {
+            clientId: clientId,
+            },
+        });
+
+        if (!client) {
+            return res.status(404).json({ error: 'Client not found' });
+        }
+
+        // Respond with client details
+        return res.status(200).json(client);
+    } catch (error) {
+        console.error('Error fetching client details:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+
 // New Client controller
 async function getNewClientController(req, res) {
     var currentPage, totalPages, entriesPerPage, searchQuery
@@ -191,29 +215,6 @@ async function generateClientId(req, res) {
         return null; // or throw a different error or provide a default value
     }
 };
-
-async function getClientDetails (req, res) {
-    try {
-        const clientId = req.params.clientId;
-
-        // Find the client by ID
-        const client = await Client.findOne({
-            where: {
-            clientId: clientId,
-            },
-        });
-
-        if (!client) {
-            return res.status(404).json({ error: 'Client not found' });
-        }
-
-        // Respond with client details
-        return res.status(200).json(client);
-    } catch (error) {
-        console.error('Error fetching client details:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-}
 
 // Update Client controller
 async function getUpdateClientController(req, res) {

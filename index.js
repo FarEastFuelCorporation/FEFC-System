@@ -1,5 +1,6 @@
 // index.js
 
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 require('events').EventEmitter.defaultMaxListeners = 15;
@@ -11,7 +12,7 @@ const qr = require('qr-image');
 const puppeteer = require('puppeteer');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 // Set up EJS as the view engine
 app.set('view engine', 'ejs');
