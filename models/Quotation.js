@@ -35,6 +35,7 @@ const Quotation = sequelize.define(
         },
         submittedBy: {
             type: DataTypes.STRING,
+            allowNull: false,
         },
         createdAt: {
             type: DataTypes.DATE,

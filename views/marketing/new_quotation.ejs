@@ -7,8 +7,9 @@
             <h4>QUOTATIONS</h4><br>
             <div id="new_client_form_tab">
                 <h5>NEW QUOTATION FORM</h5><br>
-                <form  action="https://script.google.com/macros/s/AKfycbwTLM-nBKAsa_oRJrwGhfP8LQXohvfbOYN4SXr8Tv7lzvFn2LEl_SpFRgJmmRWW5MX9MQ/exec" method="post">
+                <form  action="/dashboard/quotations/new" method="post">
                     <input type="hidden" name="user" id="user" value="<%= employeeName %>">
+                    <input type="hidden" name="userId" id="userId" value="<%= employeeId %>">
                     <h6>QUOTATION DETAILS</h6>
                     <div style="display: flex; gap: 20px;">
                         <div>
@@ -207,16 +208,16 @@
                                     <select name="type_of_vehicle1" id="type_of_vehicle1" class="form-control" required>
                                         <option value="" disabled selected>Select Type of Vehicle</option>
                                         <% vehicleTypes.forEach(vehicleType => { %>
-                                            <option value="<%= vehicleType.typeOfVehicle %>"><%= vehicleType.typeOfVehicle %></option>
+                                            <option value="<%= vehicleType.vehicleId %>"><%= vehicleType.typeOfVehicle %></option>
                                         <% }); %>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="transportation_fee1">
+                                    <label for="hauling_area1">
                                         <i class="fa-solid fa-list"></i>
                                         Area of Hauling
                                     </label><br>
-                                    <input type="text" name="transportation_fee1" id="transportation_fee1" autocomplete="off" class="form-control" required placeholder="Type Area of Hauling...">
+                                    <input type="text" name="hauling_area1" id="hauling_area1" autocomplete="off" class="form-control" required placeholder="Type Area of Hauling...">
                                 </div>
                                 <div>
                                     <label for="tf_mode1">
@@ -878,7 +879,7 @@
 
         newItem.querySelectorAll('[id^="unit_price"]').forEach((element) => {
             element.id = element.id.replace(/(\d+)/, itemIndex);
-            element.value = "";
+            element.value = "0";
         });
 
         newItem.querySelectorAll('[name^="unit_price"]').forEach((element) => {
@@ -891,6 +892,15 @@
         });
 
         newItem.querySelectorAll('[name^="vat_calculation"]').forEach((element) => {
+            element.name = element.name.replace(/(\d+)/, itemIndex);
+        });
+
+        newItem.querySelectorAll('[id^="fix_price"]').forEach((element) => {
+            element.id = element.id.replace(/(\d+)/, itemIndex);
+            element.value = "0";
+        });
+
+        newItem.querySelectorAll('[name^="fix_price"]').forEach((element) => {
             element.name = element.name.replace(/(\d+)/, itemIndex);
         });
 
@@ -948,12 +958,12 @@
             element.name = element.name.replace(/(\d+)/, tfItemIndex);
         });
 
-        newTFItem.querySelectorAll('[id^="transportation_fee"]').forEach((element) => {
+        newTFItem.querySelectorAll('[id^="hauling_area"]').forEach((element) => {
             element.id = element.id.replace(/(\d+)/, tfItemIndex);
             element.value = "";
         });
 
-        newTFItem.querySelectorAll('[name^="transportation_fee"]').forEach((element) => {
+        newTFItem.querySelectorAll('[name^="hauling_area"]').forEach((element) => {
             element.name = element.name.replace(/(\d+)/, tfItemIndex);
         });
 
@@ -977,7 +987,7 @@
 
         newTFItem.querySelectorAll('[id^="tf_unit_price"]').forEach((element) => {
             element.id = element.id.replace(/(\d+)/, tfItemIndex);
-            element.value = "";
+            element.value = "0";
         });
 
         newTFItem.querySelectorAll('[name^="tf_unit_price"]').forEach((element) => {
@@ -995,7 +1005,7 @@
 
         newTFItem.querySelectorAll('[id^="max_capacity"]').forEach((element) => {
             element.id = element.id.replace(/(\d+)/, tfItemIndex);
-            element.value = "";
+            element.value = "0";
         });
 
         newTFItem.querySelectorAll('[name^="max_capacity"]').forEach((element) => {
@@ -1105,7 +1115,7 @@
             counter++;
             // Get values from form fields for each item
             var type_of_vehicle = document.getElementById('type_of_vehicle' + i).value;
-            var transportationFee = document.getElementById('transportation_fee' + i).value;
+            var hauling_area = document.getElementById('hauling_area' + i).value;
             var mode = document.getElementById('tf_mode' + i).value;
             var unit = document.getElementById('tf_unit' + i).value;
             var unitPrice = document.getElementById('tf_unit_price' + i).value;
@@ -1115,7 +1125,7 @@
             var tfNewRowHtml = `
                 <tr>
                     <td>${counter}</td>
-                    <td>${type_of_vehicle} - ${transportationFee.toUpperCase()}</td>
+                    <td>${type_of_vehicle} - ${hauling_area.toUpperCase()}</td>
                     <td>Per</td>
                     <td>${unit}</td>
                     <td style="justify-content: right !important; padding-right: 5px !important">${formatNumber(unitPrice)}</td>
@@ -1188,9 +1198,9 @@
             console.error('Error fetching client details:', error);
             throw error; // Re-throw the error to handle it in the calling code if needed
         });
-}
+    }
 </script>
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function () {
   // Event listener for the "Generate Image" button
   document.getElementById('generate_image_button').addEventListener('click', function () {
@@ -1237,4 +1247,4 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-</script>
+</script> -->

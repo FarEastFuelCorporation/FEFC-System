@@ -67,7 +67,7 @@
                                     <td><%= quotation.termsBuying %></td>
                                     <td><%= quotation.scopeOfWork %></td>
                                     <td><%= quotation.remarks %></td>
-                                    <td><%= quotation.submittedBy %></td>
+                                    <td><%= quotation.Employee.firstName %> <%= quotation.Employee.lastName %></td>
                                     <td>
                                         <!-- Update button -->
                                         <a href="/dashboard/quotations/update?quotationCode=<%= quotation.quotationCode %>">

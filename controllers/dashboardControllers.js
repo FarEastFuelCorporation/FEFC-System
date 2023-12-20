@@ -153,7 +153,6 @@ async function getNewClientController(req, res) {
     res.render('dashboard', viewsData);
 }
 
-// 
 async function postNewClientController(req, res) {
     try {
         // Extracting data from the request body
@@ -355,8 +354,7 @@ async function getQuotationsController(req, res) {
         const quotations = await Quotation.findAll({
             include: [
                 { model: Client, as: 'Client' },
-                { model: QuotationWaste, as: 'QuotationWaste' },
-                { model: QuotationTransportation, as: 'QuotationTransportation', include: [{ model: VehicleType, as: 'VehicleType' }] },
+                { model: Employee, as: 'Employee' },
             ],
         });
 
@@ -387,9 +385,9 @@ async function getQuotationsController(req, res) {
         // Check for the success query parameter
         let successMessage;
         if(req.query.success === 'new'){
-            successMessage = 'Client created successfully!';
+            successMessage = 'Quotation created successfully!';
         } else if (req.query.success === 'update'){
-            successMessage = 'Client updated successfully!';
+            successMessage = 'Quotation updated successfully!';
         }
 
         const viewsData = {
@@ -458,12 +456,110 @@ async function getNewQuotationController(req, res) {
         entriesPerPage,
         searchQuery,
         employeeName,
+        employeeId,
         typesOfWastes,
         clients,
         vehicleTypes,
     };
     res.render('dashboard', viewsData);
 }
+async function postNewQuotationController(req, res) {
+    try {
+        const {
+            userId,
+            quotation_no,
+            revision_no,
+            validity,
+            terms,
+            terms2,
+            client,
+            scope_of_work,
+            remarks,
+            list_counter,
+            tf_counter,
+        } = req.body;
+
+        // Creating a new Quotation
+        const newQuotation = await Quotation.create({
+            quotationCode: quotation_no,
+            revisionNumber: revision_no,
+            validity: validity,
+            clientId: client,
+            termsCharge: terms,
+            termsBuying: terms2,
+            scopeOfWork: scope_of_work,
+            remarks: remarks,
+            submittedBy: userId,
+        });
+        
+        // Process dynamic fields
+        for (let i = 1; i <= list_counter; i++) {
+            const waste_code =  req.body[`waste_code${i}`];
+            const waste_name =  req.body[`waste_name${i}`];
+            const mode =  req.body[`mode${i}`];
+            const unit =  req.body[`unit${i}`];
+            const unit_price =  req.body[`unit_price${i}`];
+            const vat_calculation =  req.body[`vat_calculation${i}`];
+            const fix_price =  req.body[`fix_price${i}`];
+
+            // Creating a new QuotationWaste
+            const newQuotationWaste = await QuotationWaste.create({
+                quotationCode: quotation_no,
+                wasteId: waste_code,
+                wasteName: waste_name,
+                mode: mode,
+                unit: unit,
+                unitPrice: unit_price,
+                vatCalculation: vat_calculation,
+                maxCapacity: fix_price,
+            });
+        }
+    
+        // Process dynamic transportation fields
+        for (let i = 1; i <= tf_counter; i++) {
+            const type_of_vehicle =  req.body[`type_of_vehicle${i}`];
+            const hauling_area =  req.body[`hauling_area${i}`];
+            const tf_mode =  req.body[`tf_mode${i}`];
+            const tf_unit =  req.body[`tf_unit${i}`];
+            const tf_unit_price =  req.body[`tf_unit_price${i}`];
+            const tf_vat_calculation =  req.body[`tf_vat_calculation${i}`];
+            const max_capacity =  req.body[`max_capacity${i}`];
+
+            // Creating a new QuotationTransportation
+            const newQuotationTransportation = await QuotationTransportation.create({
+                quotationCode: quotation_no,
+                vehicleId: type_of_vehicle,
+                haulingArea: hauling_area,
+                mode: tf_mode,
+                unit: tf_unit,
+                unitPrice: tf_unit_price,
+                vatCalculation: tf_vat_calculation,
+                maxCapacity: max_capacity,
+            });
+        }
+
+        // Redirect back to the quotation route with a success message
+        res.redirect('/dashboard/quotations?success=new');
+    } catch (error) {
+        // Handling errors
+        console.error('Error creating quotation:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 
-module.exports = { getDashboardController, getBookedTransactionsController, getClientsController, getClientDetails, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController };
+
+module.exports = { 
+    getDashboardController,
+    getBookedTransactionsController,
+    getClientsController,
+    getClientDetails,
+    getNewClientController,
+    getUpdateClientController,
+    postNewClientController,
+    postUpdateClientController,
+    getTypeOfWasteController,
+    getQuotationsController,
+    getNewQuotationController,
+    postNewQuotationController
+};
