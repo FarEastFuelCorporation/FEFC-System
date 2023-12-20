@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails, postNewQuotationController } = require('../controllers/dashboardControllers');
+const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController } = require('../controllers/dashboardControllers');
 
 // Dashboard route
 router.get('/', isAuthenticated, getDashboardController);
@@ -22,7 +22,7 @@ router.get('/clients/new', getNewClientController);
 router.post('/clients/new', postNewClientController);
 
 // Clients route
-router.get('/clients/update', getUpdateClientController);
+router.get('/clients/update/:quotationCode', getUpdateClientController);
 
 router.post('/clients/update', postUpdateClientController);
 
@@ -32,9 +32,13 @@ router.get('/type_of_waste', getTypeOfWasteController);
 // Quotations route
 router.get('/quotations', getQuotationsController);
 
-// New Client Form route
+// New Quotation Form route
 router.get('/quotations/new', getNewQuotationController);
 router.post('/quotations/new', postNewQuotationController);
+
+// Update Quotation Form route
+router.get('/quotations/update/:quotationCode', getUpdateQuotationController);
+router.post('/quotations/update/', postUpdateQuotationController);
 
 // Commissions route
 router.get('/commissions', (req, res) => {

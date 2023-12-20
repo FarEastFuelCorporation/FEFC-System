@@ -1,12 +1,12 @@
-<!-- views/marketing/new_quotation.ejs -->
+<!-- views/marketing/update_quotation.ejs -->
 
 <div class="content">
     <div class="col-xs-12">
         <section>
             <h4>QUOTATIONS</h4><br>
             <div id="new_client_form_tab">
-                <h5>NEW QUOTATION FORM</h5><br>
-                <form  action="/dashboard/quotations/new" method="post">
+                <h5>UPDATE QUOTATION FORM</h5><br>
+                <form  action="/dashboard/quotations/update" method="post">
                     <input type="hidden" name="user" id="user" value="<%= employeeName %>">
                     <input type="hidden" name="userId" id="userId" value="<%= employeeId %>">
                     <h6>QUOTATION DETAILS</h6>
@@ -25,47 +25,44 @@
                                     <i class="fa-solid fa-list-ol"></i>
                                     Quotation #
                                 </label><br>
-                                <input type="text" name="quotation_no" id="quotation_no" autocomplete="off" class="form-control" required placeholder="Type Quotation #">
+                                <input type="text" name="quotation_no" id="quotation_no" autocomplete="off" class="form-control" required value="<%= quotation[0]?.quotationCode %>">
                             </div>
                             <div>
                                 <label for="revision_no">
                                     <i class="fa-solid fa-list-ol"></i>
                                     Revision #
                                 </label><br>
-                                <input type="text" name="revision_no" id="revision_no" autocomplete="off" class="form-control" required placeholder="Type Revision #">
+                                <input type="text" name="revision_no" id="revision_no" autocomplete="off" class="form-control" required value="<%= quotation[0]?.revisionNumber %>">
                             </div>
                             <div id="validity_container">
-                                <label for="terms">
+                                <label for="validity">
                                     <i class="fa-solid fa-calendar-days"></i>
                                     MOA End Date
                                 </label><br>
-                                <input type="date" name="validity" id="validity" autocomplete="off" class="form-control" placeholder="Type Quotation #">
+                                <% const validityDate = quotation[0]?.validity ? quotation[0].validity.toISOString().split('T')[0] : ''; %>
+                                <input type="date" name="validity" id="validity" autocomplete="off" class="form-control" value="<%= validityDate %>">
                             </div>
                             <div>
                                 <label for="terms">
                                     <i class="fa-solid fa-calendar-days"></i>
                                     Terms Charge
                                 </label><br>
-                                <input type="text" name="terms" id="terms" autocomplete="off" class="form-control" required placeholder="Input Terms (Charge)">
+                                <input type="text" name="terms" id="terms" autocomplete="off" class="form-control" required value="<%= quotation[0]?.termsCharge %>">
                             </div>
                             <div>
                                 <label for="terms2">
                                     <i class="fa-solid fa-calendar-days"></i>
                                     Terms Buying
                                 </label><br>
-                                <input type="text" name="terms2" id="terms2" autocomplete="off" class="form-control" required placeholder="Input Terms (Buying)">
+                                <input type="text" name="terms2" id="terms2" autocomplete="off" class="form-control" required value="<%= quotation[0]?.termsBuying %>">
                             </div>
                             <div>
                                 <label for="client">
                                     <i class="fa-solid fa-user"></i>
                                     Client
                                 </label><br>
-                                <select name="client" id="client" class="form-control" required>
-                                    <option value="" disabled selected>Select Client</option>
-                                    <% clients.forEach(client => { %>
-                                        <option value="<%= client.clientId %>"><%= client.clientName %></option>
-                                    <% }); %>
-                                </select>
+                                <input type="hidden" name="client" id="client" autocomplete="off" class="form-control" required readonly value="<%= quotation[0]?.Client?.clientId %>">
+                                <input type="text" name="clientName" id="clientName" autocomplete="off" class="form-control" required readonly value="<%= quotation[0]?.Client?.clientName %>">
                             </div>
                         </div><br>
                         <div class="d-flex gap-3">
@@ -74,19 +71,19 @@
                                     <i class="fa-solid fa-list-ol"></i>
                                     Scope of Work
                                 </label><br>
-                                <input type="text" name="scope_of_work" id="scope_of_work" autocomplete="off" class="form-control" required placeholder="Input Scope of Work">
+                                <input type="text" name="scope_of_work" id="scope_of_work" autocomplete="off" class="form-control" required value="<%= quotation[0]?.scopeOfWork %>">
                             </div>
                             <div class="container-fluid m-0 p-0">
                                 <label for="remarks">
                                     <i class="fa-solid fa-list-ol"></i>
                                     Remarks
                                 </label><br>
-                                <input type="text" name="remarks" id="remarks" autocomplete="off" class="form-control" required placeholder="Input Remarks (Leave blank if none)">
+                                <input type="text" name="remarks" id="remarks" autocomplete="off" class="form-control" required value="<%= quotation[0]?.remarks %>">
                             </div>
                         </div><br>
                     </div><br>
                     <h6>QUOTATION WASTE DETAILS</h6>
-                    <input type="hidden" id="list_counter" name="list_counter" value="1">
+                    <input type="hidden" id="list_counter" name="list_counter" value="<%= quotation[0]?.QuotationWaste.length %>">
                     <div class="position-relative">
                         <div class="d-flex gap-2 position-absolute top-0 end-0" style="margin-top: -40px;">
                             <button type="button" id="remove_item_button" class="btn btn-danger" style="display: none;">
@@ -97,89 +94,93 @@
                             </button>
                         </div>
                         <div id="item-container">
-                            <div class="item" id="item_1" style="display: grid; grid-template-columns: 1% 15% 25% 12% 10% 10% 12% 15%; gap: 15px; width: calc(100% - 105px);">
+                        <% quotation[0]?.QuotationWaste.forEach((waste, index) => { %>
+                            <div class="item" id="item_<%= index + 1 %>" style="display: grid; grid-template-columns: 1% 15% 25% 12% 10% 10% 12% 15%; gap: 15px; width: calc(100% - 105px);">
+                                <!-- Your existing HTML for each item goes here -->
                                 <div>
                                     <h6>#</h6>
-                                    <h3 id="number1">1</h3>
+                                    <h3 id="number<%= index + 1 %>"><%= index + 1 %></h3>
                                 </div>
                                 <div>
-                                    <label for="waste_code1">
+                                    <label for="waste_code<%= index + 1 %>">
                                         <i class="fa-solid fa-list"></i>
                                         Waste Code
                                     </label><br>
-                                    <select name="waste_code1" id="waste_code1" class="form-control" required>
+                                    <select name="waste_code<%= index + 1 %>" id="waste_code<%= index + 1 %>" class="form-control" required>
                                         <option value="" disabled selected>Select Waste Code</option>
                                         <% typesOfWastes.forEach(typesOfWaste => { %>
-                                            <option value="<%= typesOfWaste.wasteId %>"><%= typesOfWaste.wasteCode %></option>
+                                            <option value="<%= typesOfWaste.wasteId %>" <%= quotation[0]?.QuotationWaste[index]?.wasteId === typesOfWaste.wasteId ? 'selected' : '' %>><%= typesOfWaste.wasteCode %></option>
                                         <% }); %>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="waste_name1">
+                                    <label for="waste_name<%= index + 1 %>">
                                         <i class="fa-solid fa-trash-can"></i>
                                         Waste Name
                                     </label><br>
-                                    <input type="text" name="waste_name1" id="waste_name1" autocomplete="off" class="form-control" required placeholder="Type Waste Name...">
+                                    <input type="text" name="waste_name<%= index + 1 %>" id="waste_name<%= index + 1 %>" autocomplete="off" class="form-control" required value="<%= quotation[0]?.QuotationWaste[index]?.wasteName %>">
                                 </div>
                                 <div>
-                                    <label for="mode1">
+                                    <label for="mode<%= index + 1 %>">
                                         <i class="fa-solid fa-cart-shopping"></i>
                                         Mode
                                     </label><br>
-                                    <select name="mode1" id="mode1" class="form-control" required>
-                                        <option value="" disabled selected>SELECT</option>
-                                        <option value="CHARGE">CHARGE</option>
-                                        <option value="FREE OF CHARGE">FREE OF CHARGE</option>
-                                        <option value="BUYING">BUYING</option>
-                                        <option value="SELLING">SELLING</option>
+                                    <select name="mode<%= index + 1 %>" id="mode<%= index + 1 %>" class="form-control" required>
+                                        <option value="" disabled <%= quotation[0]?.QuotationWaste[index]?.mode === '' ? 'selected' : '' %>>SELECT</option>
+                                        <option value="CHARGE" <%= quotation[0]?.QuotationWaste[index]?.mode === 'CHARGE' ? 'selected' : '' %>>CHARGE</option>
+                                        <option value="FREE OF CHARGE" <%= quotation[0]?.QuotationWaste[index]?.mode === 'FREE OF CHARGE' ? 'selected' : '' %>>FREE OF CHARGE</option>
+                                        <option value="BUYING" <%= quotation[0]?.QuotationWaste[index]?.mode === 'BUYING' ? 'selected' : '' %>>BUYING</option>
+                                        <option value="SELLING" <%= quotation[0]?.QuotationWaste[index]?.mode === 'SELLING' ? 'selected' : '' %>>SELLING</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="unit1">
+                                    <label for="unit<%= index + 1 %>">
                                         <i class="fa-solid fa-scale-balanced"></i>
                                         Unit
                                     </label><br>
-                                    <select name="unit1" id="unit1" class="form-control" required>
-                                        <option value="" disabled selected>SELECT</option>
-                                        <option value="Pc">PIECES</option>
-                                        <option value="Kg">KILOGRAMS</option>
-                                        <option value="L">LITERS</option>
-                                        <option value="DRUM">DRUM</option>
-                                        <option value="LOT">LOT</option>
-                                        <option value="TRIP">TRIP</option>
+                                    <select name="unit<%= index + 1 %>" id="unit<%= index + 1 %>" class="form-control" required>
+                                        <option value="" disabled <%= quotation[0]?.QuotationWaste[index]?.unit === '' ? 'selected' : '' %>>SELECT</option>
+                                        <option value="Pc" <%= quotation[0]?.QuotationWaste[index]?.unit === 'Pc' ? 'selected' : '' %>>PIECES</option>
+                                        <option value="Pc" <%= quotation[0]?.QuotationWaste[index]?.unit === 'Pc' ? 'selected' : '' %>>PIECES</option>
+                                        <option value="Kg" <%= quotation[0]?.QuotationWaste[index]?.unit === 'Kg' ? 'selected' : '' %>>KILOGRAMS</option>
+                                        <option value="L" <%= quotation[0]?.QuotationWaste[index]?.unit === 'L' ? 'selected' : '' %>>LITERS</option>
+                                        <option value="DRUM" <%= quotation[0]?.QuotationWaste[index]?.unit === 'DRUM' ? 'selected' : '' %>>DRUM</option>
+                                        <option value="LOT" <%= quotation[0]?.QuotationWaste[index]?.unit === 'LOT' ? 'selected' : '' %>>LOT</option>
+                                        <option value="TRIP" <%= quotation[0]?.QuotationWaste[index]?.unit === 'TRIP' ? 'selected' : '' %>>TRIP</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="unit_price1">
+                                    <label for="unit_price<%= index + 1 %>">
                                         <i class="fa-solid fa-money-bill-wave"></i>
                                         Unit Price
                                     </label><br>
-                                    <input type="number" name="unit_price1" id="unit_price1" autocomplete="off" step="0.01" class="form-control" required value="0">
+                                    <input type="number" name="unit_price<%= index + 1 %>" id="unit_price<%= index + 1 %>" autocomplete="off" step="0.01" class="form-control" required value="<%= quotation[0]?.QuotationWaste[index]?.unitPrice %>">
                                 </div>
                                 <div>
-                                    <label for="vat_calculation1">
+                                    <label for="vat_calculation<%= index + 1 %>">
                                         <i class="fa-solid fa-calculator"></i>
                                         Vat Calculation
                                     </label><br>
-                                    <select name="vat_calculation1" id="vat_calculation1" class="form-control" required>
-                                        <option value="" disabled selected>SELECT</option>
-                                        <option value="VAT INCLUSIVE">VAT INCLUSIVE</option>
-                                        <option value="VAT EXCLUSIVE">VAT EXCLUSIVE</option>
-                                        <option value="NON VATABLE">NON VATABLE</option>
+                                    <select name="vat_calculation<%= index + 1 %>" id="vat_calculation<%= index + 1 %>" class="form-control" required>
+                                        <option value="" disabled <%= quotation[0]?.QuotationWaste[index]?.vatCalculation === '' ? 'selected' : '' %>>SELECT</option>
+                                        <option value="VAT INCLUSIVE" <%= quotation[0]?.QuotationWaste[index]?.vatCalculation === "VAT INCLUSIVE" ? 'selected' : '' %>>VAT INCLUSIVE</option>
+                                        <option value="VAT EXCLUSIVE" <%= quotation[0]?.QuotationWaste[index]?.vatCalculation === "VAT EXCLUSIVE" ? 'selected' : '' %>>VAT EXCLUSIVE</option>
+                                        <option value="NON VATABLE" <%= quotation[0]?.QuotationWaste[index]?.vatCalculation === "NON VATABLE" ? 'selected' : '' %>>NON VATABLE</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="fix_price1">
+                                    <label for="fix_price<%= index + 1 %>">
                                         <i class="fa-solid fa-money-bill-wave"></i>
                                         Fix Price
                                     </label><br>
-                                    <input type="number" name="fix_price1" id="fix_price1" autocomplete="off" class="form-control" required value="0">
+                                    <input type="number" name="fix_price<%= index + 1 %>" id="fix_price<%= index + 1 %>" autocomplete="off" class="form-control" required value="<%= quotation[0]?.QuotationWaste[index]?.maxCapacity %>">
                                 </div>
                             </div>
+                        <% }); %>
                         </div><br>
                     </div><br>
                     <h6>QUOTATION TRANSPORTATION DETAILS</h6>
-                    <input type="hidden" id="tf_counter" name="tf_counter" value="1">
+                    <input type="hidden" id="tf_counter" name="tf_counter" value="<%= quotation[0]?.QuotationTransportation.length %>">
                     <input type="hidden" id="is_transportation" name="is_transportation" value="true">
                     <button type="button" id="tf_button" class="btn btn-danger">
                         Without Transportation Fee
@@ -194,78 +195,80 @@
                             </button>
                         </div>
                         <div id="tf-container">
-                            <div class="tf-item" id="tf-item_1" style="display: grid; grid-template-columns: 1% 15% 25% 12% 10% 10% 12% 15%; gap: 15px; width: calc(100% - 105px);">
+                        <% quotation[0]?.QuotationTransportation.forEach((transportation, index) => { %>
+                            <div class="tf-item" id="tf-item_<%= index + 1 %>" style="display: grid; grid-template-columns: 1% 15% 25% 12% 10% 10% 12% 15%; gap: 15px; width: calc(100% - 105px);">
                                 <div>
                                     <h6>#</h6>
-                                    <h3 id="number1">1</h3>
+                                    <h3 id="number<%= index + 1 %>"><%= index + 1 %></h3>
                                 </div>
                                 <div>
-                                    <label for="type_of_vehicle1">
+                                    <label for="type_of_vehicle<%= index + 1 %>">
                                         <i class="fa-solid fa-truck"></i>
                                         Type of Vehicle
                                     </label><br>
-                                    <select name="type_of_vehicle1" id="type_of_vehicle1" class="form-control" required>
-                                        <option value="" disabled selected>Select Type of Vehicle</option>
+                                    <select name="type_of_vehicle<%= index + 1 %>" id="type_of_vehicle<%= index + 1 %>" class="form-control" required>
+                                        <option value="" disabled selected>Select Waste Code</option>
                                         <% vehicleTypes.forEach(vehicleType => { %>
-                                            <option value="<%= vehicleType.vehicleId %>"><%= vehicleType.typeOfVehicle %></option>
+                                            <option value="<%= vehicleType.vehicleId %>" <%= quotation[0]?.QuotationTransportation[index]?.vehicleId === vehicleType.vehicleId ? 'selected' : '' %>><%= vehicleType.typeOfVehicle %></option>
                                         <% }); %>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="hauling_area1">
+                                    <label for="hauling_area<%= index + 1 %>">
                                         <i class="fa-solid fa-list"></i>
                                         Area of Hauling
                                     </label><br>
-                                    <input type="text" name="hauling_area1" id="hauling_area1" autocomplete="off" class="form-control" required placeholder="Type Area of Hauling...">
+                                    <input type="text" name="hauling_area<%= index + 1 %>" id="hauling_area<%= index + 1 %>" autocomplete="off" class="form-control" required value="<%= quotation[0]?.QuotationTransportation[index]?.haulingArea %>">
                                 </div>
                                 <div>
-                                    <label for="tf_mode1">
+                                    <label for="tf_mode<%= index + 1 %>">
                                         <i class="fa-solid fa-cart-shopping"></i>
                                         Mode
                                     </label><br>
-                                    <select name="tf_mode1" id="tf_mode1" class="form-control" required>
-                                        <option value="" disabled selected>SELECT</option>
-                                        <option value="CHARGE">CHARGE</option>
-                                        <option value="FREE OF CHARGE">FREE OF CHARGE</option>
+                                    <select name="tf_mode<%= index + 1 %>" id="tf_mode<%= index + 1 %>" class="form-control" required>
+                                        <option value="" <%= quotation[0]?.QuotationTransportation[index]?.mode === '' ? 'selected' : '' %>>SELECT</option>
+                                        <option value="CHARGE" <%= quotation[0]?.QuotationTransportation[index]?.mode === 'CHARGE' ? 'selected' : '' %>>CHARGE</option>
+                                        <option value="FREE OF CHARGE" <%= quotation[0]?.QuotationTransportation[index]?.mode === 'FREE OF CHARGE' ? 'selected' : '' %>>FREE OF CHARGE</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="tf_unit1">
+                                    <label for="tf_unit<%= index + 1 %>">
                                         <i class="fa-solid fa-scale-balanced"></i>
                                         Unit
                                     </label><br>
-                                    <select name="tf_unit1" id="tf_unit1" class="form-control" required>
-                                        <option value="" disabled selected>SELECT</option>
-                                        <option value="TRIP">TRIP</option>
+                                    <select name="tf_unit<%= index + 1 %>" id="tf_unit<%= index + 1 %>" class="form-control" required>
+                                        <option value="" <%= quotation[0]?.QuotationTransportation[index]?.unit === '' ? 'selected' : '' %>>SELECT</option>
+                                        <option value="TRIP" <%= quotation[0]?.QuotationTransportation[index]?.unit === 'TRIP' ? 'selected' : '' %>>TRIP</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="tf_unit_price1">
+                                    <label for="tf_unit_price<%= index + 1 %>">
                                         <i class="fa-solid fa-money-bill-wave"></i>
                                         Unit Price
                                     </label><br>
-                                    <input type="number" name="tf_unit_price1" id="tf_unit_price1" autocomplete="off" step="0.01" class="form-control" required value="0">
+                                    <input type="number" name="tf_unit_price<%= index + 1 %>" id="tf_unit_price<%= index + 1 %>" autocomplete="off" step="0.01" class="form-control" required value="<%= quotation[0]?.QuotationTransportation[index]?.unitPrice %>">
                                 </div>
                                 <div>
-                                    <label for="tf_vat_calculation1">
+                                    <label for="tf_vat_calculation<%= index + 1 %>">
                                         <i class="fa-solid fa-calculator"></i>
                                         Vat Calculation
                                     </label><br>
-                                    <select name="tf_vat_calculation1" id="tf_vat_calculation1" class="form-control" required>
-                                        <option value="" disabled selected>SELECT</option>
-                                        <option value="VAT INCLUSIVE">VAT INCLUSIVE</option>
-                                        <option value="VAT EXCLUSIVE">VAT EXCLUSIVE</option>
-                                        <option value="NON VATABLE">NON VATABLE</option>
+                                    <select name="tf_vat_calculation<%= index + 1 %>" id="tf_vat_calculation<%= index + 1 %>" class="form-control" required>
+                                        <option value="" <%= quotation[0]?.QuotationTransportation[index]?.vatCalculation === '' ? 'selected' : '' %>>SELECT</option>
+                                        <option value="VAT INCLUSIVE" <%= quotation[0]?.QuotationTransportation[index]?.vatCalculation === 'VAT INCLUSIVE' ? 'selected' : '' %>>VAT INCLUSIVE</option>
+                                        <option value="VAT EXCLUSIVE" <%= quotation[0]?.QuotationTransportation[index]?.vatCalculation === 'VAT EXCLUSIVE' ? 'selected' : '' %>>VAT EXCLUSIVE</option>
+                                        <option value="NON VATABLE" <%= quotation[0]?.QuotationTransportation[index]?.vatCalculation === 'NON VATABLE' ? 'selected' : '' %>>NON VATABLE</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="max_capacity1">
+                                    <label for="max_capacity<%= index + 1 %>">
                                         <i class="fa-solid fa-weight-scale"></i>
                                         Min. Weight/ Trip (Kg)
                                     </label><br>
-                                    <input type="number" name="max_capacity1" id="max_capacity1" autocomplete="off" class="form-control" required value="0">
+                                    <input type="number" name="max_capacity<%= index + 1 %>" id="max_capacity<%= index + 1 %>" autocomplete="off" class="form-control" required value="<%= quotation[0]?.QuotationTransportation[index]?.maxCapacity %>">
                                 </div>
                             </div>
+                        <% }); %>
                         </div>
                     </div>
                     <div class="d-flex gap-3" style="margin-top: 20px;">
@@ -827,7 +830,7 @@
 </script>
 <script>
     // Counter for item index
-    let itemIndex = 1;
+    let itemIndex = document.getElementById("list_counter").value;
 
     // Function to add a new set of input fields
     function addItem() {
@@ -854,6 +857,7 @@
         newItem.querySelectorAll('[id^="waste_name"]').forEach((element) => {
             element.id = element.id.replace(/(\d+)/, itemIndex);
             element.value = "";
+            element.placeholder = "Type Waste Name...";
         });
 
         newItem.querySelectorAll('[name^="waste_name"]').forEach((element) => {
@@ -913,18 +917,25 @@
     }
 
     // Function to remove the last set of input fields
+    if (itemIndex === 1) {
+        document.getElementById('remove_item_button').style.display = 'none';
+    } else {
+        document.getElementById('remove_item_button').style.display = 'block';
+    }
+
     function removeItem() {
         const container = document.getElementById('item-container');
         const items = container.getElementsByClassName('item');
-
         // Ensure there's at least one item before removing
-        if (items.length > 1) {
-            container.removeChild(items[items.length - 1]);
+        if (itemIndex > 1) {
+            container.removeChild(items[itemIndex - 1]);
             itemIndex--;
 
             // Hide the remove button if there's only one item left
             if (itemIndex === 1) {
                 document.getElementById('remove_item_button').style.display = 'none';
+            } else {
+                document.getElementById('remove_item_button').style.display = 'block';
             }
         }
     }
@@ -935,7 +946,7 @@
 </script>
 <script>
     // Counter for item index
-    let tfItemIndex = 1;
+    let tfItemIndex = document.getElementById("tf_counter").value;
 
     // Function to add a new set of transportation details
     function addTransportationDetails() {tf_counter
@@ -1020,19 +1031,27 @@
         document.getElementById('remove_tf_button').style.display = 'inline-block';
     }
 
+    if (tfItemIndex === 1) {
+        document.getElementById('remove_tf_button').style.display = 'none';
+    } else {
+        document.getElementById('remove_tf_button').style.display = 'block';
+    }
+
     // Function to remove the last set of transportation details
     function removeTransportationDetails() {
         const tfContainer = document.getElementById('tf-container');
         const tfItems = tfContainer.getElementsByClassName('tf-item');
 
         // Ensure there's at least one item before removing
-        if (tfItems.length > 1) {
-            tfContainer.removeChild(tfItems[tfItems.length - 1]);
+        if (tfItemIndex > 1) {
+            tfContainer.removeChild(tfItems[tfItemIndex - 1]);
             tfItemIndex--;
 
             // Hide the remove button if there's only one item left
             if (tfItemIndex === 1) {
                 document.getElementById('remove_tf_button').style.display = 'none';
+            } else {
+                document.getElementById('remove_tf_button').style.display = 'block';
             }
         }
     }
@@ -1052,7 +1071,6 @@
         tfButton.textContent = isWithoutTF ? 'Without Transportation Fee' : 'With Transportation Fee';
 
         // Change button color to success if "With Transportation Fee" is selected
-        console.log(tfContainer)
         if (isWithoutTF) {
             tfButton.classList.remove('btn-success');
             tfButton.classList.add('btn-danger');
@@ -1115,7 +1133,8 @@
 
         // Get the total number of items
         var tfCount = document.getElementById('tf_counter').value;
-    
+        const vehicleTypes = <%- JSON.stringify(vehicleTypes) %>;
+        console.log(vehicleTypes)
         // Loop through each item
         for (var i = 1; i <= tfCount; i++) {
             counter++;
@@ -1126,7 +1145,15 @@
             var unit = document.getElementById('tf_unit' + i).value;
             var unitPrice = document.getElementById('tf_unit_price' + i).value;
             var vatCalculation = document.getElementById('tf_vat_calculation' + i).value;
-    
+
+            // Find the corresponding vehicleType object in the vehicleTypes array
+            var selectedVehicleType = vehicleTypes.find(function (vehicleType) {
+                    return vehicleType.vehicleId === type_of_vehicle;
+                });
+
+            // Update type_of_vehicle with the typeOfVehicle property
+            type_of_vehicle = selectedVehicleType ? selectedVehicleType.typeOfVehicle : type_of_vehicle;
+
             // Create HTML for a new table row
             var tfNewRowHtml = `
                 <tr>
@@ -1140,7 +1167,7 @@
                     <td>${vatCalculation}</td>
                 </tr>
                 `;
-    
+            console.log(tfNewRowHtml)
             // Insert the new row HTML into the table
             document.getElementById('table_data').insertAdjacentHTML('beforeend', tfNewRowHtml);
         }
@@ -1173,8 +1200,6 @@
         document.getElementById('revision_number_container').innerText = document.getElementById('revision_no').value;
         document.getElementById('accounting_head_signature').innerHTML = `<img src="/images/CARDINEZ_DAISY.png" alt="">`;
         document.getElementById('vice_president_signature').innerHTML = `<img src="/images/DE VERA_EXEQUIEL.png" alt="">`;
-        document.getElementById('charge_input').innerText = document.getElementById('terms').value;
-        document.getElementById('buying_input').innerText = document.getElementById('terms2').value;
 
         try {
         const clientDetails = await fetchClientDetails(clientId);
@@ -1208,51 +1233,3 @@
         });
     }
 </script>
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Event listener for the "Generate Image" button
-  document.getElementById('generate_image_button').addEventListener('click', function () {
-    // Get the HTML content from the 'what_to_print' element
-    const htmlContent = document.getElementById('what_to_print').innerHTML;
-
-    // Make a fetch request to send the HTML content to the server for generating the image
-    fetch('/generate-image', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ htmlContent }),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json(); // Assuming the server returns a JSON object with the Data URL
-    })
-    .then(data => {
-      // Create a link element
-      const downloadLink = document.createElement('a');
-
-      // Set the href attribute with the Data URL
-      downloadLink.href = data.dataUrl;
-
-      // Set the download attribute with the desired filename
-      downloadLink.download = 'generated_image.png';
-
-      // Append the link to the document
-      document.body.appendChild(downloadLink);
-
-      // Trigger a click on the link to initiate the download
-      downloadLink.click();
-
-      // Remove the link from the document
-      document.body.removeChild(downloadLink);
-    })
-    .catch(error => {
-      console.error('Error generating image:', error);
-      // Handle errors if needed
-    });
-  });
-});
-
-</script> -->

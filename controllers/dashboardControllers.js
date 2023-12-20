@@ -416,8 +416,8 @@ async function getNewQuotationController(req, res) {
     const employeeId = req.session.employeeId;
 
     const employee = await Employee.findOne({ where: { employeeId } });
-    const typesOfWastes = await TypeOfWaste.findAll();
     const clients = await Client.findAll();
+    const typesOfWastes = await TypeOfWaste.findAll();
     const vehicleTypes = await VehicleType.findAll();
 
     // Function to convert a string to proper case
@@ -547,7 +547,152 @@ async function postNewQuotationController(req, res) {
     }
 };
 
+// Update Quotation controller
+async function getUpdateQuotationController(req, res) {
+    try {
+        var currentPage, totalPages, entriesPerPage, searchQuery
+        const employeeId = req.session.employeeId;
+        const quotationCode = req.params.quotationCode;
+    
+        const employee = await Employee.findOne({ where: { employeeId } });
+        const typesOfWastes = await TypeOfWaste.findAll();
+        const vehicleTypes = await VehicleType.findAll();
+        const quotation = await Quotation.findAll({
+            where: { quotationCode },
+            include: [
+                { model: Client, as: 'Client' },
+                { model: QuotationWaste, as: 'QuotationWaste',
+                    include: [ 
+                        { model: TypeOfWaste, as: 'TypeOfWaste' },
+                    ],
+                },
+                { model: QuotationTransportation, as: 'QuotationTransportation',
+                    include: [ 
+                        { model: VehicleType, as: 'VehicleType' },
+                    ], 
+                },
+                { model: Employee, as: 'Employee' }
+            ],
+        });
+    
+        // Function to convert a string to proper case
+        function toProperCase(str) {
+            return str.replace(/\w\S*/g, function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
+    
+        // Apply the function to the employee's first and last names
+        const employeeName = `${toProperCase(employee.firstName)} ${toProperCase(employee.lastName)}`;
+    
+        // Render the dashboard view with data
+        const viewsData = {
+            pageTitle: 'Marketing User - Update Quotation Form',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/update_quotation',
+            route: 'marketing_dashboard',
+            general_scripts: 'marketing/marketing_scripts',
+            currentPage,
+            totalPages,
+            entriesPerPage,
+            searchQuery,
+            employeeName,
+            employeeId,
+            quotation,
+            typesOfWastes,
+            vehicleTypes,
+        };
+        res.render('dashboard', viewsData);
+    } catch (error) {
+        console.error('Error in getUpdateQuotationController:', error);
+        // Handle the error appropriately (e.g., send an error response)
+        res.status(500).send('Internal Server Error');
+    }
 
+}
+async function postUpdateQuotationController(req, res) {
+    try {
+        const {
+            userId,
+            quotation_no,
+            revision_no,
+            validity,
+            terms,
+            terms2,
+            client,
+            scope_of_work,
+            remarks,
+            list_counter,
+            tf_counter,
+        } = req.body;
+
+        // Creating a new Quotation
+        const newQuotation = await Quotation.create({
+            quotationCode: quotation_no,
+            revisionNumber: revision_no,
+            validity: validity,
+            clientId: client,
+            termsCharge: terms,
+            termsBuying: terms2,
+            scopeOfWork: scope_of_work,
+            remarks: remarks,
+            submittedBy: userId,
+        });
+        
+        // Process dynamic fields
+        for (let i = 1; i <= list_counter; i++) {
+            const waste_code =  req.body[`waste_code${i}`];
+            const waste_name =  req.body[`waste_name${i}`];
+            const mode =  req.body[`mode${i}`];
+            const unit =  req.body[`unit${i}`];
+            const unit_price =  req.body[`unit_price${i}`];
+            const vat_calculation =  req.body[`vat_calculation${i}`];
+            const fix_price =  req.body[`fix_price${i}`];
+
+            // Creating a new QuotationWaste
+            const newQuotationWaste = await QuotationWaste.create({
+                quotationCode: quotation_no,
+                wasteId: waste_code,
+                wasteName: waste_name,
+                mode: mode,
+                unit: unit,
+                unitPrice: unit_price,
+                vatCalculation: vat_calculation,
+                maxCapacity: fix_price,
+            });
+        }
+    
+        // Process dynamic transportation fields
+        for (let i = 1; i <= tf_counter; i++) {
+            const type_of_vehicle =  req.body[`type_of_vehicle${i}`];
+            const hauling_area =  req.body[`hauling_area${i}`];
+            const tf_mode =  req.body[`tf_mode${i}`];
+            const tf_unit =  req.body[`tf_unit${i}`];
+            const tf_unit_price =  req.body[`tf_unit_price${i}`];
+            const tf_vat_calculation =  req.body[`tf_vat_calculation${i}`];
+            const max_capacity =  req.body[`max_capacity${i}`];
+
+            // Creating a new QuotationTransportation
+            const newQuotationTransportation = await QuotationTransportation.create({
+                quotationCode: quotation_no,
+                vehicleId: type_of_vehicle,
+                haulingArea: hauling_area,
+                mode: tf_mode,
+                unit: tf_unit,
+                unitPrice: tf_unit_price,
+                vatCalculation: tf_vat_calculation,
+                maxCapacity: max_capacity,
+            });
+        }
+
+        // Redirect back to the quotation route with a success message
+        res.redirect('/dashboard/quotations?success=new');
+    } catch (error) {
+        // Handling errors
+        console.error('Error creating quotation:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 module.exports = { 
     getDashboardController,
@@ -561,5 +706,7 @@ module.exports = {
     getTypeOfWasteController,
     getQuotationsController,
     getNewQuotationController,
-    postNewQuotationController
+    postNewQuotationController,
+    getUpdateQuotationController,
+    postUpdateQuotationController,
 };

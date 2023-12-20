@@ -126,7 +126,7 @@
             // Update the URL to reflect the current page
             const newUrl = `/dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`;
             history.pushState({ page: pageNumber, entriesPerPage }, '', newUrl);
-            
+            window.location.reload()
         })
         .catch(error => {
             console.error('Error:', error);

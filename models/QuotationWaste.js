@@ -9,8 +9,8 @@ const QuotationWaste = sequelize.define(
             primaryKey: true,
             autoIncrement: true,
         },
-        quotationCode: {
-            type: DataTypes.STRING,
+        quotationId: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         wasteId: {

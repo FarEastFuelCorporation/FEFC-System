@@ -6,10 +6,15 @@ const sequelize = require('../config/config');
 const Quotation = sequelize.define(
     'Quotation',
     {
+        quotationId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: true,
+            autoIncrement: true,
+        },
         quotationCode: {
             type: DataTypes.STRING,
             allowNull: false,
-            primaryKey: true,
         },
         revisionNumber: {
             type: DataTypes.STRING,

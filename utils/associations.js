@@ -20,29 +20,29 @@ Employee.hasMany(Quotation, { as: 'Quotation', foreignKey: 'submittedBy', source
 
 Vehicle.belongsTo(VehicleType, { as: 'VehicleType', foreignKey: 'vehicleId', targetKey: 'vehicleId' });
 
-VehicleType.hasMany(Vehicle, { as: 'Vehicle', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
-VehicleType.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
-
-TypeOfWaste.hasMany(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'wasteId', sourceKey: 'wasteId' });
-
 Client.hasMany(Quotation, { as: 'Quotation', foreignKey: 'clientId', sourceKey: 'clientId' });
 Client.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'clientId', sourceKey: 'clientId' });
 
+TypeOfWaste.hasMany(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'wasteId', sourceKey: 'wasteId' });
+
+VehicleType.hasMany(Vehicle, { as: 'Vehicle', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
+VehicleType.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
+
+Quotation.hasMany(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'quotationId', sourceKey: 'quotationId' });
+Quotation.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'quotationId', sourceKey: 'quotationId' });
 Quotation.belongsTo(Client, { as: 'Client', foreignKey: 'clientId', targetKey: 'clientId' });
-Quotation.hasMany(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'quotationCode', sourceKey: 'quotationCode' });
-Quotation.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'quotationCode', sourceKey: 'quotationCode' });
 Quotation.belongsTo(Employee, { as: 'Employee', foreignKey: 'submittedBy', targetKey: 'employeeId' });
 
-QuotationWaste.belongsTo(Quotation, { as: 'Quotation', foreignKey: 'quotationCode', targetKey: 'quotationCode' });
+QuotationWaste.belongsTo(Quotation, { as: 'Quotation', foreignKey: 'quotationId', targetKey: 'quotationId' });
 QuotationWaste.belongsTo(TypeOfWaste, { as: 'TypeOfWaste', foreignKey: 'wasteId', targetKey: 'wasteId' });
 QuotationWaste.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'id', sourceKey: 'id' });
 
-QuotationTransportation.belongsTo(Quotation, { as: 'Quotation', foreignKey: 'quotationCode', targetKey: 'quotationCode' });
+QuotationTransportation.belongsTo(Quotation, { as: 'Quotation', foreignKey: 'quotationId', targetKey: 'quotationId' });
 QuotationTransportation.belongsTo(VehicleType, { as: 'VehicleType', foreignKey: 'vehicleId', targetKey: 'vehicleId' });
 QuotationTransportation.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'id', sourceKey: 'id' });
 
-MarketingTransaction.belongsTo(Client, { as: 'Client', foreignKey: 'clientId', targetKey: 'clientId' });
 MarketingTransaction.belongsTo(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'quotationWasteId', targetKey: 'id' });
+MarketingTransaction.belongsTo(Client, { as: 'Client', foreignKey: 'clientId', targetKey: 'clientId' });
 MarketingTransaction.belongsTo(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'quotationTransportationId', targetKey: 'id' });
 
 
