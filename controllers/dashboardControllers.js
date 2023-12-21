@@ -9,6 +9,8 @@ const TreatmentProcess = require("../models/TreatmentProcess");
 const TypeOfWaste = require("../models/TypeOfWaste");
 const User = require("../models/User");
 const VehicleType = require("../models/VehicleType");
+const { createCanvas } = require('canvas');
+const htmlToImage = require('html-to-image');
 
 // Dashboard controller
 async function getDashboardController(req, res) {
@@ -429,6 +431,7 @@ async function getNewQuotationController(req, res) {
 
     // Apply the function to the employee's first and last names
     const employeeName = `${toProperCase(employee.firstName)} ${toProperCase(employee.lastName)}`;
+    const employeeSignature = employee.picture.replace(/\.jpg$/, '.png');
 
     // Sorting the clients array by clientName
     clients.sort((clientA, clientB) => {
@@ -457,6 +460,7 @@ async function getNewQuotationController(req, res) {
         searchQuery,
         employeeName,
         employeeId,
+        employeeSignature,
         typesOfWastes,
         clients,
         vehicleTypes,
@@ -584,6 +588,7 @@ async function getUpdateQuotationController(req, res) {
     
         // Apply the function to the employee's first and last names
         const employeeName = `${toProperCase(employee.firstName)} ${toProperCase(employee.lastName)}`;
+        const employeeSignature = employee.picture.replace(/\.jpg$/, '.png');
     
         // Render the dashboard view with data
         const viewsData = {
@@ -598,6 +603,7 @@ async function getUpdateQuotationController(req, res) {
             searchQuery,
             employeeName,
             employeeId,
+            employeeSignature,
             quotation,
             typesOfWastes,
             vehicleTypes,
@@ -624,8 +630,18 @@ async function postUpdateQuotationController(req, res) {
             remarks,
             list_counter,
             tf_counter,
+            imageDataUrl,
         } = req.body;
+        
+        // Convert base64 image data to buffer
+        const imageDataBuffer = Buffer.from(imageDataUrl.split(',')[1], 'base64');
 
+        // You may want to generate a unique filename or use the quotation code as the filename
+        const filename = 'your-unique-filename.png';
+
+        // Save the image to a specific directory (create the directory if it doesn't exist)
+        const imagePath = path.join(__dirname, 'images', filename);
+        await fs.writeFile(imagePath, imageDataBuffer);
         // Creating a new Quotation
         const newQuotation = await Quotation.create({
             quotationCode: quotation_no,
@@ -637,6 +653,7 @@ async function postUpdateQuotationController(req, res) {
             scopeOfWork: scope_of_work,
             remarks: remarks,
             submittedBy: userId,
+            quotationImage: `/images/${filename}`,
         });
         
         // Process dynamic fields

@@ -10,6 +10,12 @@ const bodyParser = require('body-parser');
 const sequelize = require('./config/config');
 const qr = require('qr-image');
 const puppeteer = require('puppeteer');
+const multer = require('multer');
+const fs = require('fs/promises');
+
+// Set up storage for multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const app = express();
 const port = process.env.PORT;
@@ -22,6 +28,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve Bootstrap files from the 'node_modules' folder
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
+
 
 // Set Cache-Control header to prevent caching
 app.use((req, res, next) => {
@@ -30,6 +38,7 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // Use express-session middleware
 app.use(session({
     secret: 'your-secret-key',
@@ -46,7 +55,7 @@ app.use(session({
 async function initializeApp() {
     try {
         console.log('Syncing models to the database...');
-        await sequelize.sync({ alter: true });
+        await sequelize.sync({ });
         console.log('Models synced successfully.');
     } catch (error) {
         console.error('Error syncing models:', error);
@@ -74,6 +83,13 @@ app.use('/dashboard', dashboardRoutes);
 
 // Include the logout route
 const logoutRoute = require('./routes/logout');
+const Quotation = require('./models/Quotation');
+const VehicleType = require('./models/VehicleType');
+const TypeOfWaste = require('./models/TypeOfWaste');
+const Employee = require('./models/Employee');
+const QuotationWaste = require('./models/QuotationWaste');
+const QuotationTransportation = require('./models/QuotationTransportation');
+const Client = require('./models/Client');
 app.use(logoutRoute);
 
 
@@ -92,32 +108,64 @@ app.get('/', (req, res) => {
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 
-app.post('/generate-image', async (req, res) => {
+// Validate Quotation route
+app.get('/quotations/validate/:quotationCode', async (req, res) => {
   try {
-    const htmlContent = req.body.htmlContent;
-
-    // Use puppeteer to convert HTML content to a Data URL
-    const browser = await puppeteer.launch({
-      headless: 'new', // Opt into the new headless mode
+    var currentPage, totalPages, entriesPerPage, searchQuery
+    const quotationCode = req.params.quotationCode;
+    const typesOfWastes = await TypeOfWaste.findAll();
+    const vehicleTypes = await VehicleType.findAll();
+    const quotation = await Quotation.findAll({
+        where: { quotationCode },
+        include: [
+            { model: Client, as: 'Client' },
+            { model: QuotationWaste, as: 'QuotationWaste',
+                include: [ 
+                    { model: TypeOfWaste, as: 'TypeOfWaste' },
+                ],
+            },
+            { model: QuotationTransportation, as: 'QuotationTransportation',
+                include: [ 
+                    { model: VehicleType, as: 'VehicleType' },
+                ], 
+            },
+            { model: Employee, as: 'Employee' }
+        ],
     });
-    const page = await browser.newPage();
-    await page.setContent(htmlContent);
 
-    // Get the HTML content as Data URL
-    const dataUrl = await page.evaluate(() => {
-      return new Promise((resolve) => {
-        resolve(document.documentElement.outerHTML);
-      });
-    });
+    // Function to convert a string to proper case
+    function toProperCase(str) {
+        return str.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
 
-    // Close the browser
-    await browser.close();
+    // Apply the function to the employee's first and last names
+    const employeeName = `${toProperCase(quotation[0]?.Employee.firstName)} ${toProperCase(quotation[0]?.Employee.lastName)}`;
+    const employeeSignature = quotation[0]?.Employee.picture.replace(/\.jpg$/, '.png');
 
-    // Send the Data URL as the response
-    res.json({ dataUrl });
+    // Render the dashboard view with data
+    const viewsData = {
+        pageTitle: 'Marketing User - Update Quotation Form',
+        sidebar: 'marketing/marketing_sidebar',
+        content: 'marketing/update_quotation',
+        route: 'marketing_dashboard',
+        general_scripts: 'marketing/marketing_scripts',
+        currentPage,
+        totalPages,
+        entriesPerPage,
+        searchQuery,
+        employeeName,
+        employeeSignature,
+        quotation,
+        typesOfWastes,
+        vehicleTypes,
+    };
+    res.render('validate_quotation', viewsData);
   } catch (error) {
-    console.error('Error generating image:', error);
-    res.status(500).send('Internal Server Error');
+      console.error('Error in getUpdateQuotationController:', error);
+      // Handle the error appropriately (e.g., send an error response)
+      res.status(500).send('Internal Server Error');
   }
 });
 

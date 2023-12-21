@@ -6,7 +6,7 @@
             <h4>QUOTATIONS</h4><br>
             <div id="new_client_form_tab">
                 <h5>UPDATE QUOTATION FORM</h5><br>
-                <form  action="/dashboard/quotations/update" method="post">
+                <form id="quotationForm" action="/dashboard/quotations/update" method="post" enctype="multipart/form-data" onsubmit="submitForm(event)">
                     <input type="hidden" name="user" id="user" value="<%= employeeName %>">
                     <input type="hidden" name="userId" id="userId" value="<%= employeeId %>">
                     <h6>QUOTATION DETAILS</h6>
@@ -292,7 +292,7 @@
                     <div class="what_to_print" id="what_to_print" style="display: none;">
                         <img src="/images/letterhead.jpg" id="background-image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;">
                         <div class="pdf_container">
-                            <div d-flex>
+                            <div d-flex style="height: 100% !important;">
                                 <div class="client_copy">
                                     <h4 class="bold">CLIENT'S COPY</h4>
                                 </div>
@@ -404,9 +404,9 @@
                                         <h3>2. Copy of BIR Form 2303 and 2307</h3>
                                     </div>
                                 </div>
-                                <% 
-
-                                %>
+                                <div id="qrCode">
+                                    <img id="qrCodeImage" src="" alt="">
+                                </div>
                                 <div class="footer">
                                     <div>
                                         <div class="footer_header">
@@ -414,7 +414,7 @@
                                         </div>
                                         <div class="assignatory">
                                             <div>
-                                                <div class="signature" id="marketing_signature"></div>
+                                                <div class="signature" id="marketing_signature"><img src="/images/<%= employeeSignature %>" alt=""></div>
                                                 <h3 class="bold"><u id="marketing_user"><%= employeeName %></u></h3>
                                             </div>
                                             <div>
@@ -457,7 +457,7 @@
                                         <div class="assignatory">
                                         </div>
                                     </div>
-                                </div>`
+                                </div>
                             </div>
                         </div>
                         <style>
@@ -752,11 +752,28 @@
                             {
                                 position: absolute;
                                 top: 730px;
-                                width: 100%;
+                                width: 90%;
                                 height: 65px;
                                 border: 2px solid black !important;
                                 overflow: hidden;
                                 font-size: 14px;
+                            }
+
+                            
+                            #what_to_print #qrCode
+                            {
+                                position: absolute;
+                                top: 730px;
+                                right: 0;
+                                width: calc(10% + 2px);
+                                height: 65px;
+                                border: 2px solid black !important;
+                            }
+
+                            #what_to_print #qrCode img
+                            {
+                                height: 100%;
+                                width: 100%;
                             }
                                 
                             #what_to_print .footer
@@ -917,7 +934,7 @@
     }
 
     // Function to remove the last set of input fields
-    if (itemIndex === 1) {
+    if (itemIndex <= 1) {
         document.getElementById('remove_item_button').style.display = 'none';
     } else {
         document.getElementById('remove_item_button').style.display = 'block';
@@ -1031,7 +1048,7 @@
         document.getElementById('remove_tf_button').style.display = 'inline-block';
     }
 
-    if (tfItemIndex === 1) {
+    if (tfItemIndex <= 1) {
         document.getElementById('remove_tf_button').style.display = 'none';
     } else {
         document.getElementById('remove_tf_button').style.display = 'block';
@@ -1134,7 +1151,6 @@
         // Get the total number of items
         var tfCount = document.getElementById('tf_counter').value;
         const vehicleTypes = <%- JSON.stringify(vehicleTypes) %>;
-        console.log(vehicleTypes)
         // Loop through each item
         for (var i = 1; i <= tfCount; i++) {
             counter++;
@@ -1167,7 +1183,6 @@
                     <td>${vatCalculation}</td>
                 </tr>
                 `;
-            console.log(tfNewRowHtml)
             // Insert the new row HTML into the table
             document.getElementById('table_data').insertAdjacentHTML('beforeend', tfNewRowHtml);
         }
@@ -1200,6 +1215,30 @@
         document.getElementById('revision_number_container').innerText = document.getElementById('revision_no').value;
         document.getElementById('accounting_head_signature').innerHTML = `<img src="/images/CARDINEZ_DAISY.png" alt="">`;
         document.getElementById('vice_president_signature').innerHTML = `<img src="/images/DE VERA_EXEQUIEL.png" alt="">`;
+        document.getElementById('charge_input').innerText = document.getElementById('terms').value;
+        document.getElementById('buying_input').innerText = document.getElementById('terms2').value;
+
+        const quotationNo = document.getElementById('quotation_no').value;
+        const revisionNo = document.getElementById('revision_no').value;
+
+        generateQRCode(quotationNo, revisionNo);
+
+        function generateQRCode(quotationNo, revisionNo) {
+            const qrCodeValue = `http://192.168.1.85:3000/quotations/validate/${quotationNo}`;
+
+            // Create a QR code instance
+            const qr = qrcode(0, 'L'); // Error correction level: L (Low)
+
+            // Set the value of the QR code
+            qr.addData(qrCodeValue);
+            qr.make();
+
+            // Get the QR code as a data URL
+            const qrDataURL = qr.createDataURL(4); // Scale factor: 4
+
+            // Display the QR code on your page (replace 'yourQRCodeImageId' with the actual ID)
+            document.getElementById('qrCodeImage').src = qrDataURL;
+        }
 
         try {
         const clientDetails = await fetchClientDetails(clientId);
@@ -1211,7 +1250,6 @@
         document.getElementById('address_container2').innerText = clientDetails.billerAddress;
         document.getElementById('contact_number2').innerText = clientDetails.billerContactNumber;
         document.getElementById('contact_number2').innerText = clientDetails.billerContactNumber;
-
 
         // Update your UI or perform other actions with the fetched client details
         } catch (error) {
@@ -1232,4 +1270,98 @@
             throw error; // Re-throw the error to handle it in the calling code if needed
         });
     }
+</script>
+<script>
+    async function submitForm(event) {
+        event.preventDefault();
+
+        const element = document.getElementById('what_to_print');
+
+        try {
+            // Convert HTML to image
+            const imageDataUrl = await htmlToImage.toPng(element);
+
+            // Set the image data as a hidden input field in the form
+            const imageInput = document.createElement('input');
+            imageInput.type = 'hidden';
+            imageInput.name = 'imageDataUrl';
+            imageInput.value = imageDataUrl;
+            document.getElementById('quotationForm').appendChild(imageInput);
+
+            // Submit the form
+            document.getElementById('quotationForm').submit();
+        } catch (error) {
+            console.error('Error converting HTML to image:', error);
+        }
+    }
+</script>
+<script>
+    function convertToPDFandDownload() {
+        // Assuming your form has an ID 'quotationForm'
+        const quotationForm = document.querySelector('#quotationForm');
+
+        // Perform form validation before proceeding
+        if (validateForm(quotationForm)) {
+            const element = document.getElementById('what_to_print');
+            const quotation_no = document.getElementById("quotation_no").value;
+            const client = document.getElementById("clientName").value;
+            let modifiedCompanyName = client.replace(/\./g, '');
+
+            const opt = {
+                filename: `${quotation_no} - ${client}`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 10 },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'letter',
+                    orientation: 'portrait',
+                    margin: { top: -10, right: 0, bottom: 0, left: 0 }
+                },
+                pagebreak: { before: ['avoid'] }
+            };
+
+            const marginTop = 0; // Top margin in mm
+            const marginBottom = 0; // Bottom margin in mm
+
+            // Set the page height to account for the top and bottom margins
+            const pageHeight = 279.4 - marginTop - marginBottom;
+
+            // Reset the element's transform style
+            element.style.transform = 'none';
+
+            // Generate the PDF with the adjusted options
+            html2pdf()
+                .set(opt)
+                .from(element)
+                .toContainer()
+                .then(() => {
+                    html2pdf().set(opt).from(element).save().then(() => {
+                        // Call the submit button click event immediately after the PDF is downloaded
+                    });
+                });
+        } else {
+            // Handle the case where the form is not valid
+            alert('Please fill out the form completely before downloading.');
+        }
+    }
+
+    // Function to validate the form
+    function validateForm(form) {
+        // Query all input elements with the 'required' attribute
+        const requiredInputs = form.querySelectorAll('input[required]');
+
+        // Check if all required inputs have a non-empty value
+        for (const input of requiredInputs) {
+            if (input.value.trim() === '') {
+                return false; // Form is not valid
+            }
+            // You can add more specific validation checks for different input types if needed
+        }
+
+        // Add more validation checks as needed
+
+        return true; // Form is valid
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', convertToPDFandDownload)
 </script>

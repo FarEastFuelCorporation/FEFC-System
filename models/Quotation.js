@@ -42,6 +42,9 @@ const Quotation = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        quotationImage: {
+            type: DataTypes.BLOB('long'),
+        },
         createdAt: {
             type: DataTypes.DATE,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),

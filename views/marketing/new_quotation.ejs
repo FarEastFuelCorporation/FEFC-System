@@ -35,7 +35,7 @@
                                 <input type="text" name="revision_no" id="revision_no" autocomplete="off" class="form-control" required placeholder="Type Revision #">
                             </div>
                             <div id="validity_container">
-                                <label for="terms">
+                                <label for="validity">
                                     <i class="fa-solid fa-calendar-days"></i>
                                     MOA End Date
                                 </label><br>
@@ -411,7 +411,7 @@
                                         </div>
                                         <div class="assignatory">
                                             <div>
-                                                <div class="signature" id="marketing_signature"></div>
+                                                <div class="signature" id="marketing_signature"><img src="/images/<%= employeeSignature %>" alt=""></div>
                                                 <h3 class="bold"><u id="marketing_user"><%= employeeName %></u></h3>
                                             </div>
                                             <div>
@@ -749,11 +749,28 @@
                             {
                                 position: absolute;
                                 top: 730px;
-                                width: 100%;
+                                width: 90%;
                                 height: 65px;
                                 border: 2px solid black !important;
                                 overflow: hidden;
                                 font-size: 14px;
+                            }
+
+                            
+                            #what_to_print #qrCode
+                            {
+                                position: absolute;
+                                top: 730px;
+                                right: 0;
+                                width: calc(10% + 2px);
+                                height: 65px;
+                                border: 2px solid black !important;
+                            }
+
+                            #what_to_print #qrCode img
+                            {
+                                height: 100%;
+                                width: 100%;
                             }
                                 
                             #what_to_print .footer
@@ -1052,7 +1069,6 @@
         tfButton.textContent = isWithoutTF ? 'Without Transportation Fee' : 'With Transportation Fee';
 
         // Change button color to success if "With Transportation Fee" is selected
-        console.log(tfContainer)
         if (isWithoutTF) {
             tfButton.classList.remove('btn-success');
             tfButton.classList.add('btn-danger');
