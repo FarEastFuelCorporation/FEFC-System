@@ -76,10 +76,10 @@ async function getBookedTransactionsController(req, res) {
         } else if (req.query.success === 'update'){
             successMessage = 'Client updated successfully!';
         }
-        
+
         // Render the 'marketing/clients' view and pass the necessary data
         const viewsData = {
-            pageTitle: 'Marketing User - Clients',
+            pageTitle: 'Marketing User - Booked Transactions',
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/booked_transactions',
             route: 'booked_transactions',

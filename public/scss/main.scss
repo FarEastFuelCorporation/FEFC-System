@@ -305,12 +305,29 @@ th {
     border: 1px solid black !important;
 }
 
-#calendar_days {
+.calendar {
     border: 1px solid black;
     width: 100%;
 }
 
-#calendar_days tr{
+.calendar tr{
     border: 1px solid black;
     width: 100%;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar tr th,
+.calendar tr td{
+    border: 1px solid black;
+}
+
+.calendar tr td .td_header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.calendar tr td .td_header span{
+    font-size: 16px;
+    font-weight: bold;
 }

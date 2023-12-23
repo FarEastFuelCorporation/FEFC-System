@@ -1,11 +1,25 @@
 <!-- views/marketing/booked_transactions.ejs -->
 
 <div class="content">
-    <div id="calendar_days"></div>
+    <h1>December 2023</h1>
+    <table class="calendar">
+        <thead>
+            <tr>
+                <th>SUNDAY</th>
+                <th>MONDAY</th>
+                <th>TUESDAY</th>
+                <th>WEDNESDAY</th>
+                <th>THURSDAY</th>
+                <th>FRIDAY</th>
+                <th>SATURDAY</th>
+            </tr>
+        </thead>
+        <tbody id="calendar_days"></tbody>
+    </table>
 </div>
 
 <script>
-    generateCalendarDays(2023, 2)
+    generateCalendarDays(2023, 11)
 
     function generateCalendarDays(year, month) {
         // const hauling_date = marketing_transaction_form.querySelector("#hauling_date");
@@ -51,7 +65,9 @@
                     var bookButton = document.createElement("button");
                     bookButton.textContent = "Book";
                     // Set class for the "Book" button
-                    bookButton.classList.add("form-control");
+                    bookButton.classList.add("py-0");
+                    bookButton.classList.add("btn");
+                    bookButton.classList.add("btn-success");
                     bookButton.classList.add("book-button");
 
                     // Create a div for "Available slot"
