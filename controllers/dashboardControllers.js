@@ -43,11 +43,55 @@ async function getDashboardController(req, res) {
 
 // Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
-    try {
+    try {        // Fetch all clients from the database
+        const clients = await Client.findAll();
+
+        // Get the page number, entries per page, and search query from the query parameters
+        const currentPage = parseInt(req.query.page) || 1;
+        const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
+        const searchQuery = req.query.search || ''; // Default to an empty string if no search query
+
+        // Additional logic to filter clients based on the search query
+        const filteredClients = clients.filter(client => {
+            // Customize this logic based on how you want to perform the search
+            return (
+                client.clientName.toLowerCase().includes(searchQuery.toLowerCase())
+                // Add more fields if needed
+            );
+        });
+
+        // Calculate total pages based on the total number of filtered clients and entries per page
+        const totalFilteredClients = filteredClients.length;
+        const totalPages = Math.ceil(totalFilteredClients / entriesPerPage);
+
+        // Implement pagination and send the filtered clients to the view
+        const startIndex = (currentPage - 1) * entriesPerPage;
+        const endIndex = currentPage * entriesPerPage;
+        const paginatedClients = filteredClients.slice(startIndex, endIndex);
+
+        // Check for the success query parameter
+        let successMessage;
+        if(req.query.success === 'new'){
+            successMessage = 'Client created successfully!';
+        } else if (req.query.success === 'update'){
+            successMessage = 'Client updated successfully!';
+        }
+        
+        // Render the 'marketing/clients' view and pass the necessary data
         const viewsData = {
-            pageTitle: 'Marketing User - Booked Transactions',
+            pageTitle: 'Marketing User - Clients',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/booked_transactions',
+            route: 'booked_transactions',
+            general_scripts: 'marketing/marketing_scripts',
+            clients: paginatedClients,
+            currentPage,
+            totalPages,
+            entriesPerPage,
+            searchQuery,
+            successMessage,
         };
-        res.render('booked_transactions', viewsData);
+        res.render('dashboard', viewsData);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
