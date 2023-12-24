@@ -1,56 +1,95 @@
 <!-- views/marketing/booked_transactions.ejs -->
 
 <div class="content">
-    <!-- The Modal -->
-    <div class="modal" id="myModal">
-        <div class="modal-dialog  modal-lg">
-            <div class="modal-content">
-
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h4 class="modal-title">Booked Transaction</h4>
-                <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="modal-body">
-                <div class="d-flex gap-3">
-                    <div>
-                        <label for="haulingDate">
-                            <i class="fa-solid fa-calendar-days"></i>
-                            Hauling Date
-                        </label><br>
-                        <input type="date" name="haulingDate" id="haulingDate" autocomplete="off" class="form-control" style="width: fit-content;" required readonly>
+    <form action="">
+        <div class="modal" id="myModal" style="height: 100vh; width: 100%;">
+            <div class="modal-dialog  modal-lg" style="width: 100% !important;">
+                <div class="modal-content">
+    
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Booked Transaction</h4>
+                    <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                </div>
+    
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <div class="row d-flex gap-3 flex-wrap mb-3">
+                        <div class="col">
+                            <label for="haulingDate">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                Hauling Date
+                            </label><br>
+                            <input type="date" name="haulingDate" id="haulingDate" autocomplete="off" class="form-control" required readonly>
+                        </div>
+                        <div class="col">
+                            <label for="haulingTime">
+                                <i class="fa-regular fa-clock"></i>
+                                Hauling Time
+                            </label><br>
+                            <input type="time" name="haulingTime" id="haulingTime" autocomplete="off" class="form-control" required>
+                        </div>
                     </div>
-                    <div>
-                        <label for="haulingTime">
-                            <i class="fa-regular fa-clock"></i>
-                            Hauling Time
-                        </label><br>
-                        <input type="time" name="haulingTime" id="haulingTime" autocomplete="off" class="form-control" style="width: fit-content;" required>
+                    <div class="row d-flex gap-3 flex-wrap mb-3">
+                        <div class="col">
+                            <label for="client">
+                                <i class="fa-solid fa-user"></i>
+                                Client
+                            </label><br>
+                            <input class="form-control" list="clientList" id="clientName" name="clientName" autocomplete="off" required placeholder="Type to search Client" onchange="updateClientId()">
+                            <input type="hidden" id="clientId" name="clientId">
+                            <datalist id="clientList">
+                                <option value="" disabled selected>Select Client</option>
+                                <% clients.forEach(client => { %>
+                                    <option value="<%= client.clientName %>" data-clientId="<%= client.clientId %>"><%= client.clientName %></option>
+                                <% }); %>
+                            </datalist>
+                        </div>
+                    </div>
+                    <div class="row d-flex gap-3 flex-wrap mb-3">
+                        <div class="col">
+                            <label for="submit_to">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                Submit To
+                            </label><br>
+                            <select name="submit_to" id="submit_to" class="form-control" required>
+                                <option value="" disabled selected>SELECT</option>
+                                <option value="LOGISTICS">LOGISTICS</option>
+                                <option value="RECEIVING">RECEIVING</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="type_of_waste">
+                                <i class="fa-solid fa-trash-can"></i>
+                                Type of Waste
+                            </label><br>
+                            <input class="form-control" list="QuotationWasteList" id="wasteName" name="wasteName" autocomplete="off" required placeholder="Type to search Type of Waste..." onchange="updateWasteId()">
+                            <input type="hidden" id="wasteId" name="wasteId">
+                            <datalist id="QuotationWasteList"></datalist>
+                        </div>
+                    </div>
+                    <div class="row gap-3 mb-3 flex-wrap" id="type_of_vehicle_row" style="display: none;">
+                        <div class="col">
+                            <label for="type_of_vehicle1">
+                                <i class="fa-solid fa-truck"></i>
+                                Type of Vehicle 1
+                            </label>
+                            <input class="form-control" list="QuotationTransportationList" id="typeOfVehicle" name="typeOfVehicle" autocomplete="off" required placeholder="Type to search Type of Vehicle..." onchange="updateVehicleId()">
+                            <input type="hidden" id="vehicleId" name="vehicleId">
+                            <datalist id="QuotationTransportationList"></datalist>
+                        </div>
                     </div>
                 </div>
-                <label for="client">
-                    <i class="fa-solid fa-user"></i>
-                    Client
-                </label><br>
-                <input class="form-control" list="clientList" id="client" name="client" required placeholder="Type to search...">
-                <datalist name="clientList" id="clientList">
-                    <option value="" disabled selected>Select Client</option>
-                    <% clients.forEach(client => { %>
-                        <option value="<%= client.clientId %>"><%= client.clientName %></option>
-                    <% }); %>
-                </datalist>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
-
+    
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+    
+                </div>
             </div>
         </div>
-    </div>
+    </form>
     <h1>December 2023</h1>
     <table class="calendar">
         <thead>
@@ -67,9 +106,162 @@
         <tbody id="calendar_days"></tbody>
     </table>
 </div>
-
 <script>
-    generateCalendarDays(2023, 11)
+    function updateClientId() {
+        var clientNameInput = document.getElementById('clientName');
+        var clientIdInput = document.getElementById('clientId');
+        var wasteNameInput = document.getElementById('wasteName');
+        var wasteIdInput = document.getElementById('wasteId');
+
+        // Find the selected option in the client datalist
+        var selectedClientOption = document.querySelector('#clientList option[value="' + clientNameInput.value + '"]');
+
+        // If a matching client option is found, update the clientIdInput value
+        if (selectedClientOption) {
+            clientIdInput.value = selectedClientOption.getAttribute('data-clientId');
+            // Fetch and update the waste datalist based on the selected client
+            updateWasteDatalist(clientIdInput.value);
+            updateTransportationDatalist(clientIdInput.value);
+        } else {
+            // The entered value is not in the list
+            clientIdInput.value = '';
+            wasteNameInput.innerHTML = '<option value="" disabled selected>Select Waste</option>';
+            wasteIdInput.value = '';
+
+            // You can clear the input or display a message to the user
+            clientNameInput.value = '';
+            alert('Please select a client from the list.');
+        }
+    }
+
+    function updateWasteId() {
+        var wasteName = document.getElementById('wasteName');
+        var wasteId = document.getElementById('wasteId');
+
+        // Find the selected option in the waste datalist
+        var selectedWasteOption = document.querySelector('#QuotationWasteList option[value="' + wasteName.value + '"]');
+
+        // If a matching waste option is found, update the wasteId value
+        if (selectedWasteOption) {
+            wasteId.value = selectedWasteOption.getAttribute('data-wasteId');
+        } else {
+            // The entered value is not in the list
+            wasteId.value = '';
+
+            // You can clear the input or display a message to the user
+            wasteName.value = '';
+            alert('Please select a waste from the list.');
+        }
+    }
+
+    function updateVehicleId() {
+        var typeOfVehicle = document.getElementById('typeOfVehicle');
+        var vehicleId = document.getElementById('vehicleId');
+
+        // Find the selected option in the waste datalist
+        var selectedWasteOption = document.querySelector('#QuotationTransportationList option[value="' + typeOfVehicle.value + '"]');
+
+        // If a matching waste option is found, update the vehicleId value
+        if (selectedWasteOption) {
+            vehicleId.value = selectedWasteOption.getAttribute('data-vehicleId');
+            console.log(vehicleId.value)
+        } else {
+            // The entered value is not in the list
+            vehicleId.value = '';
+
+            // You can clear the input or display a message to the user
+            typeOfVehicle.value = '';
+            alert('Please select a waste from the list.');
+        }
+    }
+
+    function updateWasteDatalist(clientId) {
+        // Replace the URL with the actual endpoint on your server
+        const endpoint = `/dashboard/getQuotationWastesByClient?clientId=${clientId}`;
+        fetch(endpoint)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(wastes => {
+                // Update the QuotationWasteList datalist options accordingly
+                const QuotationWasteList = document.getElementById('QuotationWasteList');
+                const wasteNameInput = document.getElementById('wasteName');
+                const wasteIdInput = document.getElementById('wasteId');
+
+                // Clear existing options
+                QuotationWasteList.innerHTML = '<option value="" disabled selected>Select Waste</option>';
+
+                // Add new options based on the fetched data
+                wastes.forEach(waste => {
+                    const option = document.createElement('option');
+                    option.value = waste.wasteName;
+                    option.setAttribute('data-wasteId', waste.id);
+                    QuotationWasteList.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching wastes:', error);
+            });
+    }
+
+    function updateTransportationDatalist(clientId) {
+        // Replace the URL with the actual endpoint on your server
+        const endpoint = `/dashboard/getQuotationTransportationByClient?clientId=${clientId}`;
+
+        fetch(endpoint)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(transportation => {
+                console.log(transportation)
+                // Update the QuotationTransportationList datalist options accordingly
+                const QuotationTransportationList = document.getElementById('QuotationTransportationList');
+                const typeOfVehicle = document.getElementById('typeOfVehicle');
+                const vehicleIdInput = document.getElementById('vehicleId');
+
+                // Clear existing options
+                QuotationTransportationList.innerHTML = '<option value="" disabled selected>Select Waste</option>';
+
+                // Add new options based on the fetched data
+                transportation.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.vehicleId;
+                    option.setAttribute('data-vehicleId', vehicle.id);
+                    QuotationTransportationList.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching wastes:', error);
+            });
+    }
+
+    // Add an event listener to the "Submit To" dropdown
+    document.getElementById('submit_to').addEventListener('change', function () {
+        // Get the selected value
+        var selectedValue = this.value;
+
+        // Get the row containing the "Type of Vehicle" dropdown
+        var typeOfVehicleRow = document.getElementById('type_of_vehicle_row');
+
+        // Toggle the visibility based on the selected value
+        if (selectedValue === 'LOGISTICS') {
+            typeOfVehicleRow.style.display = 'flex';
+        } else {
+            typeOfVehicleRow.style.display = 'none';
+            console.log("none")
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        generateCalendarDays(2023, 11);
+    });
 
     function generateCalendarDays(year, month) {
         // const hauling_date = marketing_transaction_form.querySelector("#hauling_date");
@@ -215,7 +407,6 @@
                         var formattedDate = year + '-' + (month + 1).toString().padStart(2, "0") + '-' + clickedDate.toString().padStart(2, "0");
 
                         // Set the hauling_date input value
-                        console.log(clickedDate)
                         document.getElementById("haulingDate").value = formattedDate;
 
                     });

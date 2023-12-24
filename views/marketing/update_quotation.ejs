@@ -415,7 +415,7 @@
                                         <div class="assignatory">
                                             <div>
                                                 <div class="signature" id="marketing_signature"><img src="/images/<%= employeeSignature %>" alt=""></div>
-                                                <h3 class="bold"><u id="marketing_user"><%= employeeName %></u></h3>
+                                                <h3 class="bold" id="marketing_user"><%= employeeName %></h3>
                                             </div>
                                             <div>
                                                 <h4>Marketing Staff / CSR</h4>
@@ -429,7 +429,7 @@
                                         <div class="assignatory">
                                             <div>
                                                 <div class="signature" id="accounting_head_signature"></div>
-                                                <h3 class="bold"><u>Daisy Cardinez</u></h3>
+                                                <h3 class="bold">Daisy Cardinez</h3>
                                             </div>
                                             <div>
                                                 <h4>Accounting Manager</h4>
@@ -443,7 +443,7 @@
                                         <div class="assignatory">
                                             <div>
                                                 <div class="signature" id="vice_president_signature"></div>
-                                                <h3 class="bold"><u>Exequiel B. De Vera</u></h3>
+                                                <h3 class="bold">Exequiel B. De Vera</h3>
                                             </div>
                                             <div>
                                                 <h4>Vice-President</h4>
@@ -816,6 +816,11 @@
                                 justify-content: end;
                                 height: 60px;
                                 border: 1px solid black ;
+                            }
+        
+                            #what_to_print .assignatory div h3
+                            {
+                                text-decoration: underline;
                             }
         
                         </style>
@@ -1314,16 +1319,10 @@
                     unit: 'mm',
                     format: 'letter',
                     orientation: 'portrait',
-                    margin: { top: -30, right: -0, bottom: 0, left: 0 }
+                    margin: { top: 0, right: 200, bottom: 0, left: 0 }
                 },
                 pagebreak: { before: ['avoid'] }
             };
-
-            const marginTop = 0; // Top margin in mm
-            const marginBottom = 0; // Bottom margin in mm
-
-            // Set the page height to account for the top and bottom margins
-            const pageHeight = 279.4 - marginTop - marginBottom;
 
             // Generate the PDF with the adjusted options
             html2pdf()

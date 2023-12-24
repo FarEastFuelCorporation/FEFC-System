@@ -48,7 +48,25 @@ async function getBookedTransactionsController(req, res) {
 
         // Fetch all clients from the database
         const clients = await Client.findAll();
-        const quotations = await Quotation.findAll();
+        const quotation = await Quotation.findAll({
+            where: { 
+                status: 'ACTIVE' // Add this condition
+            },
+            include: [
+                { model: Client, as: 'Client' },
+                { model: QuotationWaste, as: 'QuotationWaste',
+                    include: [ 
+                        { model: TypeOfWaste, as: 'TypeOfWaste' },
+                    ],
+                },
+                { model: QuotationTransportation, as: 'QuotationTransportation',
+                    include: [ 
+                        { model: VehicleType, as: 'VehicleType' },
+                    ], 
+                },
+                { model: Employee, as: 'Employee' }
+            ],
+        });
 
 
         // Check for the success query parameter
@@ -67,7 +85,7 @@ async function getBookedTransactionsController(req, res) {
             route: 'booked_transactions',
             general_scripts: 'marketing/marketing_scripts',
             clients,
-            quotations,
+            quotation,
             currentPage,
             totalPages,
             entriesPerPage,
@@ -249,18 +267,13 @@ async function getUpdateClientController(req, res) {
     var currentPage, totalPages, entriesPerPage, searchQuery
 
     // Fetch the client ID from the request parameters
-    const clientId = req.query.clientId;
+    const clientId = req.params.clientId;
 
     // Fetch all clients from the database (You might need to modify this based on your use case)
-    const clients = await Client.findAll();
-
-    // Additional logic to filter clients based on the search query
-    const filteredClients = clients.filter(client => {
-        // Customize this logic based on how you want to perform the search
-        return (
-            client.clientId.toLowerCase().includes(clientId.toLowerCase())
-        );
-    });
+    const client = await Client.findOne({
+            where: { clientId },
+        }
+    );
 
     // Render the dashboard view with data
     const viewsData = {
@@ -269,7 +282,7 @@ async function getUpdateClientController(req, res) {
         content: 'marketing/update_client',
         route: 'marketing_dashboard',
         general_scripts: 'marketing/marketing_scripts',
-        filteredClients,
+        client,
         currentPage,
         totalPages,
         entriesPerPage,
@@ -590,7 +603,11 @@ async function getUpdateQuotationController(req, res) {
         const typesOfWastes = await TypeOfWaste.findAll();
         const vehicleTypes = await VehicleType.findAll();
         const quotation = await Quotation.findAll({
-            where: { quotationCode, revisionNumber },
+            where: { 
+                quotationCode, 
+                revisionNumber,
+                status: 'ACTIVE' // Add this condition
+            },
             include: [
                 { model: Client, as: 'Client' },
                 { model: QuotationWaste, as: 'QuotationWaste',
@@ -739,6 +756,51 @@ async function postUpdateQuotationController(req, res) {
     }
 };
 
+// other controller
+async function getQuotationWasteByClient(req, res) {
+    try {
+        const clientId = req.query.clientId;
+        // Fetch Quotations and include associated QuotationWastes
+        const quotations = await Quotation.findAll({
+            where: { clientId },
+            include: [{ 
+                model: QuotationWaste, 
+                as: 'QuotationWaste' 
+            }]
+        });
+        // Extract QuotationWastes from the fetched Quotations
+        const wastes = quotations.flatMap(quotation => quotation.QuotationWaste);
+        
+        // Respond with the fetched wastes in JSON format
+        res.json(wastes);
+    } catch (error) {
+        console.error('Error fetching wastes by client:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+async function getQuotationTransportationByClient(req, res) {
+    try {
+        const clientId = req.query.clientId;
+        // Fetch Quotations and include associated QuotationTransportation
+        const quotations = await Quotation.findAll({
+            where: { clientId },
+            include: [{ 
+                model: QuotationTransportation,
+                as: 'QuotationTransportation' 
+            }],
+        });
+        // Extract QuotationTransportation from the fetched Quotations
+        const transportation = quotations.flatMap(quotation => quotation.QuotationTransportation);
+        
+        // Respond with the fetched wastes in JSON format
+        res.json(transportation);
+    } catch (error) {
+        console.error('Error fetching wastes by client:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 module.exports = { 
     getDashboardController,
     getBookedTransactionsController,
@@ -754,4 +816,6 @@ module.exports = {
     postNewQuotationController,
     getUpdateQuotationController,
     postUpdateQuotationController,
+    getQuotationWasteByClient,
+    getQuotationTransportationByClient,
 };

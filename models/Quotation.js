@@ -38,6 +38,9 @@ const Quotation = sequelize.define(
         remarks: {
             type: DataTypes.STRING,
         },
+        status: {
+            type: DataTypes.STRING,
+        },
         submittedBy: {
             type: DataTypes.STRING,
             allowNull: false,

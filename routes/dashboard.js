@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController } = require('../controllers/dashboardControllers');
+const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient } = require('../controllers/dashboardControllers');
 
 // Dashboard route
 router.get('/', isAuthenticated, getDashboardController);
@@ -14,15 +14,13 @@ router.get('/booked_transactions', getBookedTransactionsController);
 // Clients route
 router.get('/clients', getClientsController);
 
-router.get('/clients/:clientId', getClientDetails);
+// router.get('/clients/:clientId', getClientDetails);
 
 // New Client Form route
-router.get('/clients/new', getNewClientController);
-
 router.post('/clients/new', postNewClientController);
 
-// Clients route
-router.get('/clients/update/:quotationCode', getUpdateClientController);
+// Update Client route
+router.get('/clients/update/:clientId', getUpdateClientController);
 
 router.post('/clients/update', postUpdateClientController);
 
@@ -44,5 +42,9 @@ router.post('/quotations/update/', postUpdateQuotationController);
 router.get('/commissions', (req, res) => {
     res.render('commissions');
 });
+
+// Other route
+router.get('/getQuotationWastesByClient', getQuotationWasteByClient);
+router.get('/getQuotationTransportationByClient', getQuotationTransportationByClient);
 
 module.exports = router;

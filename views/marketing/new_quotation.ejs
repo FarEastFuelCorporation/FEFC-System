@@ -62,7 +62,6 @@
                                 </label><br>
                                 <input class="form-control" list="clientList" id="clientName" name="clientName" required placeholder="Type to search..." onchange="updateClientId()">
                                 <input type="hidden" id="clientId" name="clientId">
-                                
                                 <datalist name="clientList" id="clientList">
                                     <option value="" disabled selected>Select Client</option>
                                     <% clients.forEach(client => { %>
@@ -416,7 +415,7 @@
                                         <div class="assignatory">
                                             <div>
                                                 <div class="signature" id="marketing_signature"><img src="/images/<%= employeeSignature %>" alt=""></div>
-                                                <h3 class="bold"><u id="marketing_user"><%= employeeName %></u></h3>
+                                                <h3 id="marketing_user" class="bold"><%= employeeName %></h3>
                                             </div>
                                             <div>
                                                 <h4>Marketing Staff / CSR</h4>
@@ -430,7 +429,7 @@
                                         <div class="assignatory">
                                             <div>
                                                 <div class="signature" id="accounting_head_signature"></div>
-                                                <h3 class="bold"><u>Daisy Cardinez</u></h3>
+                                                <h3 class="bold">Daisy Cardinez</h3>
                                             </div>
                                             <div>
                                                 <h4>Accounting Manager</h4>
@@ -444,7 +443,7 @@
                                         <div class="assignatory">
                                             <div>
                                                 <div class="signature" id="vice_president_signature"></div>
-                                                <h3 class="bold"><u>Exequiel B. De Vera</u></h3>
+                                                <h3 class="bold">Exequiel B. De Vera</h3>
                                             </div>
                                             <div>
                                                 <h4>Vice-President</h4>
@@ -818,7 +817,11 @@
                                 height: 60px;
                                 border: 1px solid black ;
                             }
-        
+                                    
+                            #what_to_print .assignatory div h3
+                            {
+                                text-decoration: underline;
+                            }
                         </style>
                     </div><br>   
                 </form>

@@ -11,4 +11,6 @@ const sequelize = new Sequelize({
     database: process.env.DB_DBNAME,
 });
 
+sequelize.options.logging = console.log;
+
 module.exports = sequelize;

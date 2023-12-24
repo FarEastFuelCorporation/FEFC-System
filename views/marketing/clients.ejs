@@ -6,11 +6,9 @@
             <h4>CLIENTS</h4><br>
             <div>
                 <label class="d-flex gap-3">
-                    <a href="/dashboard/clients/new">
-                        <button type="button" class="form-control fw-bold bg-success text-white">
-                            <h6>NEW CLIENT FORM</h6>
-                        </button>
-                    </a>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newClientModal">
+                        <h6>NEW CLIENT FORM</h6>
+                    </button>
                 </label>
             </div>
             <% if (successMessage) { %>
@@ -72,7 +70,7 @@
                                     <td><%= client.billerContactNumber %></td>
                                     <td>
                                         <!-- Update button -->
-                                        <a href="/dashboard/clients/update?clientId=<%= client.clientId %>">
+                                        <a href="/dashboard/clients/update/<%= client.clientId %>">
                                             <button type="button" class="btn btn-success">
                                                 <h6>Update</h6>
                                             </button>
@@ -112,7 +110,106 @@
 
                 </div>
             </div>
+
+
             
         </section>
     </div>
+
+    <form id="newClientForm" action="/dashboard/clients/new" method="post">
+        <div class="modal" id="newClientModal" style="height: 100vh; width: 100%;">
+            <div class="modal-dialog  modal-lg" style="width: 100% !important;">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">NEW CLIENT FORM</h4>
+                        <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                    </div>
+        
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="clientName">
+                                    <i class="fa-solid fa-user"></i>
+                                    Client
+                                    </label><br>
+                                <input type="text" name="clientName" id="clientName" autocomplete="off" class="form-control" required placeholder="Input Client's Name...">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="address">
+                                    <i class="fa-solid fa-house-user"></i>
+                                    Address
+                                </label>
+                                <input type="text" name="address" id="address" autocomplete="off" class="form-control" required placeholder="Input Client's Address...">
+                            </div>
+                        </div>
+                        <div class="row gap-3 mb-3">
+                            <div class="col">
+                                <label for="natureOfBusiness">
+                                    <i class="fa-solid fa-table-list"></i>
+                                    Nature of Business
+                                </label><br>
+                                <input type="text" name="natureOfBusiness" id="natureOfBusiness" autocomplete="off" class="form-control" required placeholder="Input Client's Nature of Business...">
+                            </div>
+                            <div class="col">
+                                <label for="contactNumber">
+                                    <i class="fa-solid fa-square-phone"></i>
+                                    Contact Number
+                                </label><br>
+                                <input type="text" name="contactNumber" id="contactNumber" autocomplete="off" class="form-control" required placeholder="Input Client's Contact Number...">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="billerName">
+                                    <i class="fa-solid fa-user"></i>
+                                    Biller Name
+                                    </label><br>
+                                <input type="text" name="billerName" id="billerName" autocomplete="off" class="form-control" required placeholder="Input Biller's Name...">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="billerAddress">
+                                    <i class="fa-solid fa-house-user"></i>
+                                    Biller Address
+                                </label><br>
+                                <input type="text" name="billerAddress" id="billerAddress" autocomplete="off" class="form-control" required placeholder="Input Biller's Address...">
+                            </div>
+                        </div>
+                        <div class="row mb-3 gap-3">
+                            <div class="col">
+                                <label for="billerContactPerson">
+                                    <i class="fa-solid fa-square-phone"></i>
+                                    Biller Contact Person
+                                </label><br>
+                                <input type="text" name="billerContactPerson" id="billerContactPerson" autocomplete="off" class="form-control" required placeholder="Input Biller's Contact Person...">    
+                            </div>
+                            <div class="col mb-3">
+                                <label for="billerContactNumber">
+                                    <i class="fa-solid fa-square-phone"></i>
+                                    Biller Contact Number
+                                </label><br>
+                                <input type="text" name="billerContactNumber" id="billerContactNumber" autocomplete="off" class="form-control" required placeholder="Input Biller's Contact Number...">
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="submit" id="submit_btn" class="btn btn-success">
+                            Submit
+                        </button>
+                        <button type="reset" id="reset" class="btn btn-danger">
+                            Clear
+                        </button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
