@@ -45,6 +45,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>QUOTATION<br>CODE</th>
+                                <th>REVISION<br>#</th>
                                 <th>VALIDITY</th>
                                 <th>CLIENT</th>
                                 <th>TERMS CHARGE</th>
@@ -61,6 +62,7 @@
                                 <tr>
                                     <td><%= startIndex + index + 1 %></td>
                                     <td><%= quotation.quotationCode %></td>
+                                    <td><%= quotation.revisionNumber %></td>
                                     <td><%= new Date(quotation.validity).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></td>
                                     <td><%= quotation.Client.clientName %></td>
                                     <td><%= quotation.termsCharge %></td>
@@ -69,12 +71,12 @@
                                     <td><%= quotation.remarks %></td>
                                     <td><%= quotation.Employee.firstName %> <%= quotation.Employee.lastName %></td>
                                     <td>
-                                        <!-- Update button -->
-                                        <a href="/dashboard/quotations/update/<%= quotation.quotationCode %>">
+                                        <!-- Update button with two parameters -->
+                                        <a href="/dashboard/quotations/update/<%= quotation.quotationCode %>/<%= quotation.revisionNumber %>">
                                             <button type="button" class="btn btn-success">
                                                 <h6>View</h6>
                                             </button>
-                                        </a>
+                                        </a>                                        
                                     </td>
                                 </tr>
                             <% }); %>

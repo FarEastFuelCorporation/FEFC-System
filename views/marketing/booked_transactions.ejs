@@ -1,6 +1,56 @@
 <!-- views/marketing/booked_transactions.ejs -->
 
 <div class="content">
+    <!-- The Modal -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Booked Transaction</h4>
+                <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="d-flex gap-3">
+                    <div>
+                        <label for="haulingDate">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            Hauling Date
+                        </label><br>
+                        <input type="date" name="haulingDate" id="haulingDate" autocomplete="off" class="form-control" style="width: fit-content;" required readonly>
+                    </div>
+                    <div>
+                        <label for="haulingTime">
+                            <i class="fa-regular fa-clock"></i>
+                            Hauling Time
+                        </label><br>
+                        <input type="time" name="haulingTime" id="haulingTime" autocomplete="off" class="form-control" style="width: fit-content;" required>
+                    </div>
+                </div>
+                <label for="client">
+                    <i class="fa-solid fa-user"></i>
+                    Client
+                </label><br>
+                <input class="form-control" list="clientList" id="client" name="client" required placeholder="Type to search...">
+                <datalist name="clientList" id="clientList">
+                    <option value="" disabled selected>Select Client</option>
+                    <% clients.forEach(client => { %>
+                        <option value="<%= client.clientId %>"><%= client.clientName %></option>
+                    <% }); %>
+                </datalist>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+            </div>
+        </div>
+    </div>
     <h1>December 2023</h1>
     <table class="calendar">
         <thead>
@@ -69,6 +119,9 @@
                     bookButton.classList.add("btn");
                     bookButton.classList.add("btn-success");
                     bookButton.classList.add("book-button");
+                    // Set data-toggle and data-target attributes for Bootstrap modal
+                    bookButton.setAttribute("data-toggle", "modal");
+                    bookButton.setAttribute("data-target", "#myModal");
 
                     // Create a div for "Available slot"
                     var availableSlotDiv = document.createElement("div");
@@ -157,15 +210,14 @@
                     bookButton.addEventListener("click", function (event) {
                         // Get the date from the clicked button's parent td element
                         var clickedDate = event.currentTarget.parentElement.querySelector('.td_header span').textContent;
-    
+
                         // Format the date (assuming simple formatting for illustration purposes)
                         var formattedDate = year + '-' + (month + 1).toString().padStart(2, "0") + '-' + clickedDate.toString().padStart(2, "0");
-    
+
                         // Set the hauling_date input value
-                        hauling_date.value = formattedDate;
-    
-                        // Show the form
-                        form_tab_marketing_transaction_form.style.display = "block";
+                        console.log(clickedDate)
+                        document.getElementById("haulingDate").value = formattedDate;
+
                     });
                 } else {
                     // Set background color to gray for cells without a number

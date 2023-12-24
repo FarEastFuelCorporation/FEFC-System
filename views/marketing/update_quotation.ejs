@@ -710,7 +710,6 @@
                                 border-right: 1px solid black;
                                 text-align: center !important;
                                 display: flex;
-                                align-items: center !important;
                                 justify-content: center ;
                                 font-size: 10px !important;
                                 padding: 2px 2px !important;
@@ -1224,7 +1223,7 @@
         generateQRCode(quotationNo, revisionNo);
 
         function generateQRCode(quotationNo, revisionNo) {
-            const qrCodeValue = `http://192.168.1.85:3000/quotations/validate/${quotationNo}`;
+            const qrCodeValue = `http://192.168.1.85:3000/quotations/validate/${quotationNo}/${revisionNo}`;
 
             // Create a QR code instance
             const qr = qrcode(0, 'L'); // Error correction level: L (Low)
@@ -1308,14 +1307,14 @@
             let modifiedCompanyName = client.replace(/\./g, '');
 
             const opt = {
-                filename: `${quotation_no} - ${client}`,
+                filename: `${quotation_no} - ${modifiedCompanyName}`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 10 },
                 jsPDF: {
                     unit: 'mm',
                     format: 'letter',
                     orientation: 'portrait',
-                    margin: { top: -10, right: 0, bottom: 0, left: 0 }
+                    margin: { top: -30, right: -0, bottom: 0, left: 0 }
                 },
                 pagebreak: { before: ['avoid'] }
             };
@@ -1325,9 +1324,6 @@
 
             // Set the page height to account for the top and bottom margins
             const pageHeight = 279.4 - marginTop - marginBottom;
-
-            // Reset the element's transform style
-            element.style.transform = 'none';
 
             // Generate the PDF with the adjusted options
             html2pdf()

@@ -43,31 +43,13 @@ async function getDashboardController(req, res) {
 
 // Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
-    try {        // Fetch all clients from the database
+    try {
+        var currentPage, totalPages, entriesPerPage, searchQuery
+
+        // Fetch all clients from the database
         const clients = await Client.findAll();
+        const quotations = await Quotation.findAll();
 
-        // Get the page number, entries per page, and search query from the query parameters
-        const currentPage = parseInt(req.query.page) || 1;
-        const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
-        const searchQuery = req.query.search || ''; // Default to an empty string if no search query
-
-        // Additional logic to filter clients based on the search query
-        const filteredClients = clients.filter(client => {
-            // Customize this logic based on how you want to perform the search
-            return (
-                client.clientName.toLowerCase().includes(searchQuery.toLowerCase())
-                // Add more fields if needed
-            );
-        });
-
-        // Calculate total pages based on the total number of filtered clients and entries per page
-        const totalFilteredClients = filteredClients.length;
-        const totalPages = Math.ceil(totalFilteredClients / entriesPerPage);
-
-        // Implement pagination and send the filtered clients to the view
-        const startIndex = (currentPage - 1) * entriesPerPage;
-        const endIndex = currentPage * entriesPerPage;
-        const paginatedClients = filteredClients.slice(startIndex, endIndex);
 
         // Check for the success query parameter
         let successMessage;
@@ -84,7 +66,8 @@ async function getBookedTransactionsController(req, res) {
             content: 'marketing/booked_transactions',
             route: 'booked_transactions',
             general_scripts: 'marketing/marketing_scripts',
-            clients: paginatedClients,
+            clients,
+            quotations,
             currentPage,
             totalPages,
             entriesPerPage,
@@ -601,12 +584,13 @@ async function getUpdateQuotationController(req, res) {
         var currentPage, totalPages, entriesPerPage, searchQuery
         const employeeId = req.session.employeeId;
         const quotationCode = req.params.quotationCode;
+        const revisionNumber = req.params.revisionNumber;
     
         const employee = await Employee.findOne({ where: { employeeId } });
         const typesOfWastes = await TypeOfWaste.findAll();
         const vehicleTypes = await VehicleType.findAll();
         const quotation = await Quotation.findAll({
-            where: { quotationCode },
+            where: { quotationCode, revisionNumber },
             include: [
                 { model: Client, as: 'Client' },
                 { model: QuotationWaste, as: 'QuotationWaste',

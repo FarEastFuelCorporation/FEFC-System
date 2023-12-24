@@ -37,7 +37,7 @@ router.get('/quotations/new', getNewQuotationController);
 router.post('/quotations/new', postNewQuotationController);
 
 // Update Quotation Form route
-router.get('/quotations/update/:quotationCode', getUpdateQuotationController);
+router.get('/quotations/update/:quotationCode/:revisionNumber', getUpdateQuotationController);
 router.post('/quotations/update/', postUpdateQuotationController);
 
 // Commissions route

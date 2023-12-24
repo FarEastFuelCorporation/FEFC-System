@@ -6,7 +6,7 @@
             <h4>QUOTATIONS</h4><br>
             <div id="new_client_form_tab">
                 <h5>NEW QUOTATION FORM</h5><br>
-                <form  action="/dashboard/quotations/new" method="post">
+                <form id="quotationForm" action="/dashboard/quotations/new" method="post">
                     <input type="hidden" name="user" id="user" value="<%= employeeName %>">
                     <input type="hidden" name="userId" id="userId" value="<%= employeeId %>">
                     <h6>QUOTATION DETAILS</h6>
@@ -60,12 +60,15 @@
                                     <i class="fa-solid fa-user"></i>
                                     Client
                                 </label><br>
-                                <select name="client" id="client" class="form-control" required>
+                                <input class="form-control" list="clientList" id="clientName" name="clientName" required placeholder="Type to search..." onchange="updateClientId()">
+                                <input type="hidden" id="clientId" name="clientId">
+                                
+                                <datalist name="clientList" id="clientList">
                                     <option value="" disabled selected>Select Client</option>
                                     <% clients.forEach(client => { %>
-                                        <option value="<%= client.clientId %>"><%= client.clientName %></option>
+                                        <option value="<%= client.clientName %>" data-clientid="<%= client.clientId %>"><%= client.clientName %></option>
                                     <% }); %>
-                                </select>
+                                </datalist>
                             </div>
                         </div><br>
                         <div class="d-flex gap-3">
@@ -107,12 +110,13 @@
                                         <i class="fa-solid fa-list"></i>
                                         Waste Code
                                     </label><br>
-                                    <select name="waste_code1" id="waste_code1" class="form-control" required>
+                                    <input class="form-control" list="waste_codeList" id="waste_code1" name="waste_code1" required placeholder="Type to search...">
+                                    <datalist name="waste_codeList" id="waste_codeList">
                                         <option value="" disabled selected>Select Waste Code</option>
                                         <% typesOfWastes.forEach(typesOfWaste => { %>
                                             <option value="<%= typesOfWaste.wasteId %>"><%= typesOfWaste.wasteCode %></option>
                                         <% }); %>
-                                    </select>
+                                    </datalist>
                                 </div>
                                 <div>
                                     <label for="waste_name1">
@@ -401,9 +405,9 @@
                                         <h3>2. Copy of BIR Form 2303 and 2307</h3>
                                     </div>
                                 </div>
-                                <% 
-
-                                %>
+                                <div id="qrCode">
+                                    <img id="qrCodeImage" src="" alt="">
+                                </div>
                                 <div class="footer">
                                     <div>
                                         <div class="footer_header">
@@ -454,7 +458,7 @@
                                         <div class="assignatory">
                                         </div>
                                     </div>
-                                </div>`
+                                </div>
                             </div>
                         </div>
                         <style>
@@ -707,7 +711,6 @@
                                 border-right: 1px solid black;
                                 text-align: center !important;
                                 display: flex;
-                                align-items: center !important;
                                 justify-content: center ;
                                 font-size: 10px !important;
                                 padding: 2px 2px !important;
@@ -1090,6 +1093,21 @@
     });
 </script>
 <script>
+        function updateClientId() {
+        var clientInput = document.getElementById('clientName');
+        var clientIdInput = document.getElementById('clientId');
+
+        // Find the selected option in the datalist
+        var selectedOption = document.querySelector('#clientList option[value="' + clientInput.value + '"]');
+
+        // If a matching option is found, update the clientIdInput value
+        if (selectedOption) {
+            clientIdInput.value = selectedOption.getAttribute('data-clientid');
+        } else {
+            clientIdInput.value = '';
+        }
+    }
+
     async function generateQuotation() {
         document.getElementById('what_to_print').style.display = "block";
         document.getElementById('downloadAndSubmitBtn').style.display = "block";
@@ -1179,7 +1197,7 @@
         }
 
         // Get the selected client ID from the dropdown
-        const clientId = document.getElementById('client').value;
+        const clientId = document.getElementById('clientId').value;
 
         document.getElementById('date_made_container').innerText = date_decoder(new Date());
         document.getElementById('valid_until_container').innerText = date_decoder(new Date().setDate(new Date().getDate() + 30)) ;
@@ -1191,6 +1209,28 @@
         document.getElementById('vice_president_signature').innerHTML = `<img src="/images/DE VERA_EXEQUIEL.png" alt="">`;
         document.getElementById('charge_input').innerText = document.getElementById('terms').value;
         document.getElementById('buying_input').innerText = document.getElementById('terms2').value;
+
+        const quotationNo = document.getElementById('quotation_no').value;
+        const revisionNo = document.getElementById('revision_no').value;
+
+        generateQRCode(quotationNo, revisionNo);
+
+        function generateQRCode(quotationNo, revisionNo) {
+            const qrCodeValue = `http://192.168.1.85:3000/quotations/validate/${quotationNo}`;
+
+            // Create a QR code instance
+            const qr = qrcode(0, 'L'); // Error correction level: L (Low)
+
+            // Set the value of the QR code
+            qr.addData(qrCodeValue);
+            qr.make();
+
+            // Get the QR code as a data URL
+            const qrDataURL = qr.createDataURL(4); // Scale factor: 4
+
+            // Display the QR code on your page (replace 'yourQRCodeImageId' with the actual ID)
+            document.getElementById('qrCodeImage').src = qrDataURL;
+        }
 
         try {
         const clientDetails = await fetchClientDetails(clientId);
@@ -1224,51 +1264,70 @@
         });
     }
 </script>
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Event listener for the "Generate Image" button
-  document.getElementById('generate_image_button').addEventListener('click', function () {
-    // Get the HTML content from the 'what_to_print' element
-    const htmlContent = document.getElementById('what_to_print').innerHTML;
+<script>
+    function convertToPDFandDownload() {
+        // Assuming your form has an ID 'quotationForm'
+        const quotationForm = document.querySelector('#quotationForm');
 
-    // Make a fetch request to send the HTML content to the server for generating the image
-    fetch('/generate-image', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ htmlContent }),
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.json(); // Assuming the server returns a JSON object with the Data URL
-    })
-    .then(data => {
-      // Create a link element
-      const downloadLink = document.createElement('a');
+        // Perform form validation before proceeding
+        const element = document.getElementById('what_to_print');
+        const quotation_no = document.getElementById("quotation_no").value;
+        const client = document.getElementById("clientName").value;
+        let modifiedCompanyName = client.replace(/\./g, '');
 
-      // Set the href attribute with the Data URL
-      downloadLink.href = data.dataUrl;
+        const opt = {
+            filename: `${quotation_no} - ${client}`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 10 },
+            jsPDF: {
+                unit: 'mm',
+                format: 'letter',
+                orientation: 'portrait',
+                margin: { top: -10, right: -30, bottom: 0, left: 0 }
+            },
+            pagebreak: { before: ['avoid'] }
+        };
 
-      // Set the download attribute with the desired filename
-      downloadLink.download = 'generated_image.png';
+        const marginTop = 0; // Top margin in mm
+        const marginBottom = 0; // Bottom margin in mm
 
-      // Append the link to the document
-      document.body.appendChild(downloadLink);
+        // Set the page height to account for the top and bottom margins
+        const pageHeight = 279.4 - marginTop - marginBottom;
 
-      // Trigger a click on the link to initiate the download
-      downloadLink.click();
+        // Generate the PDF with the adjusted options
+        html2pdf()
+            .set(opt)
+            .from(element)
+            .toContainer()
+            .then(() => {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    // Call the submit button click event immediately after the PDF is downloaded
+                });
+            });
+        // if (validateForm(quotationForm)) {
+        // } else {
+        //     // Handle the case where the form is not valid
+        //     alert('Please fill out the form completely before downloading.');
+        // }
+    }
 
-      // Remove the link from the document
-      document.body.removeChild(downloadLink);
-    })
-    .catch(error => {
-      console.error('Error generating image:', error);
-      // Handle errors if needed
-    });
-  });
-});
+    // Function to validate the form
+    function validateForm(form) {
+        // Query all input elements with the 'required' attribute
+        const requiredInputs = form.querySelectorAll('input[required]');
 
-</script> -->
+        // Check if all required inputs have a non-empty value
+        for (const input of requiredInputs) {
+            if (input.value.trim() === '') {
+                return false; // Form is not valid
+            }
+            // You can add more specific validation checks for different input types if needed
+        }
+
+        // Add more validation checks as needed
+
+        return true; // Form is valid
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', convertToPDFandDownload)
+</script>
