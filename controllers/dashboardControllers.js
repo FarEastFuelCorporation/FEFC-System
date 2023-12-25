@@ -2,6 +2,7 @@
 
 const Client = require("../models/Client");
 const Employee = require("../models/Employee");
+const MarketingTransaction = require("../models/MarketingTransaction");
 const Quotation = require("../models/Quotation");
 const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
@@ -44,7 +45,8 @@ async function getDashboardController(req, res) {
 // Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
     try {
-        var currentPage, totalPages, entriesPerPage, searchQuery
+        var currentPage, totalPages, entriesPerPage, searchQuery;
+        const employeeId = req.session.employeeId;
 
         // Fetch all clients from the database
         const clients = await Client.findAll();
@@ -72,18 +74,19 @@ async function getBookedTransactionsController(req, res) {
         // Check for the success query parameter
         let successMessage;
         if(req.query.success === 'new'){
-            successMessage = 'Client created successfully!';
+            successMessage = 'Transaction created successfully!';
         } else if (req.query.success === 'update'){
-            successMessage = 'Client updated successfully!';
+            successMessage = 'Transaction updated successfully!';
         }
 
-        // Render the 'marketing/clients' view and pass the necessary data
+        // Render the 'marketing/booked_transactions' view and pass the necessary data
         const viewsData = {
             pageTitle: 'Marketing User - Booked Transactions',
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/booked_transactions',
             route: 'booked_transactions',
             general_scripts: 'marketing/marketing_scripts',
+            employeeId,
             clients,
             quotation,
             currentPage,
@@ -98,6 +101,100 @@ async function getBookedTransactionsController(req, res) {
         res.status(500).send('Internal Server Error');
     }
 }
+async function postBookedTransactionsController(req, res) {
+    try {
+        const {
+            status,
+            haulingDate,
+            haulingTime,
+            clientId,
+            submitTo,
+            wasteId,
+            wasteCategory,
+            vehicleCounter,
+            ptt,
+            manifest,
+            pull_out_form,
+            remarks,
+            user,
+        } = req.body;
+
+        const lastMTFTransaction = await MarketingTransaction.findOne({
+            order: [['createdAt', 'DESC']],
+        });
+
+        // Get the current year and month
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear().toString();
+        const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+
+        // Check if it's a new year
+        const mtfNumber = generateMTFNumber(lastMTFTransaction)
+        function generateMTFNumber (lastMTFTransaction) {
+            if (lastMTFTransaction) {
+                const lastYear = lastMTFTransaction.mtfNumber.slice(3, 7);
+                const lastCounter = parseInt(lastMTFTransaction.mtfNumber.slice(-4));
+    
+                if (lastYear === currentYear) {
+                    // Generate the MTF number with the current year and month
+                    const newCounter = (lastCounter + 1).toString().padStart(4, '0');
+                    const generatedMtfNumber = `MTF${currentYear}${currentMonth}${newCounter}`;
+    
+                    // Log the data type of generatedMtfNumber
+                    console.log('Data type of generatedMtfNumber:', typeof generatedMtfNumber);
+    
+                    return generatedMtfNumber.toString(); // Explicitly convert to string
+                } else {
+                    // If it's a new year, start the counter at 1
+                    const generatedMtfNumber = `MTF${currentYear}${currentMonth}0001`;
+    
+                    // Log the data type of generatedMtfNumber
+                    console.log('Data type of generatedMtfNumber:', typeof generatedMtfNumber);
+    
+                    return generatedMtfNumber;
+                }
+            } else {
+                // If there are no previous transactions, start the counter at 1
+                const generatedMtfNumber = `MTF${currentYear}${currentMonth}0001`;
+    
+                // Log the data type of generatedMtfNumber
+                console.log('Data type of generatedMtfNumber:', typeof generatedMtfNumber);
+    
+                return generatedMtfNumber;
+            }
+        }
+
+        // Process dynamic fields
+        for (let i = 1; i <= vehicleCounter; i++) {
+            const typeOfVehicle =  req.body[`typeOfVehicle${i}`];
+
+            // Creating a new MarketingTransaction
+            const newMarketingTransaction = await MarketingTransaction.create({
+                mtfNumber: mtfNumber,
+                clientId: clientId,
+                quotationWasteId: wasteId,
+                quotationTransportationId: typeOfVehicle,
+                wasteCategoryId: wasteCategory,
+                haulingDate: haulingDate,
+                haulingTime: haulingTime,
+                pullOutFormNumber: pull_out_form,
+                pttNumber: ptt,
+                manifestNumber: manifest,
+                remarks: remarks,
+                submitTo: submitTo,
+                status: status,
+                submittedBy: user,
+            });
+        }
+
+        // Redirect back to the quotation route with a success message
+        res.redirect('/dashboard/booked_transactions?success=new');
+    } catch (error) {
+        // Handling errors
+        console.error('Error creating quotation:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 // Clients controller
 async function getClientsController(req, res) {
@@ -763,10 +860,9 @@ async function getQuotationWasteByClient(req, res) {
         // Fetch Quotations and include associated QuotationWastes
         const quotations = await Quotation.findAll({
             where: { clientId },
-            include: [{ 
-                model: QuotationWaste, 
-                as: 'QuotationWaste' 
-            }]
+            include: [
+                { model: QuotationWaste, as: 'QuotationWaste' }
+            ]
         });
         // Extract QuotationWastes from the fetched Quotations
         const wastes = quotations.flatMap(quotation => quotation.QuotationWaste);
@@ -785,9 +881,8 @@ async function getQuotationTransportationByClient(req, res) {
         // Fetch Quotations and include associated QuotationTransportation
         const quotations = await Quotation.findAll({
             where: { clientId },
-            include: [{ 
-                model: QuotationTransportation,
-                as: 'QuotationTransportation' 
+            include: [{ model: QuotationTransportation, as: 'QuotationTransportation',
+                include: [{ model: VehicleType, as: 'VehicleType' }]
             }],
         });
         // Extract QuotationTransportation from the fetched Quotations
@@ -804,6 +899,7 @@ async function getQuotationTransportationByClient(req, res) {
 module.exports = { 
     getDashboardController,
     getBookedTransactionsController,
+    postBookedTransactionsController,
     getClientsController,
     getClientDetails,
     getNewClientController,

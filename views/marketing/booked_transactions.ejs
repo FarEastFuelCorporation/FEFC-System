@@ -1,91 +1,123 @@
 <!-- views/marketing/booked_transactions.ejs -->
 
 <div class="content">
-    <form action="">
+    <form id="bookedTransaction" action="/dashboard/booked_transactions" method="post">
         <div class="modal" id="myModal" style="height: 100vh; width: 100%;">
             <div class="modal-dialog  modal-lg" style="width: 100% !important;">
                 <div class="modal-content">
-    
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Booked Transaction</h4>
-                    <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
-                </div>
-    
-                <!-- Modal Body -->
-                <div class="modal-body">
-                    <div class="row d-flex gap-3 flex-wrap mb-3">
-                        <div class="col">
-                            <label for="haulingDate">
-                                <i class="fa-solid fa-calendar-days"></i>
-                                Hauling Date
-                            </label><br>
-                            <input type="date" name="haulingDate" id="haulingDate" autocomplete="off" class="form-control" required readonly>
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Booked Transaction</h4>
+                        <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                    </div>
+        
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <input type="hidden" id="user" name="user" value="<%= employeeId %>">
+                        <input type="hidden" id="status" name="status" value="">
+                        <div class="row d-flex gap-3 flex-wrap mb-3">
+                            <div class="col">
+                                <label for="haulingDate">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    Hauling Date
+                                </label><br>
+                                <input type="date" name="haulingDate" id="haulingDate" autocomplete="off" class="form-control" required readonly>
+                            </div>
+                            <div class="col">
+                                <label for="haulingTime">
+                                    <i class="fa-regular fa-clock"></i>
+                                    Hauling Time
+                                </label><br>
+                                <input type="time" name="haulingTime" id="haulingTime" autocomplete="off" class="form-control" required>
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="haulingTime">
-                                <i class="fa-regular fa-clock"></i>
-                                Hauling Time
-                            </label><br>
-                            <input type="time" name="haulingTime" id="haulingTime" autocomplete="off" class="form-control" required>
+                        <div class="row d-flex gap-3 flex-wrap mb-3">
+                            <div class="col">
+                                <label for="clientName">
+                                    <i class="fa-solid fa-user"></i>
+                                    Client
+                                </label><br>
+                                <input class="form-control" list="clientList" id="clientName" name="clientName" autocomplete="off" required placeholder="Type to search Client" onchange="updateClientId()">
+                                <input type="hidden" id="clientId" name="clientId">
+                                <datalist id="clientList">
+                                    <option value="" disabled selected>Select Client</option>
+                                    <% clients.forEach(client => { %>
+                                        <option value="<%= client.clientName %>" data-clientId="<%= client.clientId %>"><%= client.clientName %></option>
+                                    <% }); %>
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="row d-flex gap-3 flex-wrap mb-3">
+                            <div class="col">
+                                <label for="submitTo">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    Submit To
+                                </label><br>
+                                <select name="submitTo" id="submitTo" class="form-control" required>
+                                    <option value="" disabled selected>SELECT</option>
+                                    <option value="LOGISTICS">LOGISTICS</option>
+                                    <option value="RECEIVING">RECEIVING</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="wasteName">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    Type of Waste
+                                </label><br>
+                                <input class="form-control" list="QuotationWasteList" id="wasteName" name="wasteName" autocomplete="off" required placeholder="Type to search Type of Waste..." onchange="updateWasteId()">
+                                <input type="hidden" id="wasteId" name="wasteId">
+                                <datalist id="QuotationWasteList"></datalist>
+                            </div>
+                        </div>
+                        <div id="buttons" class="row" style="display: none;">
+                            <div class="col d-flex gap-2">
+                                <button type="button" id="addVehicle" class="btn btn btn-success" onclick="addTypeOfVehicle()"><i class="fa-solid fa-plus"></i></button>
+                                <button type="button" id="removeVehicle" class="btn btn-danger" onclick="removeTypeOfVehicle()" style="display: none;"><i class="fa-solid fa-minus"></i></button>    
+                            </div>
+                        </div>
+                        <input type="hidden" id="vehicleCounter" name="vehicleCounter" value="1">
+                        <div class="row gap-3 mb-3 flex-wrap" id="type_of_vehicle_row" style="display: none;">
+                            <div class="col" id="typeOfVehicleContainer1">
+                                <label for="typeOfVehicle1">
+                                    <i class="fa-solid fa-truck"></i>
+                                    Type of Vehicle 1
+                                </label>
+                                <input class="form-control" list="QuotationTransportationList" id="typeOfVehicle1" name="typeOfVehicle1" autocomplete="off" required placeholder="Type to search Type of Vehicle..." onchange="updateVehicleId()">
+                                <input type="hidden" name="vehicleId1">
+                                <datalist id="QuotationTransportationList"></datalist>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="wasteCategory">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    Waste Category
+                                </label><br>
+                                <select name="wasteCategory" id="wasteCategory" class="form-control form" required>
+                                    <option value="" disabled selected>SELECT</option>
+                                    <option value="1">HAZARDOUS WASTE</option>
+                                    <option value="2">NON-HAZARDOUS WASTE</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3 gap-3" id="documentContainer" style="display: none;"></div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="remarks">
+                                    <i class="fa-brands fa-rocketchat"></i>
+                                    Remarks
+                                </label><br>
+                                <input class="form-control" autocapitalize="words" autocomplete="off" name="remarks" id="remarks" type="text" placeholder="Type your Remarks">        
+                            </div>
                         </div>
                     </div>
-                    <div class="row d-flex gap-3 flex-wrap mb-3">
-                        <div class="col">
-                            <label for="client">
-                                <i class="fa-solid fa-user"></i>
-                                Client
-                            </label><br>
-                            <input class="form-control" list="clientList" id="clientName" name="clientName" autocomplete="off" required placeholder="Type to search Client" onchange="updateClientId()">
-                            <input type="hidden" id="clientId" name="clientId">
-                            <datalist id="clientList">
-                                <option value="" disabled selected>Select Client</option>
-                                <% clients.forEach(client => { %>
-                                    <option value="<%= client.clientName %>" data-clientId="<%= client.clientId %>"><%= client.clientName %></option>
-                                <% }); %>
-                            </datalist>
-                        </div>
+        
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" >Submit</button>
+                        <button type="reset" class="btn btn-danger" >Clear</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                     </div>
-                    <div class="row d-flex gap-3 flex-wrap mb-3">
-                        <div class="col">
-                            <label for="submit_to">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                Submit To
-                            </label><br>
-                            <select name="submit_to" id="submit_to" class="form-control" required>
-                                <option value="" disabled selected>SELECT</option>
-                                <option value="LOGISTICS">LOGISTICS</option>
-                                <option value="RECEIVING">RECEIVING</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="type_of_waste">
-                                <i class="fa-solid fa-trash-can"></i>
-                                Type of Waste
-                            </label><br>
-                            <input class="form-control" list="QuotationWasteList" id="wasteName" name="wasteName" autocomplete="off" required placeholder="Type to search Type of Waste..." onchange="updateWasteId()">
-                            <input type="hidden" id="wasteId" name="wasteId">
-                            <datalist id="QuotationWasteList"></datalist>
-                        </div>
-                    </div>
-                    <div class="row gap-3 mb-3 flex-wrap" id="type_of_vehicle_row" style="display: none;">
-                        <div class="col">
-                            <label for="type_of_vehicle1">
-                                <i class="fa-solid fa-truck"></i>
-                                Type of Vehicle 1
-                            </label>
-                            <input class="form-control" list="QuotationTransportationList" id="typeOfVehicle" name="typeOfVehicle" autocomplete="off" required placeholder="Type to search Type of Vehicle..." onchange="updateVehicleId()">
-                            <input type="hidden" id="vehicleId" name="vehicleId">
-                            <datalist id="QuotationTransportationList"></datalist>
-                        </div>
-                    </div>
-                </div>
-    
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                </div>
-    
                 </div>
             </div>
         </div>
@@ -112,9 +144,14 @@
         var clientIdInput = document.getElementById('clientId');
         var wasteNameInput = document.getElementById('wasteName');
         var wasteIdInput = document.getElementById('wasteId');
-
+        var type_of_vehicle_row = document.getElementById('type_of_vehicle_row')
+        var inputFields = type_of_vehicle_row.querySelectorAll('input')
         // Find the selected option in the client datalist
         var selectedClientOption = document.querySelector('#clientList option[value="' + clientNameInput.value + '"]');
+
+        inputFields.forEach((inputField) => {
+            inputField.value = "";
+        });
 
         // If a matching client option is found, update the clientIdInput value
         if (selectedClientOption) {
@@ -126,6 +163,7 @@
             // The entered value is not in the list
             clientIdInput.value = '';
             wasteNameInput.innerHTML = '<option value="" disabled selected>Select Waste</option>';
+            wasteIdInput.value = '';
             wasteIdInput.value = '';
 
             // You can clear the input or display a message to the user
@@ -155,24 +193,27 @@
     }
 
     function updateVehicleId() {
-        var typeOfVehicle = document.getElementById('typeOfVehicle');
-        var vehicleId = document.getElementById('vehicleId');
+        // Assuming you have multiple instances, use a class instead of an id
+        var typeOfVehicleInputs = document.querySelectorAll('.typeOfVehicleInput');
+        
+        typeOfVehicleInputs.forEach(function (typeOfVehicleInput) {
+            var vehicleIdInput = typeOfVehicleInput.nextElementSibling;
 
-        // Find the selected option in the waste datalist
-        var selectedWasteOption = document.querySelector('#QuotationTransportationList option[value="' + typeOfVehicle.value + '"]');
+            // Find the selected option in the waste datalist
+            var selectedWasteOption = document.querySelector('#QuotationTransportationList option[value="' + typeOfVehicleInput.value + '"]');
 
-        // If a matching waste option is found, update the vehicleId value
-        if (selectedWasteOption) {
-            vehicleId.value = selectedWasteOption.getAttribute('data-vehicleId');
-            console.log(vehicleId.value)
-        } else {
-            // The entered value is not in the list
-            vehicleId.value = '';
+            // If a matching waste option is found, update the vehicleId value
+            if (selectedWasteOption) {
+                vehicleIdInput.value = selectedWasteOption.getAttribute('data-vehicleId');
+            } else {
+                // The entered value is not in the list
+                vehicleIdInput.value = '';
 
-            // You can clear the input or display a message to the user
-            typeOfVehicle.value = '';
-            alert('Please select a waste from the list.');
-        }
+                // You can clear the input or display a message to the user
+                typeOfVehicleInput.value = '';
+                alert('Please select a waste from the list.');
+            }
+        });
     }
 
     function updateWasteDatalist(clientId) {
@@ -219,20 +260,19 @@
                 return response.json();
             })
             .then(transportation => {
-                console.log(transportation)
                 // Update the QuotationTransportationList datalist options accordingly
                 const QuotationTransportationList = document.getElementById('QuotationTransportationList');
-                const typeOfVehicle = document.getElementById('typeOfVehicle');
-                const vehicleIdInput = document.getElementById('vehicleId');
+                const typeOfVehicle = document.getElementById('typeOfVehicle1');
+                const vehicleIdInput = document.getElementById('vehicleId1');
 
                 // Clear existing options
                 QuotationTransportationList.innerHTML = '<option value="" disabled selected>Select Waste</option>';
-
+                console.log(transportation)
                 // Add new options based on the fetched data
                 transportation.forEach(vehicle => {
                     const option = document.createElement('option');
-                    option.value = vehicle.vehicleId;
-                    option.setAttribute('data-vehicleId', vehicle.id);
+                    option.value = vehicle.VehicleType.typeOfVehicle;
+                    option.setAttribute('data-vehicleId', vehicle.VehicleType.vehicleId);
                     QuotationTransportationList.appendChild(option);
                 });
             })
@@ -242,21 +282,175 @@
     }
 
     // Add an event listener to the "Submit To" dropdown
-    document.getElementById('submit_to').addEventListener('change', function () {
+    document.getElementById('submitTo').addEventListener('change', function () {
         // Get the selected value
         var selectedValue = this.value;
 
         // Get the row containing the "Type of Vehicle" dropdown
         var typeOfVehicleRow = document.getElementById('type_of_vehicle_row');
+        var status = document.getElementById('status');
+        var buttons = document.getElementById('buttons');
+        var vehicleCounter = document.getElementById('vehicleCounter');
 
         // Toggle the visibility based on the selected value
         if (selectedValue === 'LOGISTICS') {
+            buttons.style.display = 'flex';
             typeOfVehicleRow.style.display = 'flex';
-        } else {
+            status.value = 'FOR HAULING';
+            vehicleCounter.value = 1;
+            typeOfVehicleRow.innerHTML = 
+            `
+            <div class="col" id="typeOfVehicleContainer1">
+                <label for="typeOfVehicle1">
+                    <i class="fa-solid fa-truck"></i>
+                    Type of Vehicle 1
+                </label>
+                <input class="form-control" list="QuotationTransportationList" id="typeOfVehicle1" name="typeOfVehicle1" autocomplete="off" required placeholder="Type to search Type of Vehicle..." onchange="updateVehicleId()">
+                <input type="hidden" name="vehicleId1">
+                <datalist id="QuotationTransportationList"></datalist>
+            </div>
+            `
+            ;
+        } else {        
+            status.value = 'FOR RECEIVING';    
+            buttons.style.display = 'none';
             typeOfVehicleRow.style.display = 'none';
-            console.log("none")
+            typeOfVehicleRow.innerHTML = "";
+            vehicleCounter.value = 0;
+        }
+
+        var clientIdInput = document.getElementById('clientId').value;
+        updateTransportationDatalist(clientIdInput)
+        
+        var index = document.getElementById('vehicleCounter').value;
+
+        if(index > 1){
+            removeVehicle.style.display = "flex"
+        } else {
+            removeVehicle.style.display = "none"
         }
     });
+
+    document.getElementById('wasteCategory').addEventListener('change', function () {
+        const documentContainer = document.getElementById("documentContainer")
+        documentContainer.style.display = "flex";
+        // Get the selected value
+        var selectedValue = this.value;
+        if(selectedValue == "1"){
+            documentContainer.innerHTML = "";
+            var data =                     
+            `
+            <div class="col" id="ptt_container">
+                <label for="ptt">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    PTT #
+                </label>
+                <input type="text" autocomplete="off" name="ptt" id="ptt" class="form-control form" required>
+            </div>
+            <div class="col" id="manifest_container">
+                <label for="manifest">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Manifest #
+                </label>
+                <input type="text" autocomplete="off" name="manifest" id="manifest" class="form-control form" required>
+            </div>
+            <div class="col" id="pull_out_form_container" style="display:none">
+                <label for="pull_out_form">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Pull Out Form #
+                </label>
+                <input type="text" autocomplete="off" name="pull_out_form" id="pull_out_form" class="form-control form" required value="N/A">
+            </div>
+            `
+            documentContainer.insertAdjacentHTML("afterbegin", data)
+        }
+        else if(selectedValue == "2"){
+            documentContainer.innerHTML = "";
+            var data2 = 
+            `
+            <div class="col" id="ptt_container" style="display:none">
+                <label for="ptt">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    PTT #
+                </label>
+                <input type="text" autocomplete="off" name="ptt" id="ptt" class="form-control form" required value="N/A">
+            </div>
+            <div class="col" id="manifest_container" style="display:none">
+                <label for="manifest">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Manifest #
+                </label>
+                <input type="text" autocomplete="off" name="manifest" id="manifest" class="form-control form" required value="N/A">
+            </div>
+            <div class="col" id="pull_out_form_container">
+                <label for="pull_out_form">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Pull Out Form #
+                </label>
+                <input type="text" autocomplete="off" name="pull_out_form" id="pull_out_form" class="form-control form" required>
+            </div>
+            `
+            documentContainer.insertAdjacentHTML("afterbegin", data2)
+        }
+        else{
+            documentContainer.innerHTML = "";
+        }
+    })
+
+    // Exclude specific input from being reset
+    document.getElementById('bookedTransaction').addEventListener('reset', function (event) {
+        // Prevent the default reset behavior
+        event.preventDefault();
+
+        // Reset all form elements, except for the input with id "input3"
+        Array.from(this.elements).forEach(function (element) {
+            if (element.id !== 'haulingDate') {
+            element.value = "";
+            }
+        });
+    });
+
+    function addTypeOfVehicle() {
+        // Clone the original block
+        var originalBlock = document.getElementById('typeOfVehicleContainer1');
+        var removeVehicle = document.getElementById('removeVehicle');
+        var clone = originalBlock.cloneNode(true);
+
+        // Update the id, name, and any other attributes as needed
+        var index = document.getElementById('type_of_vehicle_row').childElementCount + 1;
+        document.getElementById("vehicleCounter").value = index;
+        clone.id = 'typeOfVehicleContainer' + index;
+        clone.querySelector('label').innerHTML = '<i class="fa-solid fa-truck"></i> Type of Vehicle ' + index;
+        clone.querySelector('input[name="typeOfVehicle1"]').name = 'typeOfVehicle' + index;
+        clone.querySelector('input[id="typeOfVehicle1"]').id = 'typeOfVehicle' + index;
+        clone.querySelector('input[name="vehicleId1"]').name = 'vehicleId' + index;
+
+        // Append the clone to the container
+        document.getElementById('type_of_vehicle_row').appendChild(clone);
+
+        if(index > 1){
+            removeVehicle.style.display = "flex"
+        } else {
+            removeVehicle.style.display = "none"
+        }
+    }
+
+    function removeTypeOfVehicle() {
+        var container = document.getElementById('type_of_vehicle_row');
+        var removeVehicle = document.getElementById('removeVehicle');
+        var childrenCount = container.childElementCount;
+
+        // Ensure there is at least one block remaining
+        if (childrenCount > 1) {
+            // Remove the last block
+            container.removeChild(container.lastElementChild);
+        }
+        document.getElementById("vehicleCounter").value--
+
+        if(document.getElementById("vehicleCounter").value == 1){
+            removeVehicle.style.display = "none"
+        }
+    }
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -408,6 +602,19 @@
 
                         // Set the hauling_date input value
                         document.getElementById("haulingDate").value = formattedDate;
+
+                        const bookedTransaction = document.getElementById('bookedTransaction')
+                        document.getElementById('QuotationWasteList').innerHTML = "";
+                        document.getElementById('QuotationTransportationList').innerHTML = "";
+                        document.getElementById('documentContainer').innerHTML = "";
+                        document.getElementById('documentContainer').style.display = "none";
+
+                        // Reset all form elements, except for the input with id "input3"
+                        Array.from(bookedTransaction.elements).forEach(function (element) {
+                            if (element.id !== 'haulingDate') {
+                                element.value = "";
+                            }
+                        });
 
                     });
                 } else {

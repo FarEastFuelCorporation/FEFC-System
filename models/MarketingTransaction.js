@@ -6,11 +6,15 @@ const sequelize = require('../config/config');
 const MarketingTransaction = sequelize.define(
     'MarketingTransaction', 
     {
-        mtfNumber: {
-            type: DataTypes.STRING,
+        id: {
+            type: DataTypes.INTEGER,
             primaryKey: true,
             allowNull: false,
-            unique: true,
+            autoIncrement: true
+        },
+        mtfNumber: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         clientId: {
             type: DataTypes.STRING,
@@ -24,16 +28,16 @@ const MarketingTransaction = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        wasteCategoryId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         haulingDate: {
             type: DataTypes.DATEONLY,
             allowNull: false,
         },
         haulingTime: {
             type: DataTypes.TIME,
-            allowNull: false,
-        },
-        vehicleId: {
-            type: DataTypes.STRING,
             allowNull: false,
         },
         pullOutFormNumber: {
@@ -52,12 +56,12 @@ const MarketingTransaction = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        status: {
+            type: DataTypes.STRING,
+        },
         submittedBy: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
-        status: {
-            type: DataTypes.STRING,
         },
         createdAt: {
             type: DataTypes.DATE,
