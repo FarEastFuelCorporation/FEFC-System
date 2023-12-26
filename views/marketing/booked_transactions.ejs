@@ -13,7 +13,6 @@
         
                     <!-- Modal Body -->
                     <div class="modal-body">
-                        <input type="hidden" id="user" name="user" value="<%= employeeId %>">
                         <input type="hidden" id="status" name="status" value="">
                         <div class="row d-flex gap-3 flex-wrap mb-3">
                             <div class="col">
@@ -122,21 +121,28 @@
             </div>
         </div>
     </form>
-    <h1>December 2023</h1>
-    <table class="calendar">
-        <thead>
-            <tr>
-                <th>SUNDAY</th>
-                <th>MONDAY</th>
-                <th>TUESDAY</th>
-                <th>WEDNESDAY</th>
-                <th>THURSDAY</th>
-                <th>FRIDAY</th>
-                <th>SATURDAY</th>
-            </tr>
-        </thead>
-        <tbody id="calendar_days"></tbody>
-    </table>
+    <section>
+        <% if (successMessage) { %>
+            <div class="alert alert-success" role="alert">
+                <%= successMessage %>
+            </div>
+        <% } %>
+        <h1>December 2023</h1>
+        <table class="calendar">
+            <thead>
+                <tr>
+                    <th>SUNDAY</th>
+                    <th>MONDAY</th>
+                    <th>TUESDAY</th>
+                    <th>WEDNESDAY</th>
+                    <th>THURSDAY</th>
+                    <th>FRIDAY</th>
+                    <th>SATURDAY</th>
+                </tr>
+            </thead>
+            <tbody id="calendar_days"></tbody>
+        </table>
+    </section>
 </div>
 <script>
     function updateClientId() {
@@ -264,10 +270,16 @@
                 const QuotationTransportationList = document.getElementById('QuotationTransportationList');
                 const typeOfVehicle = document.getElementById('typeOfVehicle1');
                 const vehicleIdInput = document.getElementById('vehicleId1');
+                const submitTo = document.getElementById('submitTo').value;
 
                 // Clear existing options
-                QuotationTransportationList.innerHTML = '<option value="" disabled selected>Select Waste</option>';
-                console.log(transportation)
+                if (submitTo === 'LOGISTICS') {
+                    QuotationTransportationList.innerHTML = 
+                    '<option value="" disabled selected>Select Waste</option>';
+                } else {        
+                    QuotationTransportationList.innerHTML = 
+                    '<option value="CLIENT VEHICLE" data-vehicleId="V000"></option>';
+                }
                 // Add new options based on the fetched data
                 transportation.forEach(vehicle => {
                     const option = document.createElement('option');
@@ -294,11 +306,15 @@
 
         // Toggle the visibility based on the selected value
         if (selectedValue === 'LOGISTICS') {
-            buttons.style.display = 'flex';
-            typeOfVehicleRow.style.display = 'flex';
             status.value = 'FOR HAULING';
-            vehicleCounter.value = 1;
-            typeOfVehicleRow.innerHTML = 
+            ;
+        } else {        
+            status.value = 'FOR RECEIVING';    
+        }
+        buttons.style.display = 'flex';
+        typeOfVehicleRow.style.display = 'flex';
+        vehicleCounter.value = 1;
+        typeOfVehicleRow.innerHTML = 
             `
             <div class="col" id="typeOfVehicleContainer1">
                 <label for="typeOfVehicle1">
@@ -310,14 +326,6 @@
                 <datalist id="QuotationTransportationList"></datalist>
             </div>
             `
-            ;
-        } else {        
-            status.value = 'FOR RECEIVING';    
-            buttons.style.display = 'none';
-            typeOfVehicleRow.style.display = 'none';
-            typeOfVehicleRow.innerHTML = "";
-            vehicleCounter.value = 0;
-        }
 
         var clientIdInput = document.getElementById('clientId').value;
         updateTransportationDatalist(clientIdInput)

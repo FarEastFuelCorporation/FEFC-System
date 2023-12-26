@@ -70,7 +70,6 @@ async function getBookedTransactionsController(req, res) {
             ],
         });
 
-
         // Check for the success query parameter
         let successMessage;
         if(req.query.success === 'new'){
@@ -116,12 +115,13 @@ async function postBookedTransactionsController(req, res) {
             manifest,
             pull_out_form,
             remarks,
-            user,
         } = req.body;
 
         const lastMTFTransaction = await MarketingTransaction.findOne({
             order: [['createdAt', 'DESC']],
         });
+        
+        const employeeId = req.session.employeeId;
 
         // Get the current year and month
         const currentDate = new Date();
@@ -183,7 +183,7 @@ async function postBookedTransactionsController(req, res) {
                 remarks: remarks,
                 submitTo: submitTo,
                 status: status,
-                submittedBy: user,
+                submittedBy: employeeId,
             });
         }
 
