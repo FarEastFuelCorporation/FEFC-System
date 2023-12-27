@@ -12,6 +12,7 @@ const QuotationWaste = require('../models/QuotationWaste');
 const QuotationTransportation = require('../models/QuotationTransportation');
 const MarketingTransaction = require('../models/MarketingTransaction');
 const WasteCategory = require('../models/WasteCategory');
+const TransactionStatus = require('../models/TransactionStatus');
 
 // Define associations
 User.belongsTo(Employee, { as: 'Employee', foreignKey: 'employeeId', targetKey: 'employeeId' });
@@ -28,6 +29,8 @@ Client.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: '
 TypeOfWaste.hasMany(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'wasteId', sourceKey: 'wasteId' });
 
 WasteCategory.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'wasteCategoryId', sourceKey: 'id' });
+
+TransactionStatus.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'statusId', sourceKey: 'id' });
 
 VehicleType.hasMany(Vehicle, { as: 'Vehicle', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
 VehicleType.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
@@ -49,7 +52,8 @@ MarketingTransaction.belongsTo(QuotationWaste, { as: 'QuotationWaste', foreignKe
 MarketingTransaction.belongsTo(Client, { as: 'Client', foreignKey: 'clientId', targetKey: 'clientId' });
 MarketingTransaction.belongsTo(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'quotationTransportationId', targetKey: 'id' });
 MarketingTransaction.belongsTo(WasteCategory, { as: 'WasteCategory', foreignKey: 'wasteCategoryId', targetKey: 'id' });
-MarketingTransaction.belongsTo(Employee, { as: 'Employee', foreignKey: 'submittedBy', targetKey: 'employeeId' });
+MarketingTransaction.belongsTo(TransactionStatus, { as: 'TransactionStatus', foreignKey: 'submittedBy', targetKey: 'id' });
+MarketingTransaction.belongsTo(Employee, { as: 'Employee', foreignKey: 'statusId', targetKey: 'employeeId' });
 
 
 // Export the associations

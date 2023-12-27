@@ -182,7 +182,7 @@ async function postBookedTransactionsController(req, res) {
                 manifestNumber: manifest,
                 remarks: remarks,
                 submitTo: submitTo,
-                status: status,
+                statusId: status,
                 submittedBy: employeeId,
             });
         }
