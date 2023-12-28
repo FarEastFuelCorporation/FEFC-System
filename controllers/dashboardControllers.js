@@ -853,6 +853,71 @@ async function postUpdateQuotationController(req, res) {
     }
 };
 
+// Quotations controller
+async function getCommissionsController(req, res) {
+    try {
+        // Fetch all quotations from the database
+        const quotations = await Quotation.findAll({
+            include: [
+                { model: Client, as: 'Client' },
+                { model: Employee, as: 'Employee' },
+            ],
+        });
+
+        // Get the page number, entries per page, and search query from the query parameters
+        // const currentPage = parseInt(req.query.page) || 1;
+        const currentPage = 1;
+        const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
+        const searchQuery = req.query.search || ''; // Default to an empty string if no search query
+
+        // Additional logic to filter types of waste based on the search query
+        const filteredQuotations = quotations.filter(quotation => {
+            // Customize this logic based on how you want to perform the search
+            const clientName = quotation.Client.clientName;
+            return (
+                clientName.toLowerCase().includes(searchQuery.toLowerCase())
+                // Add more fields if needed
+            );
+        });
+
+        // Calculate total pages based on the total number of filtered types of waste and entries per page
+        // const totalFilteredQuotations = filteredQuotations.length;
+        const totalFilteredQuotations = 1;
+        const totalPages = Math.ceil(totalFilteredQuotations / entriesPerPage);
+
+        // Implement pagination and send the filtered types of waste to the view
+        const startIndex = (currentPage - 1) * entriesPerPage;
+        const endIndex = currentPage * entriesPerPage;
+        const paginatedQuotations = filteredQuotations.slice(startIndex, endIndex);
+
+        // Check for the success query parameter
+        let successMessage;
+        if(req.query.success === 'new'){
+            successMessage = 'Quotation created successfully!';
+        } else if (req.query.success === 'update'){
+            successMessage = 'Quotation updated successfully!';
+        }
+
+        const viewsData = {
+            pageTitle: 'Marketing User - Commissions',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/commissions',
+            route: 'commissions',
+            general_scripts: 'marketing/marketing_scripts',
+            quotations: paginatedQuotations,
+            currentPage,
+            totalPages,
+            entriesPerPage,
+            searchQuery,
+            successMessage,
+        };
+        res.render('dashboard', viewsData);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 // other controller
 async function getQuotationWasteByClient(req, res) {
     try {
@@ -912,6 +977,7 @@ module.exports = {
     postNewQuotationController,
     getUpdateQuotationController,
     postUpdateQuotationController,
+    getCommissionsController,
     getQuotationWasteByClient,
     getQuotationTransportationByClient,
 };

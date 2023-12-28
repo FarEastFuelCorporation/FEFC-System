@@ -13,13 +13,17 @@ const QuotationTransportation = require('../models/QuotationTransportation');
 const MarketingTransaction = require('../models/MarketingTransaction');
 const WasteCategory = require('../models/WasteCategory');
 const TransactionStatus = require('../models/TransactionStatus');
+const EmployeeRole = require('../models/EmployeeRole');
 
 // Define associations
 User.belongsTo(Employee, { as: 'Employee', foreignKey: 'employeeId', targetKey: 'employeeId' });
 
+EmployeeRole.belongsTo(Employee, { as: 'Employee', foreignKey: 'employeeRoleId', targetKey: 'employeeRoleId' });
+
 Employee.hasMany(User, { as: 'User', foreignKey: 'employeeId', sourceKey: 'employeeId' });
 Employee.hasMany(Quotation, { as: 'Quotation', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
 Employee.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
+Employee.hasMany(EmployeeRole, { as: 'EmployeeRole', foreignKey: 'employeeRoleId', sourceKey: 'employeeRoleId', });
 
 Vehicle.belongsTo(VehicleType, { as: 'VehicleType', foreignKey: 'vehicleId', targetKey: 'vehicleId' });
 

@@ -11,6 +11,10 @@ const Employee = sequelize.define(
             allowNull: false,
             primaryKey: true,
         },
+        employeeRoleId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         firstName: {
             type: DataTypes.STRING,
             allowNull: false,

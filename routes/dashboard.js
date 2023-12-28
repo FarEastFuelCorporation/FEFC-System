@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient, postBookedTransactionsController } = require('../controllers/dashboardControllers');
+const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient, postBookedTransactionsController, getCommissionsController } = require('../controllers/dashboardControllers');
 
 // Dashboard route
 router.get('/', isAuthenticated, getDashboardController);
@@ -40,9 +40,7 @@ router.get('/quotations/update/:quotationCode/:revisionNumber', getUpdateQuotati
 router.post('/quotations/update/', postUpdateQuotationController);
 
 // Commissions route
-router.get('/commissions', (req, res) => {
-    res.render('commissions');
-});
+router.get('/commissions', getCommissionsController);
 
 // Other route
 router.get('/getQuotationWastesByClient', getQuotationWasteByClient);
