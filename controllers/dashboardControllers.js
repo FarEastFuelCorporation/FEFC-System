@@ -12,6 +12,7 @@ const User = require("../models/User");
 const VehicleType = require("../models/VehicleType");
 const { createCanvas } = require('canvas');
 const htmlToImage = require('html-to-image');
+const Vehicle = require("../models/Vehicle");
 
 // Dashboard controller
 async function getDashboardController(req, res) {
@@ -169,7 +170,7 @@ async function postBookedTransactionsController(req, res) {
             const typeOfVehicle =  req.body[`typeOfVehicle${i}`];
 
             // Creating a new MarketingTransaction
-            const newMarketingTransaction = await MarketingTransaction.create({
+            await MarketingTransaction.create({
                 mtfNumber: mtfNumber,
                 clientId: clientId,
                 quotationWasteId: wasteId,
@@ -961,6 +962,42 @@ async function getQuotationTransportationByClient(req, res) {
     }
 }
 
+async function getVehicleTypes(req, res) {
+    try {
+        const vehicleTypes = await VehicleType.findAll();
+        res.json(vehicleTypes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+async function getMarketingTransactions(req, res) {
+    try {
+        const marketingTransaction = await MarketingTransaction.findAll({
+            include: [{ model: QuotationTransportation, as: 'QuotationTransportation',
+                include: [{ model: VehicleType, as: 'VehicleType' }]
+            }],
+        });
+        res.json(marketingTransaction);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+async function getVehicles(req, res) {
+    try {
+        const vehicle = await Vehicle.findAll({
+            include: [{ model: VehicleType, as: 'VehicleType' }],
+        });
+        res.json(vehicle);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
+
 module.exports = { 
     getDashboardController,
     getBookedTransactionsController,
@@ -980,4 +1017,7 @@ module.exports = {
     getCommissionsController,
     getQuotationWasteByClient,
     getQuotationTransportationByClient,
+    getVehicleTypes,
+    getMarketingTransactions,
+    getVehicles,
 };

@@ -127,6 +127,8 @@
                 <%= successMessage %>
             </div>
         <% } %>
+    </section>
+    <section class="mb-3">
         <h1>December 2023</h1>
         <table class="calendar">
             <thead>
@@ -459,10 +461,63 @@
             removeVehicle.style.display = "none"
         }
     }
+
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        generateCalendarDays(2023, 11);
+    let vehicleTypesData = []; // Declare another global variable
+    let marketingTransactionsData = []; // Declare another global variable
+    let vehiclesData = []; // Declare another global variable
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            // Make parallel AJAX requests using Promise.all
+            const [ vehicleTypesResponse, marketingTransactionsResponse, vehiclesResponse] = await Promise.all([
+                fetch('/dashboard/getVehicleTypes', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }),
+                fetch('/dashboard/getMarketingTransaction', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }),
+                fetch('/dashboard/getVehicles', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }),
+            ]);
+
+            // Check for errors in marketing transaction response
+            if (!vehicleTypesResponse.ok) {
+                throw new Error('Network response was not ok for marketing transactions');
+            }
+
+            // Check for errors in marketing transaction response
+            if (!marketingTransactionsResponse.ok) {
+                throw new Error('Network response was not ok for marketing transactions');
+            }
+
+            // Check for errors in vehicles response
+            if (!vehiclesResponse.ok) {
+                throw new Error('Network response was not ok for marketing transactions');
+            }
+
+            // Get JSON data for vehicles marketing transactions and vehicles
+            vehicleTypesData = await vehicleTypesResponse.json();
+            marketingTransactionsData = await marketingTransactionsResponse.json();
+            vehiclesData = await vehiclesResponse.json();
+
+            // Log or process the data as needed
+            generateCalendarDays(2023, 11);
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     });
 
     function generateCalendarDays(year, month) {
@@ -525,46 +580,45 @@
 
                     var total_vehicle_day = [];
                     var vehicle_type_day = [];
-                    // for(let x = 1; x < vehicle_data_list.content.length; x++){
-                    //     if(!vehicle_type_day.includes(vehicle_data_list.content[x][findTextInArray(vehicle_data_list, "CODE")])){
-                    //         vehicle_type_day.push(vehicle_data_list.content[x][findTextInArray(vehicle_data_list, "CODE")])
-                    //         total_vehicle_day[vehicle_data_list.content[x][findTextInArray(vehicle_data_list, "CODE")]] = 1;
-                    //     }
-                    //     else{
-                    //         total_vehicle_day[vehicle_data_list.content[x][findTextInArray(vehicle_data_list, "CODE")]]++;
-                    //     }
-                    // }
+                    for(let x = 1; x < vehiclesData.length; x++){
+                        if(!vehicle_type_day.includes(vehiclesData[x].VehicleType.vehicleCode)){
+                            vehicle_type_day.push(vehiclesData[x].VehicleType.vehicleCode);
+                            total_vehicle_day[vehiclesData[x].VehicleType.vehicleCode] = 1;
+                        }
+                        else{
+                            total_vehicle_day[vehiclesData[x].VehicleType.vehicleCode]++;
+                        }
+                    }
 
                     var date_format = year + '-' + (month + 1).toString().padStart(2, "0") + '-' + (dayValues[index]).toString().padStart(2, "0");
-                    
                     var booked_vehicle_day = [];
                     var booked_vehicle_type_day = [];
                     var book_logistics = 0
                     var book_receiving = 0
-                    // for(let x = 1; x < mtf_data_list.content.length; x++){
-                    //     if(date_format == date_decoder2(mtf_data_list.content[x][findTextInArray(mtf_data_list, "HAULING DATE")])){
-                    //         if(mtf_data_list.content[x][findTextInArray(mtf_data_list, "SUBMIT TO")] == "LOGISTICS"){
-                    //             var vehicle_code;
-                    //             for(let y = 1; y < vehicle_data_list.content.length; y++){
-                    //                 if(vehicle_data_list.content[y][findTextInArray(vehicle_data_list, "TYPE OF VEHICLE")] == mtf_data_list.content[x][findTextInArray(mtf_data_list, "TYPE OF VEHICLE")]){
-                    //                     vehicle_code = vehicle_data_list.content[y][findTextInArray(vehicle_data_list, "CODE")]
-                    //                     break
-                    //                 }
-                    //             }
-                    //             if(!booked_vehicle_type_day.includes(vehicle_code)){
-                    //                 booked_vehicle_type_day.push(vehicle_code)
-                    //                 booked_vehicle_day[vehicle_code] = 1;
-                    //             }
-                    //             else{
-                    //                 booked_vehicle_day[vehicle_code]++;
-                    //             }
-                    //             book_logistics += 1;
-                    //         }
-                    //         else if(mtf_data_list.content[x][findTextInArray(mtf_data_list, "SUBMIT TO")] == "RECEIVING"){
-                    //             book_receiving += 1;
-                    //         }
-                    //     }
-                    // }
+                    for(let x = 0; x < marketingTransactionsData.length; x++){
+                        if(date_format == date_decoder2(marketingTransactionsData[x].haulingDate)){
+                            if(marketingTransactionsData[x].submitTo == "LOGISTICS"){
+                                var vehicle_code;
+                                for(let y = 1; y < vehiclesData.length; y++){
+                                    if(vehiclesData[y].VehicleType.typeOfVehicle == marketingTransactionsData[x].QuotationTransportation.VehicleType.typeOfVehicle){
+                                        vehicle_code = vehiclesData[y].VehicleType.vehicleCode
+                                        break
+                                    }
+                                }
+                                if(!booked_vehicle_type_day.includes(vehicle_code)){
+                                    booked_vehicle_type_day.push(vehicle_code)
+                                    booked_vehicle_day[vehicle_code] = 1;
+                                }
+                                else{
+                                    booked_vehicle_day[vehicle_code]++;
+                                }
+                                book_logistics += 1;
+                            }
+                            else if(marketingTransactionsData[x].submitTo == "RECEIVING"){
+                                book_receiving += 1;
+                            }
+                        }
+                    }
                             
                     // Create a div for "Booked slot"
                     var bookSlotDiv = document.createElement("div");
@@ -573,24 +627,21 @@
                     bookSlotDiv.classList.add("book_slot");
 
                     var available_vehicle_div = document.createElement("div")
-                    available_vehicle_div.classList.add("available_vehicle_class");
-                    
-                    // vehicle_type.forEach((data, index) => {
-                    //     var vehicle_div = document.createElement("div");
-                    //     vehicle_div.classList.add("vehicle_div");
-                    //     var actual_count = 0;
-                    //     if(total_vehicle[vehicle_type[index]] - booked_vehicle_day[vehicle_type[index]] < 0){
-                    //         actual_count = total_vehicle[vehicle_type[index]];
-                    //     }
-                    //     if(total_vehicle[vehicle_type[index]] - booked_vehicle_day[vehicle_type[index]] >= 0){
-                    //         actual_count = total_vehicle[vehicle_type[index]] - booked_vehicle_day[vehicle_type[index]];
-                    //     }
-                    //     else{
-                    //         actual_count = total_vehicle[vehicle_type[index]]
-                    //     }
-                    //     vehicle_div.textContent = `${data} : ${actual_count}/${total_vehicle[vehicle_type[index]]}`
-                    //     available_vehicle_div.appendChild(vehicle_div);
-                    // })
+                    available_vehicle_div.classList.add("d-flex");
+                    available_vehicle_div.classList.add("justify-content-center");
+                    available_vehicle_div.classList.add("flex-wrap");
+                    available_vehicle_div.classList.add("gap-1");
+                    vehicle_type_day.forEach((data, index) => {
+                        var vehicle_div = document.createElement("div");
+                        vehicle_div.classList.add("btn");
+                        vehicle_div.classList.add("btn-success");
+                        vehicle_div.style.fontSize = "10px";
+                        var actual_count = 0;
+                        var booked = booked_vehicle_day[vehicle_type_day[index]] || 0;
+                        actual_count = total_vehicle_day[vehicle_type_day[index]] - booked;
+                        vehicle_div.textContent = `${vehicle_type_day[index]} : ${actual_count}/${total_vehicle_day[vehicle_type_day[index]]}`
+                        available_vehicle_div.appendChild(vehicle_div);
+                    })
 
                     // Append the day value, the button, and the "Available slot" div to the cell
                     div_element.appendChild(daySpan);

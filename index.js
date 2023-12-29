@@ -1,13 +1,13 @@
 // index.js
 
 require('dotenv').config();
+require('events').EventEmitter.defaultMaxListeners = 15;
+require('./utils/associations');
 const express = require('express');
 const session = require('express-session');
-require('events').EventEmitter.defaultMaxListeners = 15;
 const path = require('path');
 const bodyParser = require('body-parser');
 const sequelize = require('./config/config');
-require('./utils/associations');
 const qr = require('qr-image');
 const puppeteer = require('puppeteer');
 const multer = require('multer');

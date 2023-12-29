@@ -26,6 +26,10 @@ const Vehicle = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        vehicleStatus: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         createdAt: {
             type: DataTypes.DATE,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),

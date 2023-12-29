@@ -1,6 +1,7 @@
 // utils/associations.js
 
 const Employee = require('../models/Employee');
+const EmployeeRole = require('../models/EmployeeRole');
 const User = require('../models/User');
 const TypeOfWaste = require('../models/TypeOfWaste');
 const TreatmentProcess = require('../models/TreatmentProcess');
@@ -13,17 +14,19 @@ const QuotationTransportation = require('../models/QuotationTransportation');
 const MarketingTransaction = require('../models/MarketingTransaction');
 const WasteCategory = require('../models/WasteCategory');
 const TransactionStatus = require('../models/TransactionStatus');
-const EmployeeRole = require('../models/EmployeeRole');
 
 // Define associations
 User.belongsTo(Employee, { as: 'Employee', foreignKey: 'employeeId', targetKey: 'employeeId' });
 
-EmployeeRole.belongsTo(Employee, { as: 'Employee', foreignKey: 'employeeRoleId', targetKey: 'employeeRoleId' });
+EmployeeRole.hasMany(Employee, { as: 'Employee', foreignKey: 'employeeRoleId', sourceKey: 'employeeRoleId', });
 
+Employee.belongsTo(EmployeeRole, { as: 'EmployeeRole', foreignKey: 'employeeRoleId', targetKey: 'employeeRoleId' });
 Employee.hasMany(User, { as: 'User', foreignKey: 'employeeId', sourceKey: 'employeeId' });
 Employee.hasMany(Quotation, { as: 'Quotation', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
 Employee.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
-Employee.hasMany(EmployeeRole, { as: 'EmployeeRole', foreignKey: 'employeeRoleId', sourceKey: 'employeeRoleId', });
+
+VehicleType.hasMany(Vehicle, { as: 'Vehicle', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
+VehicleType.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
 
 Vehicle.belongsTo(VehicleType, { as: 'VehicleType', foreignKey: 'vehicleId', targetKey: 'vehicleId' });
 
@@ -35,9 +38,6 @@ TypeOfWaste.hasMany(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'wasteId
 WasteCategory.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'wasteCategoryId', sourceKey: 'id' });
 
 TransactionStatus.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'statusId', sourceKey: 'id' });
-
-VehicleType.hasMany(Vehicle, { as: 'Vehicle', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
-VehicleType.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
 
 Quotation.hasMany(QuotationWaste, { as: 'QuotationWaste', foreignKey: 'quotationId', sourceKey: 'quotationId' });
 Quotation.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'quotationId', sourceKey: 'quotationId' });
@@ -63,6 +63,7 @@ MarketingTransaction.belongsTo(Employee, { as: 'Employee', foreignKey: 'statusId
 // Export the associations
 module.exports = {
     Employee,
+    EmployeeRole,
     User,
     TypeOfWaste,
     TreatmentProcess,
@@ -73,4 +74,6 @@ module.exports = {
     QuotationWaste,
     QuotationTransportation,
     MarketingTransaction,
+    WasteCategory,
+    TransactionStatus,
 };

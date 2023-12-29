@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const { isAuthenticated } = require('../middlewares/auth');
-const { getDashboardController, getBookedTransactionsController, getClientsController, getNewClientController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, getClientDetails, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient, postBookedTransactionsController, getCommissionsController } = require('../controllers/dashboardControllers');
+const { getDashboardController, getBookedTransactionsController, getClientsController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient, postBookedTransactionsController, getCommissionsController, getVehicleTypes, getVehicles, getMarketingTransactions } = require('../controllers/dashboardControllers');
 
 // Dashboard route
 router.get('/', isAuthenticated, getDashboardController);
@@ -45,5 +45,8 @@ router.get('/commissions', getCommissionsController);
 // Other route
 router.get('/getQuotationWastesByClient', getQuotationWasteByClient);
 router.get('/getQuotationTransportationByClient', getQuotationTransportationByClient);
+router.get('/getVehicleTypes', getVehicleTypes);
+router.get('/getMarketingTransaction', getMarketingTransactions);
+router.get('/getVehicles', getVehicles);
 
 module.exports = router;
