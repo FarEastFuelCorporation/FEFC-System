@@ -1,7 +1,7 @@
 <!-- views/marketing/booked_transactions.ejs -->
 
 <div class="content">
-    <form id="bookedTransaction" action="/dashboard/booked_transactions" method="post">
+    <form id="bookedTransaction" action="/marketing_dashboard/booked_transactions" method="post">
         <div class="modal" id="myModal" style="height: 100vh; width: 100%;">
             <div class="modal-dialog  modal-lg" style="width: 100% !important;">
                 <div class="modal-content">
@@ -115,7 +115,6 @@
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success" >Submit</button>
                         <button type="reset" class="btn btn-danger" >Clear</button>
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -226,7 +225,7 @@
 
     function updateWasteDatalist(clientId) {
         // Replace the URL with the actual endpoint on your server
-        const endpoint = `/dashboard/getQuotationWastesByClient?clientId=${clientId}`;
+        const endpoint = `/requests/getQuotationWastesByClient?clientId=${clientId}`;
         fetch(endpoint)
             .then(response => {
                 if (!response.ok) {
@@ -258,7 +257,7 @@
 
     function updateTransportationDatalist(clientId) {
         // Replace the URL with the actual endpoint on your server
-        const endpoint = `/dashboard/getQuotationTransportationByClient?clientId=${clientId}`;
+        const endpoint = `/requests/getQuotationTransportationByClient?clientId=${clientId}`;
 
         fetch(endpoint)
             .then(response => {
@@ -472,19 +471,19 @@
         try {
             // Make parallel AJAX requests using Promise.all
             const [ vehicleTypesResponse, marketingTransactionsResponse, vehiclesResponse] = await Promise.all([
-                fetch('/dashboard/getVehicleTypes', {
+                fetch('/requests/getVehicleTypes', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 }),
-                fetch('/dashboard/getMarketingTransaction', {
+                fetch('/requests/getMarketingTransaction', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 }),
-                fetch('/dashboard/getVehicles', {
+                fetch('/requests/getVehicles', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

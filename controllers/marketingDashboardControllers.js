@@ -1,5 +1,8 @@
-// controllers/dashboardController.js
+// controllers/marketingDashboardControllers.js
 
+const { Op } = require('sequelize');
+const moment = require('moment-timezone');
+const desiredTimezone = 'Asia/Shanghai';
 const Client = require("../models/Client");
 const Employee = require("../models/Employee");
 const MarketingTransaction = require("../models/MarketingTransaction");
@@ -8,20 +11,52 @@ const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const TreatmentProcess = require("../models/TreatmentProcess");
 const TypeOfWaste = require("../models/TypeOfWaste");
-const User = require("../models/User");
 const VehicleType = require("../models/VehicleType");
-const { createCanvas } = require('canvas');
-const htmlToImage = require('html-to-image');
-const Vehicle = require("../models/Vehicle");
+const TransactionStatus = require("../models/TransactionStatus");
 
 // Dashboard controller
-async function getDashboardController(req, res) {
+async function getMarketingDashboardController(req, res) {
     try {
         // Retrieve data from the database or perform other logic
         const employeeId = req.session.employeeId;
         const employee = await Employee.findOne({ where: { employeeId } });
         var currentPage, totalPages, entriesPerPage, searchQuery
         
+        // Filter marketingTransactions for the current month
+        const currentMonthStart = new Date();
+        currentMonthStart.setDate(1);
+        currentMonthStart.setHours(0, 0, 0, 0);
+
+        const currentMonthEnd = new Date();
+        currentMonthEnd.setMonth(currentMonthEnd.getMonth() + 1, 0);
+        currentMonthEnd.setHours(23, 59, 59, 999);
+
+        // Convert UTC timestamps to the local time zone
+        const currentMonthStartLocal = moment(currentMonthStart).tz(desiredTimezone);
+        const currentMonthEndLocal = moment(currentMonthEnd).tz(desiredTimezone);
+
+        const marketingTransactions = await MarketingTransaction.findAll({
+            where: {
+                haulingDate: {
+                    [Op.between]: [currentMonthStartLocal.format(), currentMonthEndLocal.format()],
+                },
+            },
+            include: [{ model: TransactionStatus, as: 'TransactionStatus' }],
+        });
+
+        // Calculate counts for each status
+        const counts = {
+            booked: marketingTransactions.filter((transaction) => transaction.statusId === 1).length,
+            forHauling: marketingTransactions.filter((transaction) => transaction.statusId === 2).length,
+            forReceiving: marketingTransactions.filter((transaction) => transaction.statusId === 3).length,
+            forWarehousing: marketingTransactions.filter((transaction) => transaction.statusId === 4).length,
+            forSorting: marketingTransactions.filter((transaction) => transaction.statusId === 5).length,
+            forTreatment: marketingTransactions.filter((transaction) => transaction.statusId === 6).length,
+            forCertification: marketingTransactions.filter((transaction) => transaction.statusId === 7).length,
+            forBilling: marketingTransactions.filter((transaction) => transaction.statusId === 8).length,
+            forCollection: marketingTransactions.filter((transaction) => transaction.statusId === 9).length,
+            finished: marketingTransactions.filter((transaction) => transaction.statusId === 10).length,
+        };
         
         // Render the dashboard view with data
         const viewsData = {
@@ -29,8 +64,9 @@ async function getDashboardController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/marketing_dashboard',
             route: 'marketing_dashboard',
-            general_scripts: 'marketing/marketing_scripts',
             employee,
+            marketingTransactions,
+            counts,
             currentPage,
             totalPages,
             entriesPerPage,
@@ -85,7 +121,6 @@ async function getBookedTransactionsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/booked_transactions',
             route: 'booked_transactions',
-            general_scripts: 'marketing/marketing_scripts',
             employeeId,
             clients,
             quotation,
@@ -141,25 +176,16 @@ async function postBookedTransactionsController(req, res) {
                     const newCounter = (lastCounter + 1).toString().padStart(4, '0');
                     const generatedMtfNumber = `MTF${currentYear}${currentMonth}${newCounter}`;
     
-                    // Log the data type of generatedMtfNumber
-                    console.log('Data type of generatedMtfNumber:', typeof generatedMtfNumber);
-    
                     return generatedMtfNumber.toString(); // Explicitly convert to string
                 } else {
                     // If it's a new year, start the counter at 1
                     const generatedMtfNumber = `MTF${currentYear}${currentMonth}0001`;
-    
-                    // Log the data type of generatedMtfNumber
-                    console.log('Data type of generatedMtfNumber:', typeof generatedMtfNumber);
     
                     return generatedMtfNumber;
                 }
             } else {
                 // If there are no previous transactions, start the counter at 1
                 const generatedMtfNumber = `MTF${currentYear}${currentMonth}0001`;
-    
-                // Log the data type of generatedMtfNumber
-                console.log('Data type of generatedMtfNumber:', typeof generatedMtfNumber);
     
                 return generatedMtfNumber;
             }
@@ -189,7 +215,7 @@ async function postBookedTransactionsController(req, res) {
         }
 
         // Redirect back to the quotation route with a success message
-        res.redirect('/dashboard/booked_transactions?success=new');
+        res.redirect('/marketing_dashboard/booked_transactions?success=new');
     } catch (error) {
         // Handling errors
         console.error('Error creating quotation:', error);
@@ -240,7 +266,6 @@ async function getClientsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/clients',
             route: 'clients',
-            general_scripts: 'marketing/marketing_scripts',
             clients: paginatedClients,
             currentPage,
             totalPages,
@@ -278,24 +303,27 @@ async function getClientDetails (req, res) {
     }
 }
 
-
 // New Client controller
 async function getNewClientController(req, res) {
-    var currentPage, totalPages, entriesPerPage, searchQuery
+    try {
+        var currentPage, totalPages, entriesPerPage, searchQuery
         
-    // Render the dashboard view with data
-    const viewsData = {
-        pageTitle: 'Marketing User - New Client Form',
-        sidebar: 'marketing/marketing_sidebar',
-        content: 'marketing/new_client',
-        route: 'marketing_dashboard',
-        general_scripts: 'marketing/marketing_scripts',
-        currentPage,
-        totalPages,
-        entriesPerPage,
-        searchQuery,
-    };
-    res.render('dashboard', viewsData);
+        // Render the dashboard view with data
+        const viewsData = {
+            pageTitle: 'Marketing User - New Client Form',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/new_client',
+            route: 'marketing_dashboard',
+            currentPage,
+            totalPages,
+            entriesPerPage,
+            searchQuery,
+        };
+        res.render('dashboard', viewsData);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
 }
 
 async function postNewClientController(req, res) {
@@ -326,7 +354,7 @@ async function postNewClientController(req, res) {
         });
 
         // Redirect back to the client route with a success message
-        res.redirect('/dashboard/clients?success=new');
+        res.redirect('/marketing_dashboard/clients?success=new');
     } catch (error) {
         // Handling errors
         console.error('Error creating client:', error);
@@ -359,35 +387,6 @@ async function generateClientId(req, res) {
         return null; // or throw a different error or provide a default value
     }
 };
-
-// Update Client controller
-async function getUpdateClientController(req, res) {
-    var currentPage, totalPages, entriesPerPage, searchQuery
-
-    // Fetch the client ID from the request parameters
-    const clientId = req.params.clientId;
-
-    // Fetch all clients from the database (You might need to modify this based on your use case)
-    const client = await Client.findOne({
-            where: { clientId },
-        }
-    );
-
-    // Render the dashboard view with data
-    const viewsData = {
-        pageTitle: 'Marketing User - Update Client Form',
-        sidebar: 'marketing/marketing_sidebar',
-        content: 'marketing/update_client',
-        route: 'marketing_dashboard',
-        general_scripts: 'marketing/marketing_scripts',
-        client,
-        currentPage,
-        totalPages,
-        entriesPerPage,
-        searchQuery,
-    };
-    res.render('dashboard', viewsData);
-}
 
 async function postUpdateClientController(req, res) {
     try {
@@ -429,7 +428,7 @@ async function postUpdateClientController(req, res) {
         });
 
         // Redirect back to the client route with a success message
-        res.redirect('/dashboard/clients?success=update');
+        res.redirect('/marketing_dashboard/clients?success=update');
     } catch (error) {
         // Handling errors
         console.error('Error updating client:', error);
@@ -473,7 +472,6 @@ async function getTypeOfWasteController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/type_of_waste',
             route: 'type_of_waste',
-            general_scripts: 'marketing/marketing_scripts',
             typesOfWaste: paginatedTypesOfWaste,
             currentPage,
             totalPages,
@@ -535,7 +533,6 @@ async function getQuotationsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/quotations',
             route: 'quotations',
-            general_scripts: 'marketing/marketing_scripts',
             quotations: paginatedQuotations,
             currentPage,
             totalPages,
@@ -552,58 +549,62 @@ async function getQuotationsController(req, res) {
 
 // New Quotation controller
 async function getNewQuotationController(req, res) {
-    var currentPage, totalPages, entriesPerPage, searchQuery
-    const employeeId = req.session.employeeId;
-
-    const employee = await Employee.findOne({ where: { employeeId } });
-    const clients = await Client.findAll();
-    const typesOfWastes = await TypeOfWaste.findAll();
-    const vehicleTypes = await VehicleType.findAll();
-
-    // Function to convert a string to proper case
-    function toProperCase(str) {
-        return str.replace(/\w\S*/g, function(txt) {
-            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    try {
+        var currentPage, totalPages, entriesPerPage, searchQuery
+        const employeeId = req.session.employeeId;
+    
+        const employee = await Employee.findOne({ where: { employeeId } });
+        const clients = await Client.findAll();
+        const typesOfWastes = await TypeOfWaste.findAll();
+        const vehicleTypes = await VehicleType.findAll();
+    
+        // Function to convert a string to proper case
+        function toProperCase(str) {
+            return str.replace(/\w\S*/g, function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
+    
+        // Apply the function to the employee's first and last names
+        const employeeName = `${toProperCase(employee.firstName)} ${toProperCase(employee.lastName)}`;
+        const employeeSignature = employee.picture.replace(/\.jpg$/, '.png');
+    
+        // Sorting the clients array by clientName
+        clients.sort((clientA, clientB) => {
+            const nameA = clientA.clientName.toUpperCase(); // Convert names to uppercase for case-insensitive sorting
+            const nameB = clientB.clientName.toUpperCase();
+    
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+            return 0; // Names are equal
         });
+            
+        // Render the dashboard view with data
+        const viewsData = {
+            pageTitle: 'Marketing User - New Quotation Form',
+            sidebar: 'marketing/marketing_sidebar',
+            content: 'marketing/new_quotation',
+            route: 'marketing_dashboard',
+            currentPage,
+            totalPages,
+            entriesPerPage,
+            searchQuery,
+            employeeName,
+            employeeId,
+            employeeSignature,
+            typesOfWastes,
+            clients,
+            vehicleTypes,
+        };
+        res.render('dashboard', viewsData);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
     }
-
-    // Apply the function to the employee's first and last names
-    const employeeName = `${toProperCase(employee.firstName)} ${toProperCase(employee.lastName)}`;
-    const employeeSignature = employee.picture.replace(/\.jpg$/, '.png');
-
-    // Sorting the clients array by clientName
-    clients.sort((clientA, clientB) => {
-        const nameA = clientA.clientName.toUpperCase(); // Convert names to uppercase for case-insensitive sorting
-        const nameB = clientB.clientName.toUpperCase();
-
-        if (nameA < nameB) {
-            return -1;
-        }
-        if (nameA > nameB) {
-            return 1;
-        }
-        return 0; // Names are equal
-    });
-        
-    // Render the dashboard view with data
-    const viewsData = {
-        pageTitle: 'Marketing User - New Quotation Form',
-        sidebar: 'marketing/marketing_sidebar',
-        content: 'marketing/new_quotation',
-        route: 'marketing_dashboard',
-        general_scripts: 'marketing/marketing_scripts',
-        currentPage,
-        totalPages,
-        entriesPerPage,
-        searchQuery,
-        employeeName,
-        employeeId,
-        employeeSignature,
-        typesOfWastes,
-        clients,
-        vehicleTypes,
-    };
-    res.render('dashboard', viewsData);
 }
 async function postNewQuotationController(req, res) {
     try {
@@ -681,7 +682,7 @@ async function postNewQuotationController(req, res) {
         }
 
         // Redirect back to the quotation route with a success message
-        res.redirect('/dashboard/quotations?success=new');
+        res.redirect('/marketing_dashboard/quotations?success=new');
     } catch (error) {
         // Handling errors
         console.error('Error creating quotation:', error);
@@ -739,7 +740,6 @@ async function getUpdateQuotationController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/update_quotation',
             route: 'marketing_dashboard',
-            general_scripts: 'marketing/marketing_scripts',
             currentPage,
             totalPages,
             entriesPerPage,
@@ -846,7 +846,7 @@ async function postUpdateQuotationController(req, res) {
         }
 
         // Redirect back to the quotation route with a success message
-        res.redirect('/dashboard/quotations?success=new');
+        res.redirect('/marketing_dashboard/quotations?success=new');
     } catch (error) {
         // Handling errors
         console.error('Error creating quotation:', error);
@@ -854,7 +854,7 @@ async function postUpdateQuotationController(req, res) {
     }
 };
 
-// Quotations controller
+// Commissions controller
 async function getCommissionsController(req, res) {
     try {
         // Fetch all quotations from the database
@@ -904,7 +904,6 @@ async function getCommissionsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/commissions',
             route: 'commissions',
-            general_scripts: 'marketing/marketing_scripts',
             quotations: paginatedQuotations,
             currentPage,
             totalPages,
@@ -919,93 +918,13 @@ async function getCommissionsController(req, res) {
     }
 }
 
-// other controller
-async function getQuotationWasteByClient(req, res) {
-    try {
-        const clientId = req.query.clientId;
-        // Fetch Quotations and include associated QuotationWastes
-        const quotations = await Quotation.findAll({
-            where: { clientId },
-            include: [
-                { model: QuotationWaste, as: 'QuotationWaste' }
-            ]
-        });
-        // Extract QuotationWastes from the fetched Quotations
-        const wastes = quotations.flatMap(quotation => quotation.QuotationWaste);
-        
-        // Respond with the fetched wastes in JSON format
-        res.json(wastes);
-    } catch (error) {
-        console.error('Error fetching wastes by client:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
-
-async function getQuotationTransportationByClient(req, res) {
-    try {
-        const clientId = req.query.clientId;
-        // Fetch Quotations and include associated QuotationTransportation
-        const quotations = await Quotation.findAll({
-            where: { clientId },
-            include: [{ model: QuotationTransportation, as: 'QuotationTransportation',
-                include: [{ model: VehicleType, as: 'VehicleType' }]
-            }],
-        });
-        // Extract QuotationTransportation from the fetched Quotations
-        const transportation = quotations.flatMap(quotation => quotation.QuotationTransportation);
-        
-        // Respond with the fetched wastes in JSON format
-        res.json(transportation);
-    } catch (error) {
-        console.error('Error fetching wastes by client:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
-
-async function getVehicleTypes(req, res) {
-    try {
-        const vehicleTypes = await VehicleType.findAll();
-        res.json(vehicleTypes);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
-async function getMarketingTransactions(req, res) {
-    try {
-        const marketingTransaction = await MarketingTransaction.findAll({
-            include: [{ model: QuotationTransportation, as: 'QuotationTransportation',
-                include: [{ model: VehicleType, as: 'VehicleType' }]
-            }],
-        });
-        res.json(marketingTransaction);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
-async function getVehicles(req, res) {
-    try {
-        const vehicle = await Vehicle.findAll({
-            include: [{ model: VehicleType, as: 'VehicleType' }],
-        });
-        res.json(vehicle);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
-
-
-
 module.exports = { 
-    getDashboardController,
+    getMarketingDashboardController,
     getBookedTransactionsController,
     postBookedTransactionsController,
     getClientsController,
     getClientDetails,
     getNewClientController,
-    getUpdateClientController,
     postNewClientController,
     postUpdateClientController,
     getTypeOfWasteController,
@@ -1015,9 +934,4 @@ module.exports = {
     getUpdateQuotationController,
     postUpdateQuotationController,
     getCommissionsController,
-    getQuotationWasteByClient,
-    getQuotationTransportationByClient,
-    getVehicleTypes,
-    getMarketingTransactions,
-    getVehicles,
 };

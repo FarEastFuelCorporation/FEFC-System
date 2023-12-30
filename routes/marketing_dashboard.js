@@ -1,12 +1,11 @@
-// routes/dashboard.js
+// routes/marketing_dashboard.js
 
 const express = require('express');
 const router = express.Router();
-const { isAuthenticated } = require('../middlewares/auth');
-const { getDashboardController, getBookedTransactionsController, getClientsController, getUpdateClientController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient, postBookedTransactionsController, getCommissionsController, getVehicleTypes, getVehicles, getMarketingTransactions } = require('../controllers/dashboardControllers');
+const { getMarketingDashboardController, getBookedTransactionsController, getClientsController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient, postBookedTransactionsController, getCommissionsController, getVehicleTypes, getVehicles, getMarketingTransactions, getClients, getMarketingTransactionsByMonth } = require('../controllers/marketingDashboardControllers');
 
 // Dashboard route
-router.get('/', isAuthenticated, getDashboardController);
+router.get('/', getMarketingDashboardController);
 
 // Booked Transactions route
 router.get('/booked_transactions', getBookedTransactionsController);
@@ -21,8 +20,6 @@ router.get('/clients', getClientsController);
 router.post('/clients/new', postNewClientController);
 
 // Update Client route
-router.get('/clients/update/:clientId', getUpdateClientController);
-
 router.post('/clients/update', postUpdateClientController);
 
 // Type of Wastes route
@@ -41,12 +38,5 @@ router.post('/quotations/update/', postUpdateQuotationController);
 
 // Commissions route
 router.get('/commissions', getCommissionsController);
-
-// Other route
-router.get('/getQuotationWastesByClient', getQuotationWasteByClient);
-router.get('/getQuotationTransportationByClient', getQuotationTransportationByClient);
-router.get('/getVehicleTypes', getVehicleTypes);
-router.get('/getMarketingTransaction', getMarketingTransactions);
-router.get('/getVehicles', getVehicles);
 
 module.exports = router;
