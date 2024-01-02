@@ -82,7 +82,6 @@ const MarketingTransaction = sequelize.define(
     {
         // Add the paranoid option for soft delete
         paranoid: true,
-        id: false,
     }
 );
 

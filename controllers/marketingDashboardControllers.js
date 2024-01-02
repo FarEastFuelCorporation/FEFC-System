@@ -287,7 +287,7 @@ async function getClientDetails (req, res) {
         // Find the client by ID
         const client = await Client.findOne({
             where: {
-            clientId: clientId,
+                clientId: clientId,
             },
         });
 
@@ -341,7 +341,7 @@ async function postNewClientController(req, res) {
         } = req.body;
 
         // Creating a new client
-        const newClient = await Client.create({
+        await Client.create({
             clientName,
             address,
             natureOfBusiness,
@@ -623,7 +623,7 @@ async function postNewQuotationController(req, res) {
         } = req.body;
 
         // Creating a new Quotation
-        const newQuotation = await Quotation.create({
+        await Quotation.create({
             quotationCode: quotation_no,
             revisionNumber: revision_no,
             validity: validity,

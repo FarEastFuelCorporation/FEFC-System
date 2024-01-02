@@ -158,17 +158,10 @@ const Employee = sequelize.define(
         submittedBy: {
             type: DataTypes.STRING,
         },
-        createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-        },
-        updatedAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-        },
     },
+    {
+        paranoid: true,
+    }
 );
 
 module.exports = Employee;

@@ -57,19 +57,6 @@ async function getVehicleTypes(req, res) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
-async function getMarketingTransactions(req, res) {
-    try {
-        const marketingTransaction = await MarketingTransaction.findAll({
-            include: [{ model: QuotationTransportation, as: 'QuotationTransportation',
-                include: [{ model: VehicleType, as: 'VehicleType' }]
-            }],
-        });
-        res.json(marketingTransaction);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
 async function getClients(req, res) {
     try {
         const client = await Client.findAll();
@@ -85,6 +72,19 @@ async function getVehicles(req, res) {
             include: [{ model: VehicleType, as: 'VehicleType' }],
         });
         res.json(vehicle);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+async function getMarketingTransactions(req, res) {
+    try {
+        const marketingTransaction = await MarketingTransaction.findAll({
+            include: [{ model: QuotationTransportation, as: 'QuotationTransportation',
+                include: [{ model: VehicleType, as: 'VehicleType' }]
+            }],
+        });
+        res.json(marketingTransaction);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

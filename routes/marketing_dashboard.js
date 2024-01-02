@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { getMarketingDashboardController, getBookedTransactionsController, getClientsController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, getQuotationWasteByClient, getQuotationTransportationByClient, postBookedTransactionsController, getCommissionsController, getVehicleTypes, getVehicles, getMarketingTransactions, getClients, getMarketingTransactionsByMonth } = require('../controllers/marketingDashboardControllers');
+const { getMarketingDashboardController, getBookedTransactionsController, getClientsController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, postBookedTransactionsController, getCommissionsController } = require('../controllers/marketingDashboardControllers');
 
 // Dashboard route
 router.get('/', getMarketingDashboardController);

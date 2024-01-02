@@ -7,9 +7,9 @@ const router = express.Router();
 router.get('/getQuotationWastesByClient', getQuotationWasteByClient);
 router.get('/getQuotationTransportationByClient', getQuotationTransportationByClient);
 router.get('/getVehicleTypes', getVehicleTypes);
-router.get('/getMarketingTransaction', getMarketingTransactions);
 router.get('/getClients', getClients);
 router.get('/getVehicles', getVehicles);
+router.get('/getMarketingTransaction', getMarketingTransactions);
 router.get('/getMarketingTransactionsByMonth', getMarketingTransactionsByMonth);
 
 module.exports = router;

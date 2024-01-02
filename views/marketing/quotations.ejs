@@ -6,7 +6,7 @@
             <h4>QUOTATIONS</h4><br>
             <div>
                 <label class="d-flex gap-3">
-                    <a href="/dashboard/quotations/new">
+                    <a href="/marketing_dashboard/quotations/new">
                         <button type="button" class="form-control fw-bold bg-success text-white">
                             <h6>QUOTATION FORM</h6>
                         </button>
@@ -72,7 +72,7 @@
                                     <td><%= quotation.Employee.firstName %> <%= quotation.Employee.lastName %></td>
                                     <td>
                                         <!-- Update button with two parameters -->
-                                        <a href="/dashboard/quotations/update/<%= quotation.quotationCode %>/<%= quotation.revisionNumber %>">
+                                        <a href="/marketing_dashboard/quotations/update/<%= quotation.quotationCode %>/<%= quotation.revisionNumber %>">
                                             <button type="button" class="btn btn-success">
                                                 <h6>View</h6>
                                             </button>
