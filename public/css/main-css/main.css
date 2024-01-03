@@ -197,20 +197,33 @@ body {
   gap: 15px;
 }
 
-.booked .card {
+.card {
   padding: 10px;
   background-color: #fff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
   flex: 1; /* Set flex to distribute available space evenly among cards */
-  min-width: calc((100% - 60px) / 5); /* Set a minimum width for each card */
-  max-width: calc((100% - 60px) / 5);
   display: flex;
   flex-direction: row !important;
   justify-content: space-between;
   transition: min-width 0.3s ease;
   transition: max-width 0.3s ease;
+}
+
+.booked .card {
+  min-width: calc((100% - 60px) / 5);
+  max-width: calc((100% - 60px) / 5);
+}
+
+.dispathing .card {
+  min-width: calc((100% - 60px) / 5);
+  max-width: calc((100% - 60px) / 5);
+}
+
+.dispathing2 .card {
+  min-width: calc((100% - 75px) / 6);
+  max-width: calc((100% - 75px) / 6);
 }
 
 .card .icon-box {

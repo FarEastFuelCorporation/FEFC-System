@@ -4,7 +4,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/config');
 
 const LogisticsTransaction = sequelize.define(
-    'LogisticsTransaction', 
+    'LogisticsTransaction',
     {
         id: {
             type: DataTypes.INTEGER,
@@ -34,7 +34,7 @@ const LogisticsTransaction = sequelize.define(
         remarks: {
             type: DataTypes.STRING,
         },
-        submittedBy: {
+        scheduledBy: {
             type: DataTypes.STRING,
             allowNull: false,
         },

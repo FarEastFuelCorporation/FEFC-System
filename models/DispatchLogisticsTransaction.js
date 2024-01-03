@@ -27,6 +27,10 @@ const DispatchLogisticsTransaction = sequelize.define(
         remarks: {
             type: DataTypes.STRING,
         },
+        dispatchedBy: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     },
     {
         paranoid: true,

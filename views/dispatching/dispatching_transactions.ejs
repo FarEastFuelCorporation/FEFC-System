@@ -24,7 +24,7 @@
                                 </select>
                             </div>
                             <div class="form-group d-flex">
-                                <input type="text" class="form-control" placeholder="Search Client" id="searchInput" value="<%= searchQuery %>">
+                                <input type="text" class="form-control" autocomplete="off" placeholder="Search Client" id="searchInput" value="<%= searchQuery %>">
                                 <button class="btn btn-success" onclick="performSearch()">
                                     <h6>Search</h6>
                                 </button>
@@ -45,6 +45,12 @@
                                     <th>REMARKS</th>
                                     <th>BOOKED BY</th>
                                     <th>VEHICLE</th>
+                                    <th>DRIVER</th>
+                                    <th>TRUCK HELPER</th>
+                                    <th>DEPARTURE<br>DATE/TIME</th>
+                                    <th>SCHEDULE BY</th>
+                                    <th>DISPATCHED<br>DATE/TIME</th>
+                                    <th>DISPATCHED BY</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
@@ -61,35 +67,50 @@
                                         <td><%= transaction.QuotationTransportation.VehicleType.typeOfVehicle %></td>
                                         <td><%= transaction.remarks %></td>
                                         <td><%= transaction.Employee.firstName %> <%= transaction.Employee.lastName %></td>
-                                        <td>
-                                            <% if (transaction.logisticsTransactionExists && transaction.LogisticsTransactions && transaction.LogisticsTransactions.length > 0) { %>
-                                                <%= transaction.LogisticsTransactions[0].plateNumber %>
-                                            <% } else { %>
-                                                <!-- Show something else or leave it empty if logisticsTransaction doesn't exist -->
-                                                PENDING
-                                            <% } %>
-                                        </td>
-                                        <td>
-                                            <% if (transaction.logisticsTransactionExists) { %>
-                                                <!-- Update and Dispatch buttons -->
-                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dispatchingModal" onclick="getMTFData('<%= transaction.id %>')">
-                                                    <h6>Update</h6>
-                                                </button>
-                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dispatchModal" onclick="getMTFData('<%= transaction.id %>')">
-                                                    <h6>Dispatch</h6>
-                                                </button>
-                                            <% } else { %>
-                                                <!-- For Schedule button -->
-                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#scheduleModal" onclick="getMTFData('<%= transaction.id %>')">
+                                        <% if (transaction.logisticsTransactionExists) { %>
+                                        <td> <%= transaction.LogisticsTransaction[0].plateNumber %> </td>
+                                        <td> <%= transaction.LogisticsTransaction[0].Driver.firstName %> <%= transaction.LogisticsTransaction[0].Driver.lastName %> </td>
+                                        <td> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.lastName %> </td>
+                                        <td> <%= transaction.LogisticsTransaction[0].departureDate %> <%= transaction.LogisticsTransaction[0].departureTime %> </td>
+                                        <td> <%= transaction.LogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].Employee.lastName %> </td>
+                                        <% } else { %>
+                                        <td> PENDING </td>
+                                        <td> PENDING </td>
+                                        <td> PENDING </td>
+                                        <td> PENDING </td>
+                                        <td> PENDING </td>
+                                        <% } %>
+                                        <% if (transaction.dispatchLogisticsTransactionExists) { %>
+                                        <td> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedDate %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedTime %> </td>
+                                        <td> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.lastName %> </td>
+                                        <% } else { %>
+                                        <td> PENDING </td>
+                                        <td> PENDING </td>
+                                        <% } %>
+                                        <td class="d-flex flex-wrap gap-1 justify-content-center">
+                                            <% if (!transaction.logisticsTransactionExists) { %>
+                                                <!-- Show Schedule button -->
+                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#newScheduleModal" onclick="getMTFData('<%= transaction.id %>')">
                                                     <h6>For Schedule</h6>
                                                 </button>
+                                            <% } else if (!transaction.dispatchLogisticsTransactionExists) { %>
+                                                <!-- Show Update and Dispatch buttons -->
+                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#updateScheduleModal" onclick="updateData('<%= transaction.id %>')">
+                                                    <h6>Update</h6>
+                                                </button>
+                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dispatchModal" onclick="getLTFData('<%= transaction.id %>')">
+                                                    <h6>Dispatch</h6>
+                                                </button>                                            
+                                            <% } else { %>
+                                                <!-- Show Dispatched message -->
+                                                <p>Dispatched</p>
                                             <% } %>
                                         </td>
                                     </tr>
                                 <% }); %>
                             </tbody>
                         </table>
-                
+
                         <!-- Pagination -->
                         <div class="table-pagination">
                             <nav aria-label="Page navigation">
@@ -123,14 +144,14 @@
         </div>
     </div>
 
-    <form id="scheduleForm" action="/dispatching_dashboard/schedule_transactions" method="post">
-        <div class="modal" id="scheduleModal" style="height: 100vh; width: 100%;">
+    <form id="newScheduleForm" action="/dispatching_dashboard/new_schedule_transactions" method="post">
+        <div class="modal" id="newScheduleModal" style="height: 100vh; width: 100%;">
             <div class="modal-dialog  modal-lg" style="width: 100% !important;">
                 <div class="modal-content">
                     <!-- Modal Header -->
                     <div class="modal-header">
-                        <h4 class="modal-title">SCHEDULE FORM</h4>
-                        <button type="button" id="closeScheduleBtn" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">NEW SCHEDULE FORM</h4>
+                        <button type="button" id="closeNewScheduleBtn" class="close btn btn-danger" data-dismiss="modal">&times;</button>
                     </div>
         
                     <!-- Modal Body -->
@@ -199,7 +220,7 @@
                             <div class="col">
                                 <label for="remarks">
                                     <i class="fa-brands fa-rocketchat"></i>
-                                    Remerks
+                                    Remarks
                                     </label><br>
                                 <input type="text" name="remarks" id="remarks" autocomplete="off" class="form-control" placeholder="Type your Remarks">
                             </div>
@@ -210,6 +231,102 @@
                     <div class="modal-footer">
                         <button type="submit" id="submit_btn" class="btn btn-success">
                             Submit
+                        </button>
+                        <button type="reset" id="reset" class="btn btn-danger">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <form id="updateScheduleForm" method="post">
+        <div class="modal" id="updateScheduleModal" style="height: 100vh; width: 100%;">
+            <div class="modal-dialog  modal-lg" style="width: 100% !important;">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">UPDATE SCHEDULE FORM</h4>
+                        <button type="button" id="closeUpdateScheduleBtn" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                    </div>
+        
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <input type="hidden" name="mtfId" id="mtfId">
+                        <div class="row gap-3 mb-3">
+                            <div class="col">
+                                <label for="departureDate">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    Departure Date
+                                </label><br>
+                                <input type="date" name="departureDate" id="departureDate" autocomplete="off" class="form-control" required placeholder="Input Client's Nature of Business...">
+                            </div>
+                            <div class="col">
+                                <label for="departureTime">
+                                    <i class="fa-regular fa-clock"></i>
+                                    Departure Time
+                                </label><br>
+                                <input type="time" name="departureTime" id="departureTime" autocomplete="off" class="form-control" required placeholder="Input Client's Contact Number...">
+                            </div>
+                        </div>
+                        <div class="row gap-3 mb-3">
+                            <div class="col">
+                                <label for="plateNumber">
+                                    <i class="fa-solid fa-truck"></i>
+                                    Vehicle
+                                </label><br>
+                                <input class="form-control" list="vehicleList" id="plateNumber" name="plateNumber" required placeholder="Type to search...">
+                                <datalist name="vehicleList" id="vehicleList">
+                                    <option value="" disabled selected>Select Vehicle</option>
+                                    <% vehicles.forEach(vehicle => { %>
+                                        <option value="<%= vehicle.plateNumber %>"><%= vehicle.vehicleName %></option>
+                                    <% }); %>
+                                </datalist>
+                            </div>
+                            <div class="col">
+                                <label for="driverId">
+                                    <i class="fa-solid fa-user"></i>
+                                    Driver
+                                </label><br>
+                                <input class="form-control" list="driverList" name="driverId" id="driverId" autocomplete="off" required placeholder="Type to search...">
+                                <datalist id="driverList">
+                                    <option value="" disabled selected>Select Driver</option>
+                                    <% drivers.forEach(driver => { %>
+                                        <option value="<%= driver.employeeId %>"><%= driver.lastName %>, <%= driver.firstName %></option>
+                                    <% }); %>
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="row gap-3 mb-3">
+                            <div class="col">
+                                <label for="truckHelperId">
+                                    <i class="fa-solid fa-user"></i>
+                                    Truck Helper
+                                </label><br>
+                                <input class="form-control" list="truckHelperList" name="truckHelperId" id="truckHelperId" autocomplete="off" required placeholder="Type to search...">
+                                <datalist id="truckHelperList">
+                                    <option value="" disabled selected>Select Driver</option>
+                                    <% truckHelpers.forEach(truckHelper => { %>
+                                        <option value="<%= truckHelper.employeeId %>"><%= truckHelper.lastName %>, <%= truckHelper.firstName %></option>
+                                    <% }); %>
+                                </datalist>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="remarks">
+                                    <i class="fa-brands fa-rocketchat"></i>
+                                    Remarks
+                                    </label><br>
+                                <input type="text" name="remarks" id="remarks" autocomplete="off" class="form-control" placeholder="Type your Remarks">
+                            </div>
+                        </div>
+                    </div>
+        
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="submit" id="submit_btn" class="btn btn-success">
+                            Update
                         </button>
                         <button type="reset" id="reset" class="btn btn-danger">
                             Clear
@@ -231,7 +348,7 @@
         
                     <!-- Modal Body -->
                     <div class="modal-body">
-                        <input type="hidden" name="mtfId" id="mtfId">
+                        <input type="hidden" name="logisticsTransactionId" id="logisticsTransactionId">
                         <div class="row gap-3 mb-3">
                             <div class="col">
                                 <label for="dispatchedDate">
@@ -252,7 +369,7 @@
                             <div class="col">
                                 <label for="remarks">
                                     <i class="fa-brands fa-rocketchat"></i>
-                                    Remerks
+                                    Remarks
                                     </label><br>
                                 <input type="text" name="remarks" id="remarks" autocomplete="off" class="form-control" placeholder="Type your Remarks">
                             </div>
@@ -274,8 +391,86 @@
     </form>
 </div>
 <script>
-    document.getElementById("closeScheduleBtn").addEventListener("click", () => {
-        document.getElementById("scheduleModal").style.display = "none";
+    // Function to change the page
+    function changePage(pageNumber) {
+    const entriesPerPage = document.getElementById('showEntries').value;
+
+    // Make an AJAX request to the server with the updated page number
+    fetch(`/dispatching_dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Update the content of the container with the new data
+        const section = document.querySelector('section');
+        if (section) {
+            section.innerHTML = data;
+
+            document.querySelector('.content').style.marginLeft = '0';
+            document.querySelector('.content').style.width = '100%';
+            document.querySelector('.content').style.padding = '0%';
+            updateActiveClass()
+        }
+
+        // Update the URL to reflect the current page
+        const newUrl = `/dispatching_dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`;
+        history.pushState({ page: pageNumber, entriesPerPage }, '', newUrl);
+        window.location.reload()
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle errors as needed
+    });
+}
+
+function changeEntriesPerPage(selectElement) {
+    const selectedValue = selectElement.value;
+    const currentPage = <%= currentPage %> // Get the current page
+    window.location.href = `/dispatching_dashboard/<%= route %>?page=${currentPage}&entriesPerPage=${selectedValue}`;
+}
+
+function performSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchQuery = searchInput.value.trim(); // Get the trimmed search query
+    const pageNumber = 1;
+    const entriesPerPage = document.getElementById('showEntries').value;
+
+    // Make an AJAX request to the server with the search query and current page
+    fetch(`/dispatching_dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}&search=${searchQuery}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Update the content of the container with the new data
+        const section = document.querySelector('section');
+        if (section) {
+            section.innerHTML = data;
+
+            document.querySelector('.content').style.marginLeft = '0';
+            document.querySelector('.content').style.width = '100%';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle errors as needed
+    });
+}
+</script>
+<script>
+    document.getElementById("closeNewScheduleBtn").addEventListener("click", () => {
+        document.getElementById("newScheduleModal").style.display = "none";
+        document.querySelector("body").classList.remove("modal-open");
+        document.querySelector("body").style = "";
+        document.querySelector(".modal-backdrop").remove();
+    })
+    document.getElementById("closeUpdateScheduleBtn").addEventListener("click", () => {
+        document.getElementById("updateScheduleModal").style.display = "none";
         document.querySelector("body").classList.remove("modal-open");
         document.querySelector("body").style = "";
         document.querySelector(".modal-backdrop").remove();
@@ -287,10 +482,59 @@
         document.querySelector(".modal-backdrop").remove();
     })
 
+    let logisticsTransactionsData = [];
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            // Make parallel AJAX requests using Promise.all
+            const [ logisticsTransactionsResponse ] = await Promise.all([
+                fetch('/requests/getLogisticsTransaction', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }),
+            ]);
+
+            // Check for errors in marketing transaction response
+            if (!logisticsTransactionsResponse.ok) {
+                throw new Error('Network response was not ok for logistics transactions');
+            }
+
+            // Get JSON data for vehicles marketing transactions and vehicles
+            logisticsTransactionsData = await logisticsTransactionsResponse.json();
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+
     function getMTFData(MTFData) {
-        const scheduleModal = document.getElementById("scheduleModal");
+        const newScheduleModal = document.getElementById("newScheduleModal");
+        newScheduleModal.querySelector("#mtfId").value = MTFData;
+    }
+    function updateData(MTFData) {
+        const updateScheduleModal = document.getElementById("updateScheduleModal");
+        updateScheduleModal.querySelector("#mtfId").value = MTFData;
+        document.getElementById("updateScheduleForm").action = `/dispatching_dashboard/update_schedule_transactions/${MTFData}`;
+        for(let x = 0; x < logisticsTransactionsData.length; x++){
+            if(MTFData == logisticsTransactionsData[x].MarketingTransaction.id){
+                updateScheduleModal.querySelector("#departureDate").value = logisticsTransactionsData[x].departureDate;
+                updateScheduleModal.querySelector("#departureTime").value = logisticsTransactionsData[x].departureTime;
+                updateScheduleModal.querySelector("#plateNumber").value = logisticsTransactionsData[x].plateNumber;
+                updateScheduleModal.querySelector("#driverId").value = logisticsTransactionsData[x].driverId;
+                updateScheduleModal.querySelector("#truckHelperId").value = logisticsTransactionsData[x].LogisticsTransactionHelper[0].truckHelperId;
+                updateScheduleModal.querySelector("#remarks").value = logisticsTransactionsData[x].remarks;
+            }
+        }
+    }
+    function getLTFData(MTFData) {
         const dispatchModal = document.getElementById("dispatchModal");
-        scheduleModal.querySelector("#mtfId").value = MTFData;
-        dispatchModal.querySelector("#mtfId").value = MTFData;
+        for(let x = 0; x < logisticsTransactionsData.length; x++){
+            if(MTFData == logisticsTransactionsData[x].MarketingTransaction.id){
+                dispatchModal.querySelector("#logisticsTransactionId").value = logisticsTransactionsData[x].id;
+                console.log(logisticsTransactionsData[x].id)
+            }
+        }
     }
 </script>

@@ -128,7 +128,7 @@
         <% } %>
     </section>
     <section class="mb-3">
-        <h1>December 2023</h1>
+        <h1>January 2024</h1>
         <table class="calendar">
             <thead>
                 <tr>
@@ -493,7 +493,7 @@
 
             // Check for errors in marketing transaction response
             if (!vehicleTypesResponse.ok) {
-                throw new Error('Network response was not ok for marketing transactions');
+                throw new Error('Network response was not ok for vehicle types');
             }
 
             // Check for errors in marketing transaction response
@@ -503,7 +503,7 @@
 
             // Check for errors in vehicles response
             if (!vehiclesResponse.ok) {
-                throw new Error('Network response was not ok for marketing transactions');
+                throw new Error('Network response was not ok for vehicles');
             }
 
             // Get JSON data for vehicles marketing transactions and vehicles
@@ -512,7 +512,7 @@
             vehiclesData = await vehiclesResponse.json();
 
             // Log or process the data as needed
-            generateCalendarDays(2023, 11);
+            generateCalendarDays(2024, 0);
 
         } catch (error) {
             console.error('Error fetching data:', error);

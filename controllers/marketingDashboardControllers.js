@@ -20,7 +20,6 @@ async function getMarketingDashboardController(req, res) {
         // Retrieve data from the database or perform other logic
         const employeeId = req.session.employeeId;
         const employee = await Employee.findOne({ where: { employeeId } });
-        var currentPage, totalPages, entriesPerPage, searchQuery
         
         // Filter marketingTransactions for the current month
         const currentMonthStart = new Date();
@@ -67,10 +66,6 @@ async function getMarketingDashboardController(req, res) {
             employee,
             marketingTransactions,
             counts,
-            currentPage,
-            totalPages,
-            entriesPerPage,
-            searchQuery,
         };
         res.render('dashboard', viewsData);
     } catch (error) {
@@ -82,7 +77,6 @@ async function getMarketingDashboardController(req, res) {
 // Booked Transactions controller
 async function getBookedTransactionsController(req, res) {
     try {
-        var currentPage, totalPages, entriesPerPage, searchQuery;
         const employeeId = req.session.employeeId;
 
         // Fetch all clients from the database
@@ -124,10 +118,6 @@ async function getBookedTransactionsController(req, res) {
             employeeId,
             clients,
             quotation,
-            currentPage,
-            totalPages,
-            entriesPerPage,
-            searchQuery,
             successMessage,
         };
         res.render('dashboard', viewsData);
@@ -218,7 +208,7 @@ async function postBookedTransactionsController(req, res) {
         res.redirect('/marketing_dashboard/booked_transactions?success=new');
     } catch (error) {
         // Handling errors
-        console.error('Error creating quotation:', error);
+        console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -255,7 +245,7 @@ async function getClientsController(req, res) {
         // Check for the success query parameter
         let successMessage;
         if(req.query.success === 'new'){
-            successMessage = 'Client created successfully!';
+            successMessage = 'Client added successfully!';
         } else if (req.query.success === 'update'){
             successMessage = 'Client updated successfully!';
         }
@@ -279,7 +269,6 @@ async function getClientsController(req, res) {
         res.status(500).send('Internal Server Error');
     }
 }
-
 async function getClientDetails (req, res) {
     try {
         const clientId = req.params.clientId;
@@ -298,26 +287,20 @@ async function getClientDetails (req, res) {
         // Respond with client details
         return res.status(200).json(client);
     } catch (error) {
-        console.error('Error fetching client details:', error);
+        console.error('Error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
 
 // New Client controller
 async function getNewClientController(req, res) {
-    try {
-        var currentPage, totalPages, entriesPerPage, searchQuery
-        
+    try {        
         // Render the dashboard view with data
         const viewsData = {
             pageTitle: 'Marketing User - New Client Form',
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/new_client',
             route: 'marketing_dashboard',
-            currentPage,
-            totalPages,
-            entriesPerPage,
-            searchQuery,
         };
         res.render('dashboard', viewsData);
     } catch (error) {
@@ -325,7 +308,6 @@ async function getNewClientController(req, res) {
         res.status(500).send('Internal Server Error');
     }
 }
-
 async function postNewClientController(req, res) {
     try {
         // Extracting data from the request body
@@ -357,7 +339,7 @@ async function postNewClientController(req, res) {
         res.redirect('/marketing_dashboard/clients?success=new');
     } catch (error) {
         // Handling errors
-        console.error('Error creating client:', error);
+        console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -382,7 +364,7 @@ async function generateClientId(req, res) {
 
         return clientId;
     } catch (error) {
-        console.error('Error generating client ID:', error);
+        console.error('Error:', error);
         // Handle the error appropriately in your application
         return null; // or throw a different error or provide a default value
     }
@@ -431,7 +413,7 @@ async function postUpdateClientController(req, res) {
         res.redirect('/marketing_dashboard/clients?success=update');
     } catch (error) {
         // Handling errors
-        console.error('Error updating client:', error);
+        console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 }
@@ -685,7 +667,7 @@ async function postNewQuotationController(req, res) {
         res.redirect('/marketing_dashboard/quotations?success=new');
     } catch (error) {
         // Handling errors
-        console.error('Error creating quotation:', error);
+        console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
@@ -753,7 +735,7 @@ async function getUpdateQuotationController(req, res) {
         };
         res.render('dashboard', viewsData);
     } catch (error) {
-        console.error('Error in getUpdateQuotationController:', error);
+        console.error('Error:', error);
         // Handle the error appropriately (e.g., send an error response)
         res.status(500).send('Internal Server Error');
     }
@@ -849,7 +831,7 @@ async function postUpdateQuotationController(req, res) {
         res.redirect('/marketing_dashboard/quotations?success=new');
     } catch (error) {
         // Handling errors
-        console.error('Error creating quotation:', error);
+        console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };

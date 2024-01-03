@@ -1096,7 +1096,7 @@
     });
 </script>
 <script>
-        function updateClientId() {
+    function updateClientId() {
         var clientInput = document.getElementById('clientName');
         var clientIdInput = document.getElementById('clientId');
 
@@ -1110,6 +1110,33 @@
             clientIdInput.value = '';
         }
     }
+
+    let clientsData = [];
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            // Make parallel AJAX requests using Promise.all
+            const [ clientsResponse ] = await Promise.all([
+                fetch('/requests/getClients', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }),
+            ]);
+
+            // Check for errors in marketing transaction response
+            if (!clientsResponse.ok) {
+                throw new Error('Network response was not ok for logistics transactions');
+            }
+
+            // Get JSON data for vehicles marketing transactions and vehicles
+            clientsData = await clientsResponse.json();
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    });
 
     async function generateQuotation() {
         document.getElementById('what_to_print').style.display = "block";
@@ -1236,15 +1263,23 @@
         }
 
         try {
-        const clientDetails = await fetchClientDetails(clientId);
-        document.getElementById('client_name_container').innerText = clientDetails.clientName;
-        document.getElementById('address_container').innerText = clientDetails.address;
-        document.getElementById('nature_of_business_container').innerText = clientDetails.natureOfBusiness;
-        document.getElementById('contact_number').innerText = clientDetails.contactNumber;
-        document.getElementById('client_name_container2').innerText = clientDetails.billerName;
-        document.getElementById('address_container2').innerText = clientDetails.billerAddress;
-        document.getElementById('contact_number2').innerText = clientDetails.billerContactNumber;
-        document.getElementById('contact_number2').innerText = clientDetails.billerContactNumber;
+            function fetchClientDetails(clientIdInput) {
+                for(let x = 0; x < clientsData.length; x++){
+                    if(clientsData[x].clientId == clientIdInput){
+                        return clientsData[x];
+                    }
+                }
+
+            }
+            const clientDetails = await fetchClientDetails(clientId);
+            document.getElementById('client_name_container').innerText = clientDetails.clientName;
+            document.getElementById('address_container').innerText = clientDetails.address;
+            document.getElementById('nature_of_business_container').innerText = clientDetails.natureOfBusiness;
+            document.getElementById('contact_number').innerText = clientDetails.contactNumber;
+            document.getElementById('client_name_container2').innerText = clientDetails.billerName;
+            document.getElementById('address_container2').innerText = clientDetails.billerAddress;
+            document.getElementById('contact_number2').innerText = clientDetails.billerContactNumber;
+            document.getElementById('contact_number2').innerText = clientDetails.billerContactNumber;
 
 
         // Update your UI or perform other actions with the fetched client details
@@ -1257,15 +1292,6 @@
     // Add event listener to the "Generate Quotation" button
     document.getElementById('generate_button').addEventListener('click', generateQuotation);
 
-    function fetchClientDetails(clientId) {
-    // Make a fetch request to your API endpoint to get client details
-    return fetch(`/dashboard/clients/${clientId}`)
-        .then(response => response.json())
-        .catch(error => {
-            console.error('Error fetching client details:', error);
-            throw error; // Re-throw the error to handle it in the calling code if needed
-        });
-    }
 </script>
 <script>
     function convertToPDFandDownload() {

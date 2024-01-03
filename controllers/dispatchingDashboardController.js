@@ -1,5 +1,6 @@
 // controllers/dispatchingDashboardControllers.js
 
+require('dotenv').config();
 const { Op, Sequelize } = require('sequelize');
 const Client = require("../models/Client");
 const Employee = require("../models/Employee");
@@ -12,6 +13,8 @@ const Vehicle = require("../models/Vehicle");
 const VehicleType = require("../models/VehicleType");
 const WasteCategory = require("../models/WasteCategory");
 const LogisticsTransaction = require('../models/LogisticsTransaction');
+const LogisticsTransactionHelper = require('../models/LogisticsTransactionHelper');
+const DispatchLogisticsTransaction = require('../models/DispatchLogisticsTransaction');
 
 // Dashboard controller
 async function getDispatchingDashboardController(req, res) {
@@ -19,7 +22,6 @@ async function getDispatchingDashboardController(req, res) {
         // Retrieve data from the database or perform other logic
         const employeeId = req.session.employeeId;
         const employee = await Employee.findOne({ where: { employeeId } });
-        var currentPage, totalPages, entriesPerPage, searchQuery
         
         // Render the dashboard view with data
         const viewsData = {
@@ -28,10 +30,6 @@ async function getDispatchingDashboardController(req, res) {
             content: 'dispatching/dispatching_dashboard',
             route: 'dispatching_dashboard',
             employee,
-            currentPage,
-            totalPages,
-            entriesPerPage,
-            searchQuery,
         };
         res.render('dashboard', viewsData);
     } catch (error) {
@@ -41,13 +39,13 @@ async function getDispatchingDashboardController(req, res) {
 }
 
 // Vehicle Tracker controller
-async function getVehicleTracker(req, res) {
+async function getVehicleTrackerController(req, res) {
     try {
         // Retrieve data from the database or perform other logic
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
         const employeeId = req.session.employeeId;
         const employee = await Employee.findOne({ where: { employeeId } });
-        var currentPage, totalPages, entriesPerPage, searchQuery
-        
+        console.log(apiKey)
         // Render the dashboard view with data
         const viewsData = {
             pageTitle: 'Dispatching User - Vehicle Tracker',
@@ -55,11 +53,7 @@ async function getVehicleTracker(req, res) {
             content: 'dispatching/vehicle_tracker',
             route: 'vehicle_tracker',
             employee,
-            currentPage,
-            totalPages,
-            entriesPerPage,
-            searchQuery,
-            apiKey: 'AIzaSyBtwRzRYR6HP_eMlN4yLUp6FRYbK0t1YAQ',
+            apiKey: apiKey,
         };
         res.render('dashboard', viewsData);
     } catch (error) {
@@ -69,10 +63,11 @@ async function getVehicleTracker(req, res) {
 }
 
 // Dispatching Transactions controller
-async function getDispatchingTransactions(req, res) {
+async function getDispatchingTransactionsController(req, res) {
     try {
         // Fetch all clients from the database
         const marketingTransactions = await MarketingTransaction.findAll({
+            where: { submitTo: 'LOGISTICS' },
             include: [
                 { model: Client, as: 'Client' },
                 { model: QuotationWaste, as: 'QuotationWaste',
@@ -92,9 +87,44 @@ async function getDispatchingTransactions(req, res) {
                     model: LogisticsTransaction, as: 'LogisticsTransaction',
                     where: { mtfId: Sequelize.col('MarketingTransaction.id') },
                     required: false, // Use 'false' to perform a LEFT JOIN
+                    include: [
+                        {
+                            model: Employee,
+                            as: 'Employee',
+                        },
+                        {
+                            model: Employee,
+                            as: 'Driver',
+                        },
+                        {
+                            model: LogisticsTransactionHelper,
+                            as: 'LogisticsTransactionHelper',
+                            where: { logisticsTransactionId: Sequelize.col('LogisticsTransaction.id') },
+                            required: false, // Use 'false' to perform a LEFT JOIN
+                            include: [
+                                {
+                                    model: Employee,
+                                    as: 'Employee',
+                                },
+                            ],
+                        },
+                        {
+                            model: DispatchLogisticsTransaction,
+                            as: 'DispatchLogisticsTransaction',
+                            where: { logisticsTransactionId: Sequelize.col('LogisticsTransaction.id') },
+                            required: false, // Use 'false' to perform a LEFT JOIN
+                            include: [
+                                {
+                                    model: Employee,
+                                    as: 'Employee',
+                                },
+                            ],
+                        },      
+                    ]
                 },
             ],
         });
+
         // Get logistics transactions for all MTF IDs
         const logisticsTransactions = await LogisticsTransaction.findAll({
             where: { mtfId: marketingTransactions.map(transaction => transaction.id) },
@@ -136,22 +166,34 @@ async function getDispatchingTransactions(req, res) {
         });
 
         // Check if mtfId is present in LogisticsTransaction for each MarketingTransaction
-        const logisticsTransactionsPromises = filteredMarketingTransactions.map(async (marketingTransaction) => {
+        filteredMarketingTransactions.map(async (marketingTransaction) => {
             const logisticsTransaction = await LogisticsTransaction.findOne({
                 where: { mtfId: marketingTransaction.id },
             });
             return !!logisticsTransaction; // Return true if logisticsTransaction exists, false otherwise
         });
 
-        // Wait for all promises to resolve
-        const logisticsTransactionResults = await Promise.all(logisticsTransactionsPromises);
+        // Add the dispatched property to each transaction
+        const transactionsWithLogisticsInfo = await Promise.all(filteredMarketingTransactions.map(async (marketingTransaction, index) => {
+            const logisticsTransaction = logisticsTransactions.find(lt => lt.mtfId === marketingTransaction.id);
 
-        // Combine MarketingTransactions with logisticsTransactionExists information
-        const transactionsWithLogisticsInfo = filteredMarketingTransactions.map((marketingTransaction, index) => {
+            // Check if there is a DispatchLogisticsTransaction for the current transaction
+            const dispatchLogisticsTransactionExists = await DispatchLogisticsTransaction.findOne({
+                where: { logisticsTransactionId: logisticsTransaction ? logisticsTransaction.id : null },
+            });
+
             return {
                 ...marketingTransaction.toJSON(),
-                logisticsTransactionExists: logisticsTransactionResults[index],
+                logisticsTransactionExists: !!logisticsTransaction,
+                dispatchLogisticsTransactionExists: !!dispatchLogisticsTransactionExists,
             };
+        }));
+
+        // Sort the array by haulingDate and haulingTime
+        transactionsWithLogisticsInfo.sort((a, b) => {
+            const dateA = new Date(`${a.haulingDate} ${a.haulingTime}`);
+            const dateB = new Date(`${b.haulingDate} ${b.haulingTime}`);
+            return dateB - dateA;
         });
 
         // Calculate total pages based on the total number of filtered transactions and entries per page
@@ -165,13 +207,15 @@ async function getDispatchingTransactions(req, res) {
 
         // Check for the success query parameter
         let successMessage;
-        if(req.query.success === 'schedule'){
+        if(req.query.success === 'newSchedule'){
             successMessage = 'Transaction scheduled successfully!';
+        } else if (req.query.success === 'updateSchedule'){
+            successMessage = 'Transaction scheduled updated successfully!';
         } else if (req.query.success === 'dispatch'){
             successMessage = 'Transaction dispatched successfully!';
         }
 
-        // Render the 'marketing/clients' view and pass the necessary data
+        // Render the 'dashboard' view and pass the necessary data
         const viewsData = {
             pageTitle: 'Dispatching User - Dispatching Transactions',
             sidebar: 'dispatching/dispatching_sidebar',
@@ -193,7 +237,7 @@ async function getDispatchingTransactions(req, res) {
         res.status(500).send('Internal Server Error');
     }
 }
-async function postScheduledTransactions(req, res) {
+async function postScheduleTransactionsController(req, res) {
     try {
         const employeeId = req.session.employeeId;
         // Extracting data from the request body
@@ -208,28 +252,30 @@ async function postScheduledTransactions(req, res) {
             remarks,
         } = req.body;
 
-        // Creating a new client
-        await LogisticsTransaction.create({
+        const logisticsTransaction = await LogisticsTransaction.create({
             mtfId,
             departureDate,
             departureTime,
             vehicle,
             plateNumber,
             driverId,
-            truckHelperId,
             remarks,
-            submittedBy: employeeId,
+            scheduledBy: employeeId,
+        });
+        await LogisticsTransactionHelper.create({
+            logisticsTransactionId: logisticsTransaction.id,
+            truckHelperId,
         });
 
         // Redirect back to the client route with a success message
-        res.redirect('/dispatching_dashboard/dispatching_transactions?success=schedule');
+        res.redirect('/dispatching_dashboard/dispatching_transactions?success=newSchedule');
     } catch (error) {
         // Handling errors
-        console.error('Error creating client:', error);
+        console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-async function postDispatchedTransactions(req, res) {
+async function updateScheduleTransactionsController(req, res) {
     try {
         const employeeId = req.session.employeeId;
         // Extracting data from the request body
@@ -244,33 +290,218 @@ async function postDispatchedTransactions(req, res) {
             remarks,
         } = req.body;
 
-        // Creating a new client
-        await LogisticsTransaction.create({
-            mtfId,
-            departureDate,
-            departureTime,
-            vehicle,
-            plateNumber,
-            driverId,
-            truckHelperId,
-            remarks,
-            submittedBy: employeeId,
-        });
+        const logisticsTransactionId = req.params.id;
+
+        await LogisticsTransaction.update(
+            {
+                mtfId,
+                departureDate,
+                departureTime,
+                vehicle,
+                plateNumber,
+                driverId,
+                truckHelperId,
+                remarks,
+                scheduledBy: employeeId,
+            },            
+            {
+                where: { id: logisticsTransactionId },
+            }
+        );
+        await LogisticsTransactionHelper.update(
+            {
+                truckHelperId,
+            },            
+            {
+                where: { logisticsTransactionId: logisticsTransactionId },
+            }
+        );
 
         // Redirect back to the client route with a success message
-        res.redirect('/dispatching_dashboard/dispatching_transactions?success=new');
+        res.redirect('/dispatching_dashboard/dispatching_transactions?success=updateSchedule');
     } catch (error) {
         // Handling errors
-        console.error('Error creating client:', error);
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+async function postDispatchTransactionsController(req, res) {
+    try {
+        const employeeId = req.session.employeeId;
+        // Extracting data from the request body
+        const {
+            logisticsTransactionId,
+            dispatchedDate,
+            dispatchedTime,
+            remarks,
+        } = req.body;
+
+        const dispatchLogisticsTransaction = await DispatchLogisticsTransaction.create({
+            logisticsTransactionId,
+            dispatchedDate,
+            dispatchedTime,
+            remarks,
+            dispatchedBy: employeeId,
+        });
+        
+        const logisticsTransaction = await LogisticsTransaction.findOne(
+            {
+                where: { id: logisticsTransactionId },
+            }
+        );
+        console.log(logisticsTransactionId)
+        await MarketingTransaction.update(
+            {
+                statusId: "3",
+            },
+            {
+                where: { id: logisticsTransaction.mtfId },
+            }
+        );
+
+
+        // Redirect back to the client route with a success message
+        res.redirect('/dispatching_dashboard/dispatching_transactions?success=dispatch');
+    } catch (error) {
+        // Handling errors
+        console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };
 
+// Vehicles controller
+async function getVehiclesController(req, res) {
+    try {
+        const vehicles = await Vehicle.findAll({
+            include: [
+                { model: VehicleType, as: 'VehicleType' },
+            ]
+        });
+        const vehicleTypes = await VehicleType.findAll({
+            where: {
+                vehicleId: {
+                    [Op.not]: "V000"
+                }
+            }
+        });
+        
+        // Get the page number, entries per page, and search query from the query parameters
+        const currentPage = parseInt(req.query.page) || 1;
+        const entriesPerPage = parseInt(req.query.entriesPerPage) || 10;
+        const searchQuery = req.query.search || ''; // Default to an empty string if no search query
+
+        const filteredVehicles = vehicles.filter(vehicle => {
+            // Customize this logic based on how you want to perform the search
+            return (
+                vehicle.vehicleName.toLowerCase().includes(searchQuery.toLowerCase())
+                // Add more fields if needed
+            );
+        });
+
+        // Calculate total pages based on the total number of filtered clients and entries per page
+        const totalFilteredVehicles = filteredVehicles.length;
+        const totalPages = Math.ceil(totalFilteredVehicles / entriesPerPage);
+
+        // Implement pagination and send the filtered clients to the view
+        const startIndex = (currentPage - 1) * entriesPerPage;
+        const endIndex = currentPage * entriesPerPage;
+        const paginatedClients = filteredVehicles.slice(startIndex, endIndex);
+
+        // Check for the success query parameter
+        let successMessage;
+        if(req.query.success === 'new'){
+            successMessage = 'Vehicle added successfully!';
+        } else if (req.query.success === 'update'){
+            successMessage = 'Vehicle updated successfully!';
+        }
+
+        const viewsData = {
+            pageTitle: 'Dispatching User - Vehicles',
+            sidebar: 'dispatching/dispatching_sidebar',
+            content: 'dispatching/vehicles',
+            route: 'vehicles',
+            vehicles: paginatedClients,
+            vehicleTypes,
+            currentPage,
+            totalPages,
+            entriesPerPage,
+            searchQuery,
+            successMessage,
+        };
+        res.render('dashboard', viewsData);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+async function postVehicleController(req, res) {
+    try {
+        // Extracting data from the request body
+        const {
+            plateNumber,
+            vehicleName,
+            netCapacity,
+            ownership,
+            vehicleId,
+        } = req.body;
+
+        await Vehicle.create({
+            plateNumber,
+            vehicleName,
+            netCapacity,
+            ownership,
+            vehicleId,
+        });
+
+        // Redirect back to the client route with a success message
+        res.redirect('/dispatching_dashboard/vehicles?success=new');
+    } catch (error) {
+        // Handling errors
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+async function updateVehicleController(req, res) {
+    try {
+        // Extracting data from the request body
+        const {
+            plateNumber,
+            vehicleName,
+            netCapacity,
+            ownership,
+            vehicleId,
+        } = req.body;
+
+        await Vehicle.update(
+            {
+                plateNumber,
+                vehicleName,
+                netCapacity,
+                ownership,
+                vehicleId,
+            },
+            {
+                where: { plateNumber },
+            }
+        );
+
+        // Redirect back to the client route with a success message
+        res.redirect('/dispatching_dashboard/vehicles?success=update');
+    } catch (error) {
+        // Handling errors
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
 module.exports = { 
     getDispatchingDashboardController,
-    getVehicleTracker,
-    getDispatchingTransactions,
-    postDispatchedTransactions,
-    postScheduledTransactions,
+    getVehicleTrackerController,
+    getDispatchingTransactionsController,
+    postScheduleTransactionsController,
+    updateScheduleTransactionsController,
+    postDispatchTransactionsController,
+    getVehiclesController,
+    postVehicleController,
+    updateVehicleController,
 };

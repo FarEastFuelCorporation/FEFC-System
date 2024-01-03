@@ -1,5 +1,5 @@
 const sequelize = require("../config/config");
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const Client = require("../models/Client");
 const MarketingTransaction = require("../models/MarketingTransaction");
 const Quotation = require("../models/Quotation");
@@ -7,6 +7,12 @@ const QuotationTransportation = require("../models/QuotationTransportation");
 const QuotationWaste = require("../models/QuotationWaste");
 const Vehicle = require("../models/Vehicle");
 const VehicleType = require("../models/VehicleType");
+const LogisticsTransaction = require("../models/LogisticsTransaction");
+const Employee = require("../models/Employee");
+const WasteCategory = require("../models/WasteCategory");
+const TransactionStatus = require("../models/TransactionStatus");
+const LogisticsTransactionHelper = require("../models/LogisticsTransactionHelper");
+const TypeOfWaste = require("../models/TypeOfWaste");
 
 async function getQuotationWasteByClient(req, res) {
     try {
@@ -123,6 +129,62 @@ async function getMarketingTransactionsByMonth(req, res) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+async function getLogisticsTransaction(req, res) {
+    try {
+        const logisticsTransaction = await LogisticsTransaction.findAll({
+            include: [
+                {
+                    model: MarketingTransaction,
+                    as: 'MarketingTransaction',
+                    include: [
+                        { model: Client, as: 'Client' },
+                        {
+                            model: QuotationWaste,
+                            as: 'QuotationWaste',
+                            include: [
+                                { model: TypeOfWaste, as: 'TypeOfWaste' },
+                            ],
+                        },
+                        {
+                            model: QuotationTransportation,
+                            as: 'QuotationTransportation',
+                            include: [
+                                { model: VehicleType, as: 'VehicleType' },
+                            ],
+                        },
+                        { model: Employee, as: 'Employee' },
+                        { model: WasteCategory, as: 'WasteCategory' },
+                        { model: TransactionStatus, as: 'TransactionStatus' },
+                    ],
+                },
+                {
+                    model: Employee,
+                    as: 'Employee',
+                },
+                {
+                    model: Employee,
+                    as: 'Driver',
+                },
+                {
+                    model: LogisticsTransactionHelper,
+                    as: 'LogisticsTransactionHelper',
+                    where: { logisticsTransactionId: Sequelize.col('LogisticsTransaction.id') },
+                    required: false, // Use 'false' to perform a LEFT JOIN
+                    include: [
+                        {
+                            model: Employee,
+                            as: 'Employee',
+                        },
+                    ],
+                },
+            ],
+        });
+        res.json(logisticsTransaction);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 
 module.exports = { 
     getQuotationWasteByClient,
@@ -132,4 +194,5 @@ module.exports = {
     getClients,
     getVehicles,
     getMarketingTransactionsByMonth,
+    getLogisticsTransaction,
 };

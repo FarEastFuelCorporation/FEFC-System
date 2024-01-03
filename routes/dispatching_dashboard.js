@@ -1,18 +1,24 @@
 // routes/dispatching_dashboard.js
 
 const express = require('express');
-const { getDispatchingDashboardController, getVehicleTracker, getDispatchingTransactions, postDispatchedTransactions, postScheduledTransactions } = require('../controllers/dispatchingDashboardController');
+const { getDispatchingDashboardController, getVehicleTrackerController, getDispatchingTransactionsController, postScheduleTransactionsController, postDispatchTransactionsController, updateScheduleTransactionsController, getVehiclesController, postVehicleController, updateVehicleController } = require('../controllers/dispatchingDashboardController');
 const router = express.Router();
 
 // Dashboard route
 router.get('/', getDispatchingDashboardController);
 
 // Vehicle Tracker route
-router.get('/vehicle_tracker', getVehicleTracker);
+router.get('/vehicle_tracker', getVehicleTrackerController);
 
 // Dispatching Transactions route
-router.get('/dispatching_transactions', getDispatchingTransactions);
-router.post('/schedule_transactions', postDispatchedTransactions);
-router.post('/dispatch_transactions', postScheduledTransactions);
+router.get('/dispatching_transactions', getDispatchingTransactionsController);
+router.post('/new_schedule_transactions', postScheduleTransactionsController);
+router.post('/update_schedule_transactions/:id', updateScheduleTransactionsController);
+router.post('/dispatch_transactions', postDispatchTransactionsController);
+
+// Vehicles route
+router.get('/vehicles', getVehiclesController);
+router.post('/vehicles/new', postVehicleController);
+router.post('/vehicles/update', updateVehicleController);
 
 module.exports = router;

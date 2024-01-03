@@ -27,9 +27,10 @@ Employee.belongsTo(EmployeeRole, { as: 'EmployeeRole', foreignKey: 'employeeRole
 Employee.hasMany(User, { as: 'User', foreignKey: 'employeeId', sourceKey: 'employeeId' });
 Employee.hasMany(Quotation, { as: 'Quotation', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
 Employee.hasMany(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
-Employee.hasMany(LogisticsTransactionHelper, { as: 'LogisticsTransactionHelper', foreignKey: 'truckHelperId', sourceKey: 'employeeId', });
 Employee.hasMany(LogisticsTransaction, { as: 'Driver', foreignKey: 'driverId', sourceKey: 'employeeId', });
-Employee.hasMany(LogisticsTransaction, { as: 'LogisticsTransaction', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
+Employee.hasMany(LogisticsTransaction, { as: 'LogisticsTransaction', foreignKey: 'scheduledBy', sourceKey: 'employeeId', });
+Employee.hasMany(LogisticsTransactionHelper, { as: 'LogisticsTransactionHelper', foreignKey: 'truckHelperId', sourceKey: 'employeeId', });
+Employee.hasMany(DispatchLogisticsTransaction, { as: 'DispatchLogisticsTransaction', foreignKey: 'dispatchedBy', sourceKey: 'employeeId', });
 
 VehicleType.hasMany(Vehicle, { as: 'Vehicle', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
 VehicleType.hasMany(QuotationTransportation, { as: 'QuotationTransportation', foreignKey: 'vehicleId', sourceKey: 'vehicleId' });
@@ -71,13 +72,14 @@ LogisticsTransaction.hasMany(LogisticsTransactionHelper, { as: 'LogisticsTransac
 LogisticsTransaction.hasMany(DispatchLogisticsTransaction, { as: 'DispatchLogisticsTransaction', foreignKey: 'logisticsTransactionId', sourceKey: 'id' });
 LogisticsTransaction.belongsTo(MarketingTransaction, { as: 'MarketingTransaction', foreignKey: 'mtfId', targetKey: 'id' });
 LogisticsTransaction.belongsTo(Employee, { as: 'Driver', foreignKey: 'driverId', targetKey: 'employeeId' });
-LogisticsTransaction.belongsTo(Employee, { as: 'Employee', foreignKey: 'submittedBy', targetKey: 'employeeId' });
+LogisticsTransaction.belongsTo(Employee, { as: 'Employee', foreignKey: 'scheduledBy', targetKey: 'employeeId' });
 LogisticsTransaction.belongsTo(Vehicle, { as: 'Vehicle', foreignKey: 'plateNumber', targetKey: 'plateNumber' });
 
 LogisticsTransactionHelper.belongsTo(LogisticsTransaction, { as: 'LogisticsTransaction', foreignKey: 'logisticsTransactionId', targetKey: 'id' });
 LogisticsTransactionHelper.belongsTo(Employee, { as: 'Employee', foreignKey: 'truckHelperId', targetKey: 'employeeId' });
 
 DispatchLogisticsTransaction.belongsTo(LogisticsTransaction, { as: 'LogisticsTransaction', foreignKey: 'logisticsTransactionId', targetKey: 'id' });
+DispatchLogisticsTransaction.belongsTo(Employee, { as: 'Employee', foreignKey: 'dispatchedBy', targetKey: 'employeeId' });
 
 // Export the associations
 module.exports = {
