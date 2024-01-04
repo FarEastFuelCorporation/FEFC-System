@@ -59,6 +59,9 @@ const MarketingTransaction = sequelize.define(
         statusId: {
             type: DataTypes.INTEGER,
         },
+        dispatchId: {
+            type: DataTypes.INTEGER,
+        },
         submittedBy: {
             type: DataTypes.STRING,
             allowNull: false,

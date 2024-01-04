@@ -61,7 +61,7 @@
                                     <td><%= vehicle.VehicleType.typeOfVehicle %></td>
                                     <td><%= vehicle.netCapacity %></td>
                                     <td><%= vehicle.ownership %></td>
-                                    <td><%= vehicle.vehicleStatus %></td>
+                                    <td><%= vehicle.VehicleStatus.status %></td>
                                     <td>
                                         <!-- Update button -->
                                         <button type="button" id="updateBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#updateVehicleModal" onclick="getVehicleData ('<%= vehicle.plateNumber %>')">

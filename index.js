@@ -54,8 +54,8 @@ app.use(session({
 async function initializeApp() {
     try {
         console.log('Syncing models to the database...');
-        await sequelize.sync({  });
-        // await sequelize.sync({ alter: true });
+        // await sequelize.sync({  });
+        await sequelize.sync({ alter: true });
         console.log('Models synced successfully.');
     } catch (error) {
         console.error('Error syncing models:', error);

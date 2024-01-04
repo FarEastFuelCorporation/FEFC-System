@@ -26,10 +26,10 @@ const Vehicle = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        vehicleStatus: {
-            type: DataTypes.STRING,
+        vehicleStatusId: {
+            type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: "AVAILABLE",
+            defaultValue: 1,
         },
         createdAt: {
             type: DataTypes.DATE,
