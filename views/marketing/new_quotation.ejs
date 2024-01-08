@@ -109,8 +109,8 @@
                                         <i class="fa-solid fa-list"></i>
                                         Waste Code
                                     </label><br>
-                                    <input class="form-control" list="waste_codeList" id="waste_code1" name="waste_code1" required placeholder="Type to search...">
-                                    <datalist name="waste_codeList" id="waste_codeList">
+                                    <input class="form-control" list="wasteCodeList" id="waste_code1" name="waste_code1" required placeholder="Type to search...">
+                                    <datalist name="wasteCodeList" id="wasteCodeList">
                                         <option value="" disabled selected>Select Waste Code</option>
                                         <% typesOfWastes.forEach(typesOfWaste => { %>
                                             <option value="<%= typesOfWaste.wasteId %>"><%= typesOfWaste.wasteCode %></option>
