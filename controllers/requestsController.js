@@ -1,4 +1,5 @@
 const sequelize = require("../config/config");
+const { startOfMonth, endOfMonth, subMonths } = require('date-fns');
 const { Op, Sequelize } = require('sequelize');
 const Client = require("../models/Client");
 const MarketingTransaction = require("../models/MarketingTransaction");
@@ -13,6 +14,8 @@ const WasteCategory = require("../models/WasteCategory");
 const TransactionStatus = require("../models/TransactionStatus");
 const LogisticsTransactionHelper = require("../models/LogisticsTransactionHelper");
 const TypeOfWaste = require("../models/TypeOfWaste");
+const VehicleStatus = require("../models/VehicleStatus");
+const VehicleLog = require("../models/VehicleLog");
 
 async function getQuotationWasteByClient(req, res) {
     try {
@@ -75,9 +78,54 @@ async function getClients(req, res) {
 async function getVehicles(req, res) {
     try {
         const vehicle = await Vehicle.findAll({
-            include: [{ model: VehicleType, as: 'VehicleType' }],
+            include: [
+                { model: VehicleType, as: 'VehicleType' },
+            ],
         });
         res.json(vehicle);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+async function getVehicleLogs(req, res) {
+    try {
+        const vehicleLogs = await VehicleLog.findAll({
+            attributes: [
+                'plateNumber',
+                [sequelize.fn('max', sequelize.col('VehicleLog.createdAt')), 'latestCreatedAt'],
+            ],
+            include: [
+                {
+                    model: VehicleStatus,
+                    as: 'VehicleStatus',
+                    attributes: ['status'],
+                },
+            ],
+            group: ['plateNumber'],
+            order: [[sequelize.fn('max', sequelize.col('VehicleLog.createdAt')), 'DESC']],
+        });
+
+        if (!vehicleLogs || vehicleLogs.length === 0) {
+            // No vehicle logs found
+            return res.json([]);
+        }
+
+        const plateNumbers = vehicleLogs.map(log => log.plateNumber);
+        const latestVehicleLogs = await VehicleLog.findAll({
+            where: {
+                plateNumber: plateNumbers,
+                createdAt: vehicleLogs.map(log => log.get('latestCreatedAt')),
+            },
+            include: [
+                {
+                    model: VehicleStatus,
+                    as: 'VehicleStatus',
+                },
+            ],
+        });
+
+        res.json(latestVehicleLogs);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -98,32 +146,52 @@ async function getMarketingTransactions(req, res) {
 }
 async function getMarketingTransactionsByMonth(req, res) {
     try {
-        // Calculate the start of the current month
         const currentDate = new Date();
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        currentDate.setDate(0); // Set to the last day of the current month
-        
+
+        // Calculate the start of the current month
+        const currentMonthStart = startOfMonth(currentDate);
+        const currentMonthEnd = endOfMonth(currentDate);
+
         // Calculate the start of the previous 2 months
-        const prevMonth2 = new Date();
-        prevMonth2.setMonth(prevMonth2.getMonth() - 3);
-        prevMonth2.setDate(1);
+        const prevMonth1Start = subMonths(currentMonthStart, 1);
+        const prevMonth2Start = subMonths(currentMonthStart, 2);
 
-        const monthlyTransactionData = await MarketingTransaction.findAll({
-            attributes: [
-                [sequelize.literal("DATE_FORMAT(haulingDate, '%Y-%m')"), 'yearMonth'],
-                [sequelize.literal('COUNT(*)'), 'count']
+        const pendingCounts = await Promise.all([
+            MarketingTransaction.count({
+                where: {
+                    haulingDate: {
+                        [Op.gte]: prevMonth2Start,
+                        [Op.lt]: prevMonth1Start,
+                    },
+                },
+            }),
+            MarketingTransaction.count({
+                where: {
+                    haulingDate: {
+                        [Op.gte]: prevMonth1Start,
+                        [Op.lt]: currentMonthStart,
+                    },
+                },
+            }),
+            MarketingTransaction.count({
+                where: {
+                    haulingDate: {
+                        [Op.gte]: currentMonthStart,
+                        [Op.lt]: currentMonthEnd,
+                    },
+                },
+            }),
+        ]);
+
+        const result = {
+            pending: [
+                { month: prevMonth2Start.getMonth() + 1, year: prevMonth2Start.getFullYear(), count: pendingCounts[0] },
+                { month: prevMonth1Start.getMonth() + 1, year: prevMonth1Start.getFullYear(), count: pendingCounts[1] },
+                { month: currentMonthStart.getMonth() + 1, year: currentMonthStart.getFullYear(), count: pendingCounts[2] },
             ],
-            where: {
-                haulingDate: {
-                    [Op.gte]: prevMonth2,
-                    [Op.lt]: currentDate,
-                }
-            },
-            group: ['yearMonth'],
-            raw: true
-        });
+        };
 
-        res.json(monthlyTransactionData);
+        res.json(result);
     } catch (error) {
         console.error('Error executing Sequelize query:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -185,6 +253,74 @@ async function getLogisticsTransaction(req, res) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+async function getLogisticsTransactionsByMonth(req, res) {
+    try {
+        const currentDate = new Date();
+
+        // Calculate the start of the current month
+        const currentMonthStart = startOfMonth(currentDate);
+        const currentMonthEnd = endOfMonth(currentDate);
+
+        // Calculate the start of the previous 2 months
+        const prevMonth1Start = subMonths(currentMonthStart, 1);
+        const prevMonth2Start = subMonths(currentMonthStart, 2);
+
+        const pendingCounts = await Promise.all([
+            LogisticsTransaction.count({
+                include: {
+                    model: MarketingTransaction,
+                    as: 'MarketingTransaction',
+                    attributes: ['haulingDate'],
+                    where: {
+                        haulingDate: {
+                            [Op.gte]: prevMonth2Start,
+                            [Op.lt]: prevMonth1Start,
+                        },
+                    },
+                },
+            }),
+            LogisticsTransaction.count({
+                include: {
+                    model: MarketingTransaction,
+                    as: 'MarketingTransaction',
+                    attributes: ['haulingDate'],
+                    where: {
+                        haulingDate: {
+                            [Op.gte]: prevMonth1Start,
+                            [Op.lt]: currentMonthStart,
+                        },
+                    },
+                },
+            }),
+            LogisticsTransaction.count({
+                include: {
+                    model: MarketingTransaction,
+                    as: 'MarketingTransaction',
+                    attributes: ['haulingDate'],
+                    where: {
+                        haulingDate: {
+                            [Op.gte]: currentMonthStart,
+                            [Op.lt]: currentMonthEnd,
+                        },
+                    },
+                },
+            }),
+        ]);
+
+        const result = {
+            pending: [
+                { month: prevMonth2Start.getMonth() + 1, year: prevMonth2Start.getFullYear(), count: pendingCounts[0] },
+                { month: prevMonth1Start.getMonth() + 1, year: prevMonth1Start.getFullYear(), count: pendingCounts[1] },
+                { month: currentMonthStart.getMonth() + 1, year: currentMonthStart.getFullYear(), count: pendingCounts[2] },
+            ],
+        };
+
+        res.json(result);
+    } catch (error) {
+        console.error('Error executing Sequelize query:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 
 module.exports = { 
     getQuotationWasteByClient,
@@ -193,6 +329,8 @@ module.exports = {
     getMarketingTransactions,
     getClients,
     getVehicles,
+    getVehicleLogs,
     getMarketingTransactionsByMonth,
     getLogisticsTransaction,
+    getLogisticsTransactionsByMonth,
 };

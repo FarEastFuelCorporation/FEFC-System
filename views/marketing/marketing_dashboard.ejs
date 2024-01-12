@@ -139,17 +139,13 @@
             // Get JSON data for vehicles marketing transactions and vehicles
             marketingTransactionsByMonth = await marketingTransactionsByMonthResponse.json();
 
-            generateCharts();
+            generatePieChart();
+            generateBarChart();
 
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     });
-
-    function generateCharts() {
-        generatePieChart();
-        generateBarChart();
-    }
 
     function generatePieChart() {
         const for_hauling = parseInt(document.getElementById("for_hauling").innerText);
@@ -211,8 +207,8 @@
     }
 
     function generateBarChart() {
-        var seriesData = marketingTransactionsByMonth.map(data => data.count);
-        var labelsData = marketingTransactionsByMonth.map(data => formatLabel(data.yearMonth));
+        var seriesData = marketingTransactionsByMonth.pending.map(data => data.count);
+        var labelsData = marketingTransactionsByMonth.pending.map(data => formatLabel(data.month, data.year));
 
         var options = {
             chart: {
@@ -236,8 +232,8 @@
         var monthlyBarChart = new ApexCharts(document.getElementById('monthlyBarChart'), options);
         monthlyBarChart.render();
 
-        function formatLabel(yearMonth) {
-            const date = new Date(yearMonth + '-01');
+        function formatLabel(monthData, yearData) {
+            const date = new Date(`${yearData}-${monthData}-01`);
             const month = date.toLocaleDateString('en-US', { month: 'long' });
             const year = date.getFullYear();
             return `${month} ${year}`;

@@ -59,10 +59,6 @@ const MarketingTransaction = sequelize.define(
         statusId: {
             type: DataTypes.INTEGER,
         },
-        dispatchId: {
-            type: DataTypes.INTEGER,
-            defaultValue: null, 
-        },
         submittedBy: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -88,46 +84,5 @@ const MarketingTransaction = sequelize.define(
         paranoid: true,
     }
 );
-
-// Add a hook before creating or updating a record
-MarketingTransaction.beforeCreate((transaction, options) => {
-    handleTimezoneConversion(transaction);
-});
-
-MarketingTransaction.beforeUpdate((transaction, options) => {
-    handleTimezoneConversion(transaction);
-});
-
-function handleTimezoneConversion(transaction) {
-    // Convert haulingDate and haulingTime to the desired timezone
-    // Assuming 'Asia/Shanghai' as the desired timezone
-    const desiredTimezone = 'Asia/Shanghai';
-
-    // Perform the conversion using a library like 'moment-timezone' or 'dayjs'
-    // For example, using 'moment-timezone'
-    const moment = require('moment-timezone');
-
-    // Get the current date and time
-    const currentDate = moment().tz(desiredTimezone).format('YYYY-MM-DD');
-
-    // Combine the current date with the transaction's haulingTime
-    const combinedDateTime = `${currentDate} ${transaction.haulingTime}`;
-    const convertedDateTime = moment.tz(combinedDateTime, desiredTimezone).format();
-
-    // Log intermediate values for debugging
-    console.log('Current Date:', currentDate);
-    console.log('Hauling Date:', transaction.haulingDate);
-    console.log('Hauling Time:', transaction.haulingTime);
-    console.log('Combined DateTime:', combinedDateTime);
-    console.log('Converted DateTime:', convertedDateTime);
-
-    // Update the fields with the converted date and time
-    transaction.haulingDate = convertedDateTime.slice(0, 10); // Extract date part
-    transaction.haulingTime = convertedDateTime.slice(11, 19); // Extract time part
-
-    // Use the current date for timestamps
-    transaction.createdAt = currentDate + ' ' + transaction.haulingTime;
-    transaction.updatedAt = currentDate + ' ' + transaction.haulingTime;
-}
 
 module.exports = MarketingTransaction;

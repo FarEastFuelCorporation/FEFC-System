@@ -1,29 +1,27 @@
-// models/Vehicle.js
+// models/VehicleLog.js
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/config');
 
-const Vehicle = sequelize.define(
-    'Vehicle', {
+const VehicleLog = sequelize.define(
+    'VehicleLog', 
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            allowNull: false,
+            autoIncrement: true
+        },
+        dispatchId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         plateNumber: {
             type: DataTypes.STRING,
             allowNull: false,
-            primaryKey: true,
         },
-        vehicleName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        netCapacity: {
-            type: DataTypes.FLOAT,
-            allowNull: false,
-        },
-        ownership: {
-            type: DataTypes.ENUM('OWNED', 'LEASED'),
-            allowNull: false,
-        },
-        vehicleId: {
-            type: DataTypes.STRING,
+        vehicleStatusId: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         createdAt: {
@@ -39,4 +37,4 @@ const Vehicle = sequelize.define(
     },
 );
 
-module.exports = Vehicle;
+module.exports = VehicleLog;

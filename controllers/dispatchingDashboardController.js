@@ -16,6 +16,7 @@ const LogisticsTransaction = require('../models/LogisticsTransaction');
 const LogisticsTransactionHelper = require('../models/LogisticsTransactionHelper');
 const DispatchLogisticsTransaction = require('../models/DispatchLogisticsTransaction');
 const VehicleStatus = require('../models/VehicleStatus');
+const VehicleLog = require('../models/VehicleLog');
 
 // Dashboard controller
 async function getDispatchingDashboardController(req, res) {
@@ -350,48 +351,47 @@ async function postDispatchTransactionsController(req, res) {
                 where: { id: logisticsTransactionId },
             }
         );
-        const vehicle = await Vehicle.findOne(
+
+        const vehicleLog = await VehicleLog.findOne(
             {
                 include: [ 
                     { model: VehicleStatus, as: 'VehicleStatus' },
                 ], 
                 where: { plateNumber: logisticsTransaction.plateNumber },
+                order: [['createdAt', 'DESC']],
             }
         )
-        if(logisticsTransaction.plateNumber === vehicle.plateNumber){
-            console.log(`vehicleData:`+ vehicle.vehicleStatusId)
-            if(vehicle.vehicleStatusId == "1"){
-                const dispatchLogisticsTransaction =  await DispatchLogisticsTransaction.create({
-                    logisticsTransactionId,
-                    dispatchedDate,
-                    dispatchedTime,
-                    remarks,
-                    dispatchedBy: employeeId,
-                });
-                await MarketingTransaction.update(
-                    {
-                        statusId: "3",
-                        dispatchId: dispatchLogisticsTransaction.id,
-                    },
-                    {
-                        where: { id: logisticsTransaction.mtfId },
-                    }
-                );
-                await Vehicle.update(
-                    {
-                        vehicleStatusId: "2"
-                    },
-                    {
-                        where: { plateNumber: logisticsTransaction.plateNumber },
-                    }
-                )
-                // Redirect back to the client route with a success message
-                res.redirect('/dispatching_dashboard/dispatching_transactions?success=dispatch');
-            } else {
-                // Redirect back to the client route with a success message
-                res.redirect(`/dispatching_dashboard/dispatching_transactions?error=dispatch&vehicle=${vehicle.plateNumber}&status=${vehicle.VehicleStatus.status}`);
+        const dispatchLogisticsTransaction =  await DispatchLogisticsTransaction.create({
+            logisticsTransactionId,
+            dispatchedDate,
+            dispatchedTime,
+            remarks,
+            dispatchedBy: employeeId,
+        });
+        await VehicleLog.create(
+            {
+                dispatchId: dispatchLogisticsTransaction.id,
+                plateNumber: logisticsTransaction.plateNumber,
+                vehicleStatusId: "2",
+            },
+        );
+        await MarketingTransaction.update(
+            {
+                statusId: "3",
+            },
+            {
+                where: { id: logisticsTransaction.mtfId },
             }
-        }
+        );
+        // Redirect back to the client route with a success message
+        res.redirect('/dispatching_dashboard/dispatching_transactions?success=dispatch');
+        // if(logisticsTransaction.plateNumber === vehicleLog.plateNumber){
+        //     if(vehicleLog.vehicleStatusId == "1"){
+        //     } else {
+        //         // Redirect back to the client route with a success message
+        //         res.redirect(`/dispatching_dashboard/dispatching_transactions?error=dispatch&vehicle=${vehicleLog.plateNumber}&status=${vehicleLog.VehicleStatus.status}`);
+        //     }
+        // }
     } catch (error) {
         // Handling errors
         console.error('Error:', error);
@@ -405,7 +405,6 @@ async function getVehiclesController(req, res) {
         const vehicles = await Vehicle.findAll({
             include: [
                 { model: VehicleType, as: 'VehicleType' },
-                { model: VehicleStatus, as: 'VehicleStatus' },
             ]
         });
         const vehicleTypes = await VehicleType.findAll({
