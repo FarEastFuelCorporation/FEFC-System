@@ -538,7 +538,6 @@ function performSearch() {
         for(let x = 0; x < logisticsTransactionsData.length; x++){
             if(MTFData == logisticsTransactionsData[x].MarketingTransaction.id){
                 dispatchModal.querySelector("#logisticsTransactionId").value = logisticsTransactionsData[x].id;
-                console.log(logisticsTransactionsData[x].id)
             }
         }
     }
