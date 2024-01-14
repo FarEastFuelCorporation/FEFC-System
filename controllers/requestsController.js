@@ -77,12 +77,30 @@ async function getClients(req, res) {
 }
 async function getVehicles(req, res) {
     try {
-        const vehicle = await Vehicle.findAll({
+        const vehicles = await Vehicle.findAll({
             include: [
-                { model: VehicleType, as: 'VehicleType' },
+                {
+                    model: VehicleLog,
+                    as: 'VehicleLog',
+                    required: false,
+                    include: [
+                        {
+                            model: VehicleStatus,
+                            as: 'VehicleStatus',
+                            required: false,
+                        },
+                    ],
+                    order: [['createdAt', 'DESC']], // Order by createdAt in descending order to get the last transaction
+                    limit: 1, // Limit to 1 to get only the last transaction
+                },
+                {
+                    model: VehicleType,
+                    as: 'VehicleType',
+                },
             ],
         });
-        res.json(vehicle);
+
+        res.json(vehicles);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

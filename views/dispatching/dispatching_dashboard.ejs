@@ -235,6 +235,7 @@
             vehicleLogs = await vehicleLogsResponse.json();
             logisticsTransactionCounter = await logisticsTransactionCounterResponse.json();
             generateBarChart();
+            generatePieChart();
             generateVehicleCounter();
             generateCounter();
             console.log(logisticsTransactionCounter)
@@ -243,6 +244,55 @@
             console.error('Error fetching data:', error);
         }
     });
+
+    function generatePieChart() {
+        var options = {
+            series: [logisticsTransactionCounter.pending, logisticsTransactionCounter.scheduled, logisticsTransactionCounter.dispatched, 0],
+            chart: {
+                type: 'pie',
+            },
+            plotOptions: {
+                pie: {
+                    startAngle: 0,
+                    endAngle: 360
+                }
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            fill: {
+                type: 'gradient',
+            },
+            legend: {
+                show: true,
+                position: "left",
+                fontSize: '14px',
+                formatter: function (seriesName, opts) {
+                    var seriesValue = opts.w.globals.series[opts.seriesIndex];
+                    var totalValue = opts.w.globals.series.reduce((acc, val) => acc + val, 0);
+                    var percentage = ((seriesValue / totalValue) * 100).toFixed(2);
+                    return `${percentage}% ${seriesName}`;
+                },
+                labels: {
+                    useSeriesColors: false,
+                },
+            },
+            labels: ["Pending", "Scheduled", "Dispatched", "Hauled"],
+            colors: ["#dc3545", "#fd7e14", "#ffc107", "#198754"],
+            responsive: [{
+                breakpoint: 500,
+                options: {
+                    chart: {
+                        width: '100%',
+                        maxHeight: '70%',
+                    },
+                }
+            }]
+        };
+
+        var chart = new ApexCharts(pieChart, options);
+        chart.render();
+    }
 
     function generateBarChart() {
         var seriesData = logisticsTransactionsByMonth.pending.map(data => data.count);
@@ -299,8 +349,6 @@
         var availableVehicle4 = 0;
         var availableVehicle5 = 0;
         var availableVehicle6 = 0;
-        console.log(vehicles)
-        console.log(vehicleLogs)
         vehicles.forEach((data) => {
             if(data.VehicleType.vehicleId === "V002"){
                 availableVehicle1++
