@@ -182,11 +182,12 @@
     let logisticsTransactionsByMonth = [];
     let vehicles = [];
     let vehicleLogs = [];
+    let logisticsTransactionCounter = [];
 
     document.addEventListener('DOMContentLoaded', async function () {
         try {
             // Make parallel AJAX requests using Promise.all
-            const [logisticsTransactionsByMonthResponse, vehiclesResponse, vehicleLogsResponse] = await Promise.all([
+            const [logisticsTransactionsByMonthResponse, vehiclesResponse, vehicleLogsResponse, logisticsTransactionCounterResponse] = await Promise.all([
                 fetch('/requests/getLogisticsTransactionsByMonth', {
                     method: 'GET',
                     headers: {
@@ -200,6 +201,12 @@
                     },
                 }),
                 fetch('/requests/getVehicleLogs', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }),
+                fetch('/requests/getLogisticsTransactionCounter', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -219,13 +226,18 @@
                 throw new Error('Network response was not ok for vehicles');
             }
 
+            if (!logisticsTransactionCounterResponse.ok) {
+                throw new Error('Network response was not ok for logistics transaction counter');
+            }
+
             logisticsTransactionsByMonth = await logisticsTransactionsByMonthResponse.json();
             vehicles = await vehiclesResponse.json();
             vehicleLogs = await vehicleLogsResponse.json();
+            logisticsTransactionCounter = await logisticsTransactionCounterResponse.json();
             generateBarChart();
             generateVehicleCounter();
-            console.log(vehicles)
-            console.log(vehicleLogs)
+            generateCounter();
+            console.log(logisticsTransactionCounter)
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -240,10 +252,12 @@
             chart: {
                 type: 'bar',
             },
-            series: [{
-                name: 'Number of Transactions',
-                data: seriesData,
-            }],
+            series: [
+                {
+                    name: 'Number of Transactions',
+                    data: seriesData,
+                },
+            ],
             xaxis: {
                 categories: labelsData,
                 labels: {
@@ -285,50 +299,59 @@
         var availableVehicle4 = 0;
         var availableVehicle5 = 0;
         var availableVehicle6 = 0;
-
+        console.log(vehicles)
+        console.log(vehicleLogs)
         vehicles.forEach((data) => {
-            // if(data.VehicleStatus.id == 1){
-            //     availableVehicles++
-            // } else if(data.VehicleStatus.id == 2){
-            //     onHauling++
-            // } else if(data.VehicleStatus.id == 3){
-            //     forMaintenance++
-            // } else if(data.VehicleStatus.id == 4){
-            //     underMaintenance++
-            // }
-
             if(data.VehicleType.vehicleId === "V002"){
+                availableVehicle1++
                 vehicle1++
             } else if(data.VehicleType.vehicleId === "V001"){
+                availableVehicle2++
                 vehicle2++
-            } else if(data.VehicleType.vehicleId === "V003"){
-                vehicle3++
-            } else if(data.VehicleType.vehicleId === "V004"){
-                vehicle4++
-            } else if(data.VehicleType.vehicleId === "V005"){
-                vehicle5++
             } else if(data.VehicleType.vehicleId === "V006"){
+                availableVehicle3++
+                vehicle3++
+            } else if(data.VehicleType.vehicleId === "V005"){
+                availableVehicle4++
+                vehicle4++
+            } else if(data.VehicleType.vehicleId === "V004"){
+                availableVehicle5++
+                vehicle5++
+            } else if(data.VehicleType.vehicleId === "V003"){
+                availableVehicle6++
                 vehicle6++
             }
-            // if(data.VehicleStatus.id == 1){
-            //     if(data.VehicleType.vehicleId === "V002"){
-            //         availableVehicle1++
-            //     } else if(data.VehicleType.vehicleId === "V001"){
-            //         availableVehicle2++
-            //     } else if(data.VehicleType.vehicleId === "V003"){
-            //         availableVehicle3++
-            //     } else if(data.VehicleType.vehicleId === "V004"){
-            //         availableVehicle4++
-            //     } else if(data.VehicleType.vehicleId === "V005"){
-            //         availableVehicle5++
-            //     } else if(data.VehicleType.vehicleId === "V006"){
-            //         availableVehicle6++
-            //     }
-            // }
+            availableVehicles++
+            vehicleLogs.forEach((log) => {
+                if(log.plateNumber === data.plateNumber){
+                    if(log.vehicleStatusId != 1){
+                        availableVehicles--;
+                        if(data.VehicleType.vehicleId === "V002"){
+                            availableVehicle1--
+                        } else if(data.VehicleType.vehicleId === "V001"){
+                            availableVehicle2--
+                        } else if(data.VehicleType.vehicleId === "V006"){
+                            availableVehicle3--
+                        } else if(data.VehicleType.vehicleId === "V005"){
+                            availableVehicle4--
+                        } else if(data.VehicleType.vehicleId === "V004"){
+                            availableVehicle5--
+                        } else if(data.VehicleType.vehicleId === "V003"){
+                            availableVehicle6--
+                        }
+                    } 
+                    if(log.vehicleStatusId == 2){
+                        onHauling++
+                    } else if(log.vehicleStatusId == 3){
+                        forMaintenance++
+                    } else if(log.vehicleStatusId == 4){
+                        underMaintenance++
+                    }
+                }
+            })
         })
 
-        totalVehicles = onHauling + forMaintenance + underMaintenance + availableVehicles;
-        console.log(totalVehicles)
+        totalVehicles = vehicle1 + vehicle2 + vehicle3 + vehicle4 + vehicle5 + vehicle6;
         dispatching_dashboard.querySelector("#total_vehicle").innerHTML = totalVehicles;
         dispatching_dashboard.querySelector("#on_hauling_vehicle").innerHTML = onHauling;
         dispatching_dashboard.querySelector("#for_maintenance_vehicle").innerHTML = forMaintenance;
@@ -342,4 +365,12 @@
         dispatching_dashboard.querySelector("#vehicle_type6").innerHTML = `${availableVehicle6}/${vehicle6}`;
     }
 
+    function generateCounter(){
+        const dispatching_dashboard = document.getElementById("dispatching_dashboard");
+        dispatching_dashboard.querySelector("#booked_transactions").innerHTML = logisticsTransactionCounter.pending + logisticsTransactionCounter.scheduled + logisticsTransactionCounter.dispatched;
+        dispatching_dashboard.querySelector("#pending_transactions").innerHTML = logisticsTransactionCounter.pending;
+        dispatching_dashboard.querySelector("#scheduled_transactions").innerHTML = logisticsTransactionCounter.scheduled;
+        dispatching_dashboard.querySelector("#dispatched_transactions").innerHTML = logisticsTransactionCounter.dispatched;
+        dispatching_dashboard.querySelector("#hauled_transactions").innerHTML = 0;
+    }
 </script>

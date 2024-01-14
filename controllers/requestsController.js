@@ -253,6 +253,66 @@ async function getLogisticsTransaction(req, res) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+async function getLogisticsTransactionCounter(req, res) {
+    try {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1; // Adding 1 because months are zero-based
+
+        // First Counter: MarketingTransaction is not yet in LogisticsTransaction
+        const pending = await MarketingTransaction.count({
+            where: {
+                haulingDate: {
+                    [Op.gte]: `${currentDate.getFullYear()}-${currentMonth}-01`,
+                    [Op.lt]: `${currentDate.getFullYear()}-${currentMonth + 1}-01`,
+                },
+                id: {
+                    [Op.notIn]: sequelize.literal('(SELECT mtfId FROM LogisticsTransactions WHERE mtfId IS NOT NULL)'),
+                },
+            },
+        });
+        const pending2 = await MarketingTransaction.findAll({
+
+        });
+        console.log(pending)
+        console.log(pending2[0].haulingDate)
+        // Second Counter: MarketingTransaction is in LogisticsTransaction but not yet in DispatchLogisticsTransaction
+        const scheduled = await MarketingTransaction.count({
+            where: {
+                haulingDate: {
+                    [Op.gte]: `${currentDate.getFullYear()}-${currentMonth}-01`,
+                    [Op.lt]: `${currentDate.getFullYear()}-${currentMonth + 1}-01`,
+                },
+                id: {
+                    [Op.in]: sequelize.literal('(SELECT mtfId FROM LogisticsTransactions WHERE mtfId IS NOT NULL)'),
+                    [Op.notIn]: sequelize.literal('(SELECT logisticsTransactionId FROM DispatchLogisticsTransactions WHERE logisticsTransactionId IS NOT NULL)'),
+                },
+            },
+        });
+
+        // Third Counter: MarketingTransaction is in LogisticsTransaction and is in DispatchLogisticsTransaction
+        const dispatched = await MarketingTransaction.count({
+            where: {
+                haulingDate: {
+                    [Op.gte]: `${currentDate.getFullYear()}-${currentMonth}-01`,
+                    [Op.lt]: `${currentDate.getFullYear()}-${currentMonth + 1}-01`,
+                },
+                id: {
+                    [Op.in]: sequelize.literal('(SELECT mtfId FROM LogisticsTransactions WHERE mtfId IS NOT NULL)'),
+                    [Op.in]: sequelize.literal('(SELECT logisticsTransactionId FROM DispatchLogisticsTransactions WHERE logisticsTransactionId IS NOT NULL)'),
+                },
+            },
+        });
+        
+        res.json({
+            pending,
+            scheduled,
+            dispatched,
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 async function getLogisticsTransactionsByMonth(req, res) {
     try {
         const currentDate = new Date();
@@ -332,5 +392,6 @@ module.exports = {
     getVehicleLogs,
     getMarketingTransactionsByMonth,
     getLogisticsTransaction,
+    getLogisticsTransactionCounter,
     getLogisticsTransactionsByMonth,
 };

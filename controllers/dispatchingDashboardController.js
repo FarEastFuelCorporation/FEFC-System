@@ -352,46 +352,78 @@ async function postDispatchTransactionsController(req, res) {
             }
         );
 
-        const vehicleLog = await VehicleLog.findOne(
-            {
-                include: [ 
-                    { model: VehicleStatus, as: 'VehicleStatus' },
-                ], 
-                where: { plateNumber: logisticsTransaction.plateNumber },
-                order: [['createdAt', 'DESC']],
-            }
-        )
-        const dispatchLogisticsTransaction =  await DispatchLogisticsTransaction.create({
-            logisticsTransactionId,
-            dispatchedDate,
-            dispatchedTime,
-            remarks,
-            dispatchedBy: employeeId,
-        });
-        await VehicleLog.create(
-            {
-                dispatchId: dispatchLogisticsTransaction.id,
+        // Retrieve the last transaction for each plateNumber
+        const lastTransactions = await VehicleLog.findOne({
+            where: {
                 plateNumber: logisticsTransaction.plateNumber,
-                vehicleStatusId: "2",
             },
-        );
-        await MarketingTransaction.update(
-            {
-                statusId: "3",
-            },
-            {
-                where: { id: logisticsTransaction.mtfId },
-            }
-        );
-        // Redirect back to the client route with a success message
-        res.redirect('/dispatching_dashboard/dispatching_transactions?success=dispatch');
-        // if(logisticsTransaction.plateNumber === vehicleLog.plateNumber){
-        //     if(vehicleLog.vehicleStatusId == "1"){
-        //     } else {
-        //         // Redirect back to the client route with a success message
-        //         res.redirect(`/dispatching_dashboard/dispatching_transactions?error=dispatch&vehicle=${vehicleLog.plateNumber}&status=${vehicleLog.VehicleStatus.status}`);
-        //     }
-        // }
+            include: [
+                {
+                    model: VehicleStatus,
+                    as: 'VehicleStatus',
+                    attributes: ['status'],
+                },
+            ],
+            required: false,
+            order: [['createdAt', 'DESC']],
+        });
+
+        if (lastTransactions) {
+            if(lastTransactions.vehicleStatusId == "1"){
+                const dispatchLogisticsTransaction =  await DispatchLogisticsTransaction.create({
+                    logisticsTransactionId,
+                    dispatchedDate,
+                    dispatchedTime,
+                    remarks,
+                    dispatchedBy: employeeId,
+                });
+                await VehicleLog.create(
+                    {
+                        dispatchId: dispatchLogisticsTransaction.id,
+                        plateNumber: logisticsTransaction.plateNumber,
+                        vehicleStatusId: "2",
+                    },
+                );
+                await MarketingTransaction.update(
+                    {
+                        statusId: "3",
+                    },
+                    {
+                        where: { id: logisticsTransaction.mtfId },
+                    }
+                );
+                // Redirect back to the client route with a success message
+                res.redirect('/dispatching_dashboard/dispatching_transactions?success=dispatch');            
+            } else {
+                // Redirect back to the client route with a success message
+                res.redirect(`/dispatching_dashboard/dispatching_transactions?error=dispatch&vehicle=${lastTransactions.plateNumber}&status=${lastTransactions.VehicleStatus.status}`);
+            }       
+        } else {
+            const dispatchLogisticsTransaction =  await DispatchLogisticsTransaction.create({
+                logisticsTransactionId,
+                dispatchedDate,
+                dispatchedTime,
+                remarks,
+                dispatchedBy: employeeId,
+            });
+            await VehicleLog.create(
+                {
+                    dispatchId: dispatchLogisticsTransaction.id,
+                    plateNumber: logisticsTransaction.plateNumber,
+                    vehicleStatusId: "2",
+                },
+            );
+            await MarketingTransaction.update(
+                {
+                    statusId: "3",
+                },
+                {
+                    where: { id: logisticsTransaction.mtfId },
+                }
+            );
+            // Redirect back to the client route with a success message
+            res.redirect('/dispatching_dashboard/dispatching_transactions?success=dispatch');            
+        }
     } catch (error) {
         // Handling errors
         console.error('Error:', error);
