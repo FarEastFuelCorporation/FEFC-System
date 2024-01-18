@@ -47,7 +47,6 @@ async function getVehicleTrackerController(req, res) {
         const apiKey = process.env.GOOGLE_MAPS_API_KEY;
         const employeeId = req.session.employeeId;
         const employee = await Employee.findOne({ where: { employeeId } });
-        console.log(apiKey)
         // Render the dashboard view with data
         const viewsData = {
             pageTitle: 'Dispatching User - Vehicle Tracker',
