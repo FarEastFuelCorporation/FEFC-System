@@ -38,7 +38,7 @@
                 
                         <!-- Table -->
                         <table class="table table-bordered">
-                            <thead>
+                            <!-- <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>MTF #</th>
@@ -58,61 +58,106 @@
                                     <th>DISPATCHED BY</th>
                                     <th>ACTION</th>
                                 </tr>
-                            </thead>
+                            </thead> -->
                             <tbody>
-                                <% const startIndex = (currentPage - 1) * entriesPerPage; %>
-                                <% paginatedTransactions.forEach((transaction, index) => { %>
-                                    <tr>
-                                        <td><%= startIndex + index + 1 %></td>
-                                        <td><%= transaction.mtfNumber %></td>
-                                        <td><%= transaction.haulingDate %> <%= transaction.haulingTime %></td>
-                                        <td><%= transaction.Client.clientName %></td>
-                                        <td><%= transaction.QuotationWaste.TypeOfWaste.wasteCode %></td>
-                                        <td><%= transaction.QuotationWaste.wasteName %></td>
-                                        <td><%= transaction.QuotationTransportation.VehicleType.typeOfVehicle %></td>
-                                        <td><%= transaction.remarks %></td>
-                                        <td><%= transaction.Employee.firstName %> <%= transaction.Employee.lastName %></td>
-                                        <% if (transaction.logisticsTransactionExists) { %>
-                                        <td> <%= transaction.LogisticsTransaction[0].plateNumber %> </td>
-                                        <td> <%= transaction.LogisticsTransaction[0].Driver.firstName %> <%= transaction.LogisticsTransaction[0].Driver.lastName %> </td>
-                                        <td> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.lastName %> </td>
-                                        <td> <%= transaction.LogisticsTransaction[0].departureDate %> <%= transaction.LogisticsTransaction[0].departureTime %> </td>
-                                        <td> <%= transaction.LogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].Employee.lastName %> </td>
-                                        <% } else { %>
-                                        <td> PENDING </td>
-                                        <td> PENDING </td>
-                                        <td> PENDING </td>
-                                        <td> PENDING </td>
-                                        <td> PENDING </td>
-                                        <% } %>
-                                        <% if (transaction.dispatchLogisticsTransactionExists) { %>
-                                        <td> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedDate %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedTime %> </td>
-                                        <td> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.lastName %> </td>
-                                        <% } else { %>
-                                        <td> PENDING </td>
-                                        <td> PENDING </td>
-                                        <% } %>
-                                        <td class="d-flex flex-wrap gap-1 justify-content-center">
-                                            <% if (!transaction.logisticsTransactionExists) { %>
-                                                <!-- Show Schedule button -->
-                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#newScheduleModal" onclick="getMTFData('<%= transaction.id %>')">
-                                                    <h6>For Schedule</h6>
+                                <div class="accordion" id="accordionExample">
+                                    <% const startIndex = (currentPage - 1) * entriesPerPage; %>
+                                    <% paginatedTransactions.forEach((transaction, index) => { %>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= startIndex + index + 1 %>" aria-expanded="true" aria-controls="collapse<%= startIndex + index + 1 %>">
+                                                    <%= transaction.mtfNumber %> - <%= transaction.haulingDate %> - <%= transaction.haulingTime %> - <%= transaction.Client.clientName %>
                                                 </button>
-                                            <% } else if (!transaction.dispatchLogisticsTransactionExists) { %>
-                                                <!-- Show Update and Dispatch buttons -->
-                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#updateScheduleModal" onclick="updateData('<%= transaction.id %>')">
-                                                    <h6>Update</h6>
-                                                </button>
-                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dispatchModal" onclick="getLTFData('<%= transaction.id %>')">
-                                                    <h6>Dispatch</h6>
-                                                </button>                                            
+                                            </h2>
+                                            <div id="collapse<%= startIndex + index + 1 %>" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                <div class="accordion-body">
+                                                    <ul class="timeline">
+                                                        <li>
+                                                            <i class="fa fa-solid fa-book bg-blue"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= transaction.createdAt %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    Booked
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Transaction Created
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <i class="fa fa-solid fa-book bg-blue"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= transaction.createdAt %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    Dispatched
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Transaction Created
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <tr>
+                                            <td><%= startIndex + index + 1 %></td>
+                                            <td><%= transaction.mtfNumber %></td>
+                                            <td><%= transaction.haulingDate %> <%= transaction.haulingTime %></td>
+                                            <td><%= transaction.Client.clientName %></td>
+                                            <td><%= transaction.QuotationWaste.TypeOfWaste.wasteCode %></td>
+                                            <td><%= transaction.QuotationWaste.wasteName %></td>
+                                            <td><%= transaction.QuotationTransportation.VehicleType.typeOfVehicle %></td>
+                                            <td><%= transaction.remarks %></td>
+                                            <td><%= transaction.Employee.firstName %> <%= transaction.Employee.lastName %></td>
+                                            <% if (transaction.logisticsTransactionExists) { %>
+                                            <td> <%= transaction.LogisticsTransaction[0].plateNumber %> </td>
+                                            <td> <%= transaction.LogisticsTransaction[0].Driver.firstName %> <%= transaction.LogisticsTransaction[0].Driver.lastName %> </td>
+                                            <td> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.lastName %> </td>
+                                            <td> <%= transaction.LogisticsTransaction[0].departureDate %> <%= transaction.LogisticsTransaction[0].departureTime %> </td>
+                                            <td> <%= transaction.LogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].Employee.lastName %> </td>
                                             <% } else { %>
-                                                <!-- Show Dispatched message -->
-                                                <p>Dispatched</p>
+                                            <td> PENDING </td>
+                                            <td> PENDING </td>
+                                            <td> PENDING </td>
+                                            <td> PENDING </td>
+                                            <td> PENDING </td>
                                             <% } %>
-                                        </td>
-                                    </tr>
-                                <% }); %>
+                                            <% if (transaction.dispatchLogisticsTransactionExists) { %>
+                                            <td> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedDate %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedTime %> </td>
+                                            <td> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.lastName %> </td>
+                                            <% } else { %>
+                                            <td> PENDING </td>
+                                            <td> PENDING </td>
+                                            <% } %>
+                                            <td class="d-flex flex-wrap gap-1 justify-content-center">
+                                                <% if (!transaction.logisticsTransactionExists) { %>
+                                                    <!-- Show Schedule button -->
+                                                    <!-- <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#newScheduleModal" onclick="getMTFData('<%= transaction.id %>')">
+                                                        <h6>For Schedule</h6>
+                                                    </button> -->
+                                                <% } else if (!transaction.dispatchLogisticsTransactionExists) { %>
+                                                    <!-- Show Update and Dispatch buttons -->
+                                                    <!-- <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#updateScheduleModal" onclick="updateData('<%= transaction.id %>')">
+                                                        <h6>Update</h6>
+                                                    </button>
+                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dispatchModal" onclick="getLTFData('<%= transaction.id %>')">
+                                                        <h6>Dispatch</h6>
+                                                    </button>                                             -->
+                                                <% } else { %>
+                                                    <!-- Show Dispatched message -->
+                                                    <!-- <p>Dispatched</p> -->
+                                                <% } %>
+                                            <!-- </td>
+                                        </tr> -->
+                                    <% }); %>
+                                </div>
                             </tbody>
                         </table>
 
