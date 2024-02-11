@@ -388,6 +388,7 @@ th {
     position: relative;
     margin-right: 10px;
     margin-bottom: 15px;
+    
 }
 
 .timeline>li>.timeline-item {
@@ -425,6 +426,7 @@ th {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #fff !important;
+    z-index: 1;
 }
 
 .bg-blue {
@@ -440,7 +442,7 @@ th {
 
 .timeline>li>.timeline-item>.timeline-header {
     margin: 0;
-    color: #555;
+    color: #3c8dbc;
     border-bottom: 1px solid #f4f4f4;
     padding: 10px;
     font-size: 16px;
@@ -449,4 +451,17 @@ th {
 
 .timeline>li>.timeline-item>.timeline-body, .timeline>li>.timeline-item>.timeline-footer {
     padding: 10px;
+}
+
+.timeline>li>.timeline-item>.timeline-body span{
+    font-weight: bold;
+}
+
+.timeline>li>.timeline-line{
+    position: absolute;
+    top: 15px;
+    left: 30px;
+    height: 100%;
+    width: 5px;
+    background-color: gray;
 }
