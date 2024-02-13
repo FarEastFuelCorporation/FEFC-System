@@ -116,7 +116,6 @@ async function getBookedTransactionsController(req, res) {
 
         // Fetch all clients from the database
         const marketingTransactions = await MarketingTransaction.findAll({
-            where: { submitTo: 'LOGISTICS' },
             include: [
                 { model: Client, as: 'Client' },
                 { model: QuotationWaste, as: 'QuotationWaste',
