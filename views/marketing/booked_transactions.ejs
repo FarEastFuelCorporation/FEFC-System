@@ -143,6 +143,192 @@
             </thead>
             <tbody id="calendar_days"></tbody>
         </table>
+
+        <div class="container-fluid p-0">
+            <div class="table-container">
+                <!-- Table Header -->
+                <div class="table-header">
+                    <div class="form-group d-flex">
+                        <label for="showEntries">Show entries</label>
+                        <select class="form-control" id="showEntries" onchange="changeEntriesPerPage(this)">
+                            <option value="10" <%= entriesPerPage === 10 ? 'selected' : '' %>>10</option>
+                            <option value="25" <%= entriesPerPage === 25 ? 'selected' : '' %>>25</option>
+                            <option value="50" <%= entriesPerPage === 50 ? 'selected' : '' %>>50</option>
+                            <option value="100" <%= entriesPerPage === 100 ? 'selected' : '' %>>100</option>
+                        </select>
+                    </div>
+                    <div class="form-group d-flex">
+                        <input type="text" class="form-control" autocomplete="off" placeholder="Search Client" id="searchInput" value="<%= searchQuery %>">
+                        <button class="btn btn-success" onclick="performSearch()">
+                            <h6>Search</h6>
+                        </button>
+                    </div>
+                </div>
+        
+                <!-- Table -->
+                <table class="table table-bordered">
+                    <!-- <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>MTF #</th>
+                            <th>HAULING<br>DATE/TIME</th>
+                            <th>CLIENT</th>
+                            <th>WASTE<br>CODE</th>
+                            <th>WASTE NAME</th>
+                            <th>TYPE OF VEHICLE</th>
+                            <th>REMARKS</th>
+                            <th>BOOKED BY</th>
+                            <th>VEHICLE</th>
+                            <th>DRIVER</th>
+                            <th>TRUCK HELPER</th>
+                            <th>DEPARTURE<br>DATE/TIME</th>
+                            <th>SCHEDULE BY</th>
+                            <th>DISPATCHED<br>DATE/TIME</th>
+                            <th>DISPATCHED BY</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead> -->
+                    <tbody>
+                        <div class="accordion" id="accordionExample">
+                            <% const startIndex = (currentPage - 1) * entriesPerPage; %>
+                            <% paginatedTransactions.forEach((transaction, index) => { %>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= startIndex + index + 1 %>" aria-expanded="true" aria-controls="collapse<%= startIndex + index + 1 %>">
+                                            <%= transaction.mtfNumber %> - <%= transaction.haulingDate %> - <%= transaction.haulingTime %> - <%= transaction.Client.clientName %>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse<%= startIndex + index + 1 %>" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                        <div class="accordion-body">
+                                            <ul class="timeline">
+                                                <li>
+                                                    <i class="fa fa-solid fa-book bg-blue"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-clock-o"></i>
+                                                            <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                        </span>
+                                                        <h3 class="timeline-header fw-bold">
+                                                            Booked
+                                                        </h3>
+                                                        <div class="timeline-body">
+                                                            Waste Name: <span><%= transaction.QuotationWaste.wasteName %> (<%= transaction.QuotationWaste.TypeOfWaste.wasteCode %>)</span><br>
+                                                            Type of Vehicle: <span><%= transaction.QuotationTransportation.VehicleType.typeOfVehicle %></span><br>
+                                                            Remarks: <span><%= transaction.remarks %></span><br>
+                                                            Booked By: <span><%= transaction.Employee.firstName %> <%= transaction.Employee.lastName %></span><br>
+                                                        </div>
+                                                    </div>
+                                                    <div class="timeline-line"></div>
+                                                </li>
+                                                <% if (transaction.logisticsTransactionExists) { %>
+                                                <li>
+                                                    <i class="fa fa-solid fa-calendar-days bg-blue"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time">
+                                                            <i class="fa fa-clock-o"></i>
+                                                            <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                        </span>
+                                                        <h3 class="timeline-header fw-bold">
+                                                            Scheduled
+                                                        </h3>
+                                                        <div class="timeline-body">
+                                                            Vehicle: <span><%= transaction.LogisticsTransaction[0].vehicleName %></span><br>
+                                                            Plate #: <span><%= transaction.LogisticsTransaction[0].plateNumber %></span><br>
+                                                            Driver: <span><%= transaction.LogisticsTransaction[0].Driver.firstName %> <%= transaction.LogisticsTransaction[0].Driver.lastName %></span><br>
+                                                            Truck Helper: <span><%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.lastName %></span><br>
+                                                            Departure Date: <span><%= transaction.LogisticsTransaction[0].departureDate %></span><br>
+                                                            Departure Time: <span><%= transaction.LogisticsTransaction[0].departureTime %></span><br>
+                                                            Scheduled By: <span><%= transaction.LogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].Employee.lastName %></span><br>
+                                                        </div>
+                                                    </div>
+                                                    <div class="timeline-line"></div>
+                                                </li>
+                                                <% } else { %>
+                                                    <li>
+                                                        <i class="fa fa-solid fa-calendar-days bg-blue"></i>
+                                                        <div class="timeline-item">
+                                                            <span class="time">
+                                                                <i class="fa fa-clock-o"></i>
+                                                                <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                            </span>
+                                                            <h3 class="timeline-header fw-bold">
+                                                                For Schedule
+                                                            </h3>
+                                                        </div>
+                                                        <div class="timeline-line"></div>
+                                                    </li>
+                                                <% } %>
+                                                <% if (transaction.logisticsTransactionExists && transaction.dispatchLogisticsTransactionExists) { %>
+                                                    <li>
+                                                        <i class="fa fa-solid fa-calendar-check bg-blue"></i>
+                                                        <div class="timeline-item">
+                                                            <span class="time">
+                                                                <i class="fa fa-clock-o"></i>
+                                                                <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                            </span>
+                                                            <h3 class="timeline-header fw-bold">
+                                                                Dispatched
+                                                            </h3>
+                                                            <div class="timeline-body">
+                                                                Dispatched Date: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedDate %></span><br>
+                                                                Dispatched Time: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedTime %></span><br>
+                                                                Dispatched By: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.lastName %></span><br>
+                                                            </div>
+                                                        </div>
+                                                        <div class="timeline-line"></div>
+                                                    </li>
+                                                <% } else if (transaction.logisticsTransactionExists && !transaction.dispatchLogisticsTransactionExists) { %>
+                                                    <li>
+                                                        <i class="fa fa-solid fa-calendar-check bg-blue"></i>
+                                                        <div class="timeline-item">
+                                                            <span class="time">
+                                                                <i class="fa fa-clock-o"></i>
+                                                                <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                            </span>
+                                                            <h3 class="timeline-header fw-bold">
+                                                                For Dispatch
+                                                            </h3>
+                                                        </div>
+                                                        <div class="timeline-line"></div>
+                                                    </li>
+                                                <% } %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="table-pagination">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-end">
+                            <% if (currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="#" onclick="changePage(<%= currentPage - 1 %>)" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= i === currentPage ? 'custom-active' : 'custom-non-active' %>">
+                                    <a class="page-link <%= i === currentPage ? 'bg-success text-white border-success' : 'text-success' %>" href="#" onclick="changePage(<%= i %>)"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <% if (currentPage < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link text-success" href="#" onclick="changePage(<%= currentPage + 1 %>)" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
     </section>
 </div>
 <script>

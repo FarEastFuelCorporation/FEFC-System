@@ -142,6 +142,19 @@
         // If the date format is not as expected, return the original formatted date.
         return formattedDate;
     }
+
+        function formatDate(date) {
+        return new Date(date).toLocaleString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            hour12: true
+        });
+    }
 </script>
 </body>
 </html>

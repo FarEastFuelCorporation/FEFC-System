@@ -15,7 +15,7 @@
                         <%= errorMessage %>
                     </div>
                 <% } %>
-                <div class="container-fluid">
+                <div class="container-fluid p-0">
                     <div class="table-container">
                         <!-- Table Header -->
                         <div class="table-header">
@@ -77,7 +77,7 @@
                                                             <div class="timeline-item">
                                                                 <span class="time">
                                                                     <i class="fa fa-clock-o"></i>
-                                                                    <%= transaction.createdAt %>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
                                                                 </span>
                                                                 <h3 class="timeline-header fw-bold">
                                                                     Booked
@@ -85,7 +85,7 @@
                                                                 <div class="timeline-body">
                                                                     Waste Name: <span><%= transaction.QuotationWaste.wasteName %> (<%= transaction.QuotationWaste.TypeOfWaste.wasteCode %>)</span><br>
                                                                     Type of Vehicle: <span><%= transaction.QuotationTransportation.VehicleType.typeOfVehicle %></span><br>
-                                                                    Remarks: <span><%= transaction.remarks %></span>
+                                                                    Remarks: <span><%= transaction.remarks %></span><br>
                                                                     Booked By: <span><%= transaction.Employee.firstName %> <%= transaction.Employee.lastName %></span><br>
                                                                 </div>
                                                             </div>
@@ -97,7 +97,7 @@
                                                             <div class="timeline-item">
                                                                 <span class="time">
                                                                     <i class="fa fa-clock-o"></i>
-                                                                    <%= transaction.createdAt %>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
                                                                 </span>
                                                                 <h3 class="timeline-header fw-bold">
                                                                     Scheduled
@@ -120,7 +120,7 @@
                                                             <div class="timeline-item">
                                                                 <span class="time">
                                                                     <i class="fa fa-clock-o"></i>
-                                                                    <%= transaction.createdAt %>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
                                                                 </span>
                                                                 <h3 class="timeline-header fw-bold">
                                                                     Scheduled
@@ -146,7 +146,7 @@
                                                                 <div class="timeline-item">
                                                                     <span class="time">
                                                                         <i class="fa fa-clock-o"></i>
-                                                                        <%= transaction.createdAt %>
+                                                                        <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
                                                                     </span>
                                                                     <h3 class="timeline-header fw-bold">
                                                                         For Schedule
@@ -166,7 +166,7 @@
                                                                 <div class="timeline-item">
                                                                     <span class="time">
                                                                         <i class="fa fa-clock-o"></i>
-                                                                        <%= transaction.createdAt %>
+                                                                        <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
                                                                     </span>
                                                                     <h3 class="timeline-header fw-bold">
                                                                         Dispatched
@@ -185,7 +185,7 @@
                                                                 <div class="timeline-item">
                                                                     <span class="time">
                                                                         <i class="fa fa-clock-o"></i>
-                                                                        <%= transaction.createdAt %>
+                                                                        <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
                                                                     </span>
                                                                     <h3 class="timeline-header fw-bold">
                                                                         For Dispatch
