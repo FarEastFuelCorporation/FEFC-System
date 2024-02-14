@@ -1,7 +1,7 @@
 // routes/dispatching_dashboard.js
 
 const express = require('express');
-const { getDispatchingDashboardController, getVehicleTrackerController, getDispatchingTransactionsController, postScheduleTransactionsController, postDispatchTransactionsController, updateScheduleTransactionsController, getVehiclesController, postVehicleController, updateVehicleController } = require('../controllers/dispatchingDashboardController');
+const { getDispatchingDashboardController, getVehicleTrackerController, getDispatchingTransactionsController, postScheduleTransactionsController, postDispatchTransactionsController, updateScheduleTransactionsController, getVehiclesController, postVehicleController, updateVehicleController, deleteScheduleTransactionsController } = require('../controllers/dispatchingDashboardController');
 const router = express.Router();
 
 // Dashboard route
@@ -14,6 +14,7 @@ router.get('/vehicle_tracker', getVehicleTrackerController);
 router.get('/dispatching_transactions', getDispatchingTransactionsController);
 router.post('/new_schedule_transactions', postScheduleTransactionsController);
 router.post('/update_schedule_transactions/:id', updateScheduleTransactionsController);
+router.delete('/update_schedule_transactions/:id', deleteScheduleTransactionsController);
 router.post('/dispatch_transactions', postDispatchTransactionsController);
 
 // Vehicles route

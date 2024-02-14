@@ -212,6 +212,8 @@ async function getDispatchingTransactionsController(req, res) {
             successMessage = 'Transaction scheduled successfully!';
         } else if (req.query.success === 'updateSchedule'){
             successMessage = 'Transaction scheduled updated successfully!';
+        } else if (req.query.success === 'deleteSchedule'){
+            successMessage = 'Transaction scheduled deleted successfully!';
         } else if (req.query.success === 'dispatch'){
             successMessage = 'Transaction dispatched successfully!';
         }
@@ -275,6 +277,14 @@ async function postScheduleTransactionsController(req, res) {
             logisticsTransactionId: logisticsTransaction.id,
             truckHelperId,
         });
+        await MarketingTransaction.update(
+            {
+                statusId: "2",
+            },
+            {
+                where: { id: logisticsTransaction.mtfId },
+            }
+        );
 
         // Redirect back to the client route with a success message
         res.redirect('/dispatching_dashboard/dispatching_transactions?success=newSchedule');
@@ -332,6 +342,42 @@ async function updateScheduleTransactionsController(req, res) {
         // Handling errors
         console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
+    }
+};
+async function deleteScheduleTransactionsController(req, res) {
+    try {
+        const logisticsTransactionId = req.params.id;
+        // Find the LogisticsTransaction record to get the mtfId
+        const logisticsTransaction = await LogisticsTransaction.findOne({
+            where: {
+                id: logisticsTransactionId,
+            },
+        });
+
+        if (!logisticsTransaction) {
+            return res.status(404).json({ error: 'LogisticsTransaction not found' });
+        }
+
+        // Delete the LogisticsTransaction
+        await logisticsTransaction.destroy();
+
+        // Update the MarketingTransaction status
+        const marketingTransaction = await MarketingTransaction.findOne({
+            where: {
+                id: logisticsTransaction.mtfId,
+            },
+        });
+
+        if (marketingTransaction) {
+            await marketingTransaction.update({
+                statusId: 2,
+            });
+        }
+
+        res.redirect('/dispatching_dashboard/dispatching_transactions?success=deleteSchedule');
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 async function postDispatchTransactionsController(req, res) {
@@ -561,6 +607,7 @@ module.exports = {
     getDispatchingTransactionsController,
     postScheduleTransactionsController,
     updateScheduleTransactionsController,
+    deleteScheduleTransactionsController,
     postDispatchTransactionsController,
     getVehiclesController,
     postVehicleController,

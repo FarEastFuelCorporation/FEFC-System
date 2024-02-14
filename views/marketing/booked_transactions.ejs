@@ -132,7 +132,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                        <h2>January 2024</h2>
+                        <h2 id="month_header"></h2>
                     </button>
                 </h2>
                 <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -682,7 +682,7 @@
 
         // Toggle the visibility based on the selected value
         if (selectedValue === 'LOGISTICS') {
-            status.value = '2';
+            status.value = '1';
             ;
         } else {        
             status.value = '3';    
@@ -885,9 +885,14 @@
             vehicleTypesData = await vehicleTypesResponse.json();
             marketingTransactionsData = await marketingTransactionsResponse.json();
             vehiclesData = await vehiclesResponse.json();
-
+            console.log(marketingTransactionsData)
             // Log or process the data as needed
-            generateCalendarDays(2024, 0);
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthNames = ['January', 'February', 'March', 'April','May', 'June', 'July', 'August','September', 'October', 'November', 'December'];
+            document.getElementById("month_header").innerText = `${monthNames[month]} ${year}`
+            generateCalendarDays(year, month);
 
         } catch (error) {
             console.error('Error fetching data:', error);

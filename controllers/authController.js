@@ -92,9 +92,12 @@ async function postLoginController(req, res) {
             } else if (user.Employee.employeeRoleId === 3) {
                 req.session.employeeId = user.employeeId;
                 res.redirect(`/dispatching_dashboard`);
+            } else if (user.Employee.employeeRoleId === 4) {
+                req.session.employeeId = user.employeeId;
+                res.redirect(`/receiving_dashboard`);
             } else {
                 // Redirect to a different route if needed
-                res.redirect(`/dashboard`);
+                res.redirect(`/`);
             }
         } else {
             // Display an error message for incorrect credentials

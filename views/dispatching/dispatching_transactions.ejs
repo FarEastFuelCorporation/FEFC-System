@@ -72,6 +72,7 @@
                                             <div id="collapse<%= startIndex + index + 1 %>" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                                                 <div class="accordion-body">
                                                     <ul class="timeline">
+                                                        <% if (!transaction.logisticsTransactionExists) { %>
                                                         <li>
                                                             <i class="fa fa-solid fa-book bg-blue"></i>
                                                             <div class="timeline-item">
@@ -91,30 +92,45 @@
                                                             </div>
                                                             <div class="timeline-line"></div>
                                                         </li>
-                                                        <% if (transaction.logisticsTransactionExists && transaction.dispatchLogisticsTransactionExists) { %>
                                                         <li>
-                                                            <i class="fa fa-solid fa-calendar-days bg-blue"></i>
+                                                            <i class="fa fa-solid fa-calendar-days bg-yellow"></i>
                                                             <div class="timeline-item">
                                                                 <span class="time">
                                                                     <i class="fa fa-clock-o"></i>
                                                                     <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
                                                                 </span>
                                                                 <h3 class="timeline-header fw-bold">
-                                                                    Scheduled
+                                                                    For Schedule
                                                                 </h3>
                                                                 <div class="timeline-body">
-                                                                    Vehicle: <span><%= transaction.LogisticsTransaction[0].vehicleName %></span><br>
-                                                                    Plate #: <span><%= transaction.LogisticsTransaction[0].plateNumber %></span><br>
-                                                                    Driver: <span><%= transaction.LogisticsTransaction[0].Driver.firstName %> <%= transaction.LogisticsTransaction[0].Driver.lastName %></span><br>
-                                                                    Truck Helper: <span><%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.lastName %></span><br>
-                                                                    Departure Date: <span><%= transaction.LogisticsTransaction[0].departureDate %></span><br>
-                                                                    Departure Time: <span><%= transaction.LogisticsTransaction[0].departureTime %></span><br>
-                                                                    Scheduled By: <span><%= transaction.LogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].Employee.lastName %></span><br>
+                                                                    Pending <br>
+                                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#newScheduleModal" onclick="getMTFData('<%= transaction.id %>')">
+                                                                        <h6>Schedule</h6>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                             <div class="timeline-line"></div>
                                                         </li>
                                                         <% } else if (transaction.logisticsTransactionExists && !transaction.dispatchLogisticsTransactionExists) { %>
+                                                        <li>
+                                                            <i class="fa fa-solid fa-book bg-blue"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    Booked
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Waste Name: <span><%= transaction.QuotationWaste.wasteName %> (<%= transaction.QuotationWaste.TypeOfWaste.wasteCode %>)</span><br>
+                                                                    Type of Vehicle: <span><%= transaction.QuotationTransportation.VehicleType.typeOfVehicle %></span><br>
+                                                                    Remarks: <span><%= transaction.remarks %></span><br>
+                                                                    Booked By: <span><%= transaction.Employee.firstName %> <%= transaction.Employee.lastName %></span><br>
+                                                                </div>
+                                                            </div>
+                                                            <div class="timeline-line"></div>
+                                                        </li>
                                                         <li>
                                                             <i class="fa fa-solid fa-calendar-days bg-blue"></i>
                                                             <div class="timeline-item">
@@ -136,68 +152,108 @@
                                                                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#updateScheduleModal" onclick="updateData('<%= transaction.id %>')">
                                                                         <h6>Update</h6>
                                                                     </button>
+                                                                    <button type="button" class="btn btn-danger" onclick="deleteLTFData('<%= transaction.id %>')">
+                                                                        <h6>Delete</h6>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                             <div class="timeline-line"></div>
                                                         </li>
-                                                        <% } else { %>
-                                                            <li>
-                                                                <i class="fa fa-solid fa-calendar-days bg-blue"></i>
-                                                                <div class="timeline-item">
-                                                                    <span class="time">
-                                                                        <i class="fa fa-clock-o"></i>
-                                                                        <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
-                                                                    </span>
-                                                                    <h3 class="timeline-header fw-bold">
-                                                                        For Schedule
-                                                                    </h3>
-                                                                    <div class="timeline-body">
-                                                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#newScheduleModal" onclick="getMTFData('<%= transaction.id %>')">
-                                                                            <h6>Schedule</h6>
-                                                                        </button>
-                                                                    </div>
+                                                        <li>
+                                                            <i class="fa fa-solid fa-calendar-check bg-yellow"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    For Dispatch
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Pending <br>
+                                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dispatchModal" onclick="getLTFData('<%= transaction.id %>')">
+                                                                        <h6>Dispatch</h6>
+                                                                    </button>
                                                                 </div>
-                                                                <div class="timeline-line"></div>
-                                                            </li>
-                                                        <% } %>
-                                                        <% if (transaction.logisticsTransactionExists && transaction.dispatchLogisticsTransactionExists) { %>
-                                                            <li>
-                                                                <i class="fa fa-solid fa-calendar-check bg-blue"></i>
-                                                                <div class="timeline-item">
-                                                                    <span class="time">
-                                                                        <i class="fa fa-clock-o"></i>
-                                                                        <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
-                                                                    </span>
-                                                                    <h3 class="timeline-header fw-bold">
-                                                                        Dispatched
-                                                                    </h3>
-                                                                    <div class="timeline-body">
-                                                                        Dispatched Date: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedDate %></span><br>
-                                                                        Dispatched Time: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedTime %></span><br>
-                                                                        Dispatched By: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.lastName %></span><br>
-                                                                    </div>
+                                                            </div>
+                                                            <div class="timeline-line"></div>
+                                                        </li>
+                                                        <% } else if (transaction.logisticsTransactionExists && transaction.dispatchLogisticsTransactionExists) { %>
+                                                        <li>
+                                                            <i class="fa fa-solid fa-book bg-blue"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    Booked
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Waste Name: <span><%= transaction.QuotationWaste.wasteName %> (<%= transaction.QuotationWaste.TypeOfWaste.wasteCode %>)</span><br>
+                                                                    Type of Vehicle: <span><%= transaction.QuotationTransportation.VehicleType.typeOfVehicle %></span><br>
+                                                                    Remarks: <span><%= transaction.remarks %></span><br>
+                                                                    Booked By: <span><%= transaction.Employee.firstName %> <%= transaction.Employee.lastName %></span><br>
                                                                 </div>
-                                                                <div class="timeline-line"></div>
-                                                            </li>
-                                                        <% } else if (transaction.logisticsTransactionExists && !transaction.dispatchLogisticsTransactionExists) { %>
-                                                            <li>
-                                                                <i class="fa fa-solid fa-calendar-check bg-blue"></i>
-                                                                <div class="timeline-item">
-                                                                    <span class="time">
-                                                                        <i class="fa fa-clock-o"></i>
-                                                                        <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
-                                                                    </span>
-                                                                    <h3 class="timeline-header fw-bold">
-                                                                        For Dispatch
-                                                                    </h3>
-                                                                    <div class="timeline-body">
-                                                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#dispatchModal" onclick="getLTFData('<%= transaction.id %>')">
-                                                                            <h6>Dispatch</h6>
-                                                                        </button>
-                                                                    </div>
+                                                            </div>
+                                                            <div class="timeline-line"></div>
+                                                        </li>
+                                                        <li>
+                                                            <i class="fa fa-solid fa-calendar-days bg-blue"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    Scheduled
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Vehicle: <span><%= transaction.LogisticsTransaction[0].vehicleName %></span><br>
+                                                                    Plate #: <span><%= transaction.LogisticsTransaction[0].plateNumber %></span><br>
+                                                                    Driver: <span><%= transaction.LogisticsTransaction[0].Driver.firstName %> <%= transaction.LogisticsTransaction[0].Driver.lastName %></span><br>
+                                                                    Truck Helper: <span><%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].LogisticsTransactionHelper[0].Employee.lastName %></span><br>
+                                                                    Departure Date: <span><%= transaction.LogisticsTransaction[0].departureDate %></span><br>
+                                                                    Departure Time: <span><%= transaction.LogisticsTransaction[0].departureTime %></span><br>
+                                                                    Scheduled By: <span><%= transaction.LogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].Employee.lastName %></span><br>
                                                                 </div>
-                                                                <div class="timeline-line"></div>
-                                                            </li>
+                                                            </div>
+                                                            <div class="timeline-line"></div>
+                                                        </li>
+                                                        <li>
+                                                            <i class="fa fa-solid fa-calendar-check bg-blue"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    Dispatched
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Dispatched Date: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedDate %></span><br>
+                                                                    Dispatched Time: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].dispatchedTime %></span><br>
+                                                                    Dispatched By: <span><%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.firstName %> <%= transaction.LogisticsTransaction[0].DispatchLogisticsTransaction[0].Employee.lastName %></span><br>
+                                                                </div>
+                                                            </div>
+                                                            <div class="timeline-line"></div>
+                                                        </li>
+                                                        <li>
+                                                            <i class="fa fa-solid fa-truck-ramp-box bg-yellow"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time">
+                                                                    <i class="fa fa-clock-o"></i>
+                                                                    <%= new Date(transaction.createdAt).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }) %>
+                                                                </span>
+                                                                <h3 class="timeline-header fw-bold">
+                                                                    For Receiving
+                                                                </h3>
+                                                                <div class="timeline-body">
+                                                                    Pending <br>
+                                                                </div>
+                                                            </div>
+                                                            <div class="timeline-line"></div>
+                                                        </li>
                                                         <% } %>
                                                     </ul>
                                                 </div>
@@ -349,6 +405,7 @@
                     <!-- Modal Body -->
                     <div class="modal-body">
                         <input type="hidden" name="mtfId" id="mtfId">
+                        <input type="hidden" name="logisticsTransactionIdData" id="logisticsTransactionIdData">
                         <div class="row gap-3 mb-3">
                             <div class="col">
                                 <label for="departureDate">
@@ -612,9 +669,10 @@ function performSearch() {
     function updateData(MTFData) {
         const updateScheduleModal = document.getElementById("updateScheduleModal");
         updateScheduleModal.querySelector("#mtfId").value = MTFData;
-        document.getElementById("updateScheduleForm").action = `/dispatching_dashboard/update_schedule_transactions/${MTFData}`;
         for(let x = 0; x < logisticsTransactionsData.length; x++){
             if(MTFData == logisticsTransactionsData[x].MarketingTransaction.id){
+                document.getElementById("updateScheduleForm").action = `/dispatching_dashboard/update_schedule_transactions/${logisticsTransactionsData[x].id}`;
+                updateScheduleModal.querySelector("#logisticsTransactionIdData").value = logisticsTransactionsData[x].id;
                 updateScheduleModal.querySelector("#departureDate").value = logisticsTransactionsData[x].departureDate;
                 updateScheduleModal.querySelector("#departureTime").value = logisticsTransactionsData[x].departureTime;
                 updateScheduleModal.querySelector("#plateNumber").value = logisticsTransactionsData[x].plateNumber;
@@ -630,6 +688,47 @@ function performSearch() {
             if(MTFData == logisticsTransactionsData[x].MarketingTransaction.id){
                 dispatchModal.querySelector("#logisticsTransactionId").value = logisticsTransactionsData[x].id;
             }
+        }
+    }
+    function updateLTFData(MTFData) {
+        const updateScheduleModal = document.getElementById("updateScheduleModal");
+        updateScheduleModal.querySelector("#mtfId").value = MTFData;
+        for(let x = 0; x < logisticsTransactionsData.length; x++){
+            if(MTFData == logisticsTransactionsData[x].MarketingTransaction.id){
+                document.getElementById("updateScheduleForm").action = `/dispatching_dashboard/update_schedule_transactions/${logisticsTransactionsData[x].id}`;
+                updateScheduleModal.querySelector("#logisticsTransactionIdData").value = logisticsTransactionsData[x].id;
+                updateScheduleModal.querySelector("#departureDate").value = logisticsTransactionsData[x].departureDate;
+                updateScheduleModal.querySelector("#departureTime").value = logisticsTransactionsData[x].departureTime;
+                updateScheduleModal.querySelector("#plateNumber").value = logisticsTransactionsData[x].plateNumber;
+                updateScheduleModal.querySelector("#driverId").value = logisticsTransactionsData[x].driverId;
+                updateScheduleModal.querySelector("#truckHelperId").value = logisticsTransactionsData[x].LogisticsTransactionHelper[0].truckHelperId;
+                updateScheduleModal.querySelector("#remarks").value = logisticsTransactionsData[x].remarks;
+            }
+        }
+    }
+    function deleteLTFData(logisticsTransactionId) {
+        const confirmation = confirm('Are you sure you want to delete this Transaction?' + `${logisticsTransactionId}`);
+
+        if (confirmation) {
+            fetch(`/dispatching_dashboard/delete_schedule_transactions/${logisticsTransactionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) {
+                    alert(`Error: ${result.error}`);
+                } else {
+                    alert(result.message);
+                    // Optionally, you can update the UI or perform other actions after successful deletion.
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An unexpected error occurred.');
+            });
         }
     }
 </script>

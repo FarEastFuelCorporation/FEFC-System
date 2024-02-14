@@ -77,6 +77,7 @@ const othersRoutes = require('./routes/others');
 const requestsRoutes = require('./routes/requests');
 const marketingDashboardRoutes = require('./routes/marketing_dashboard');
 const dispatchingDashboardRoutes = require('./routes/dispatching_dashboard');
+const receivingDashboardRoutes = require('./routes/receiving_dashboard');
 const { error404Controller } = require('./controllers/othersController');
 
 app.use(authRoutes);
@@ -84,6 +85,7 @@ app.use(othersRoutes);
 app.use('/requests', requestsRoutes);
 app.use('/marketing_dashboard', marketingDashboardRoutes);
 app.use('/dispatching_dashboard', dispatchingDashboardRoutes);
+app.use('/receiving_dashboard', receivingDashboardRoutes);
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(error404Controller);

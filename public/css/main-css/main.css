@@ -456,4 +456,8 @@ th {
   height: 100%;
   width: 5px;
   background-color: gray;
+}
+
+.timeline li button {
+  margin-top: 10px;
 }/*# sourceMappingURL=main.css.map */

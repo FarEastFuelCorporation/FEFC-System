@@ -1,3 +1,5 @@
+// controllers/requestsController.js
+
 const sequelize = require("../config/config");
 const { startOfMonth, endOfMonth, subMonths } = require('date-fns');
 const { Op, Sequelize } = require('sequelize');
@@ -283,9 +285,7 @@ async function getLogisticsTransactionCounter(req, res) {
                     [Op.gte]: `${currentDate.getFullYear()}-${currentMonth}-01`,
                     [Op.lt]: `${currentDate.getFullYear()}-${currentMonth + 1}-01`,
                 },
-                id: {
-                    [Op.notIn]: sequelize.literal('(SELECT mtfId FROM LogisticsTransactions WHERE mtfId IS NOT NULL)'),
-                },
+                statusId: 1
             },
         });
         const pending2 = await MarketingTransaction.findAll({
@@ -300,10 +300,7 @@ async function getLogisticsTransactionCounter(req, res) {
                     [Op.gte]: `${currentDate.getFullYear()}-${currentMonth}-01`,
                     [Op.lt]: `${currentDate.getFullYear()}-${currentMonth + 1}-01`,
                 },
-                id: {
-                    [Op.in]: sequelize.literal('(SELECT mtfId FROM LogisticsTransactions WHERE mtfId IS NOT NULL)'),
-                    [Op.notIn]: sequelize.literal('(SELECT logisticsTransactionId FROM DispatchLogisticsTransactions WHERE logisticsTransactionId IS NOT NULL)'),
-                },
+                statusId: 2
             },
         });
 
@@ -314,10 +311,7 @@ async function getLogisticsTransactionCounter(req, res) {
                     [Op.gte]: `${currentDate.getFullYear()}-${currentMonth}-01`,
                     [Op.lt]: `${currentDate.getFullYear()}-${currentMonth + 1}-01`,
                 },
-                id: {
-                    [Op.in]: sequelize.literal('(SELECT mtfId FROM LogisticsTransactions WHERE mtfId IS NOT NULL)'),
-                    [Op.in]: sequelize.literal('(SELECT logisticsTransactionId FROM DispatchLogisticsTransactions WHERE logisticsTransactionId IS NOT NULL)'),
-                },
+                statusId: 3
             },
         });
         

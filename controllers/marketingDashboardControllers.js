@@ -50,7 +50,8 @@ async function getMarketingDashboardController(req, res) {
 
         // Calculate counts for each status
         const counts = {
-            booked: marketingTransactions.filter((transaction) => transaction.statusId === 1).length,
+            booked: marketingTransactions.length,
+            forSchedule: marketingTransactions.filter((transaction) => transaction.statusId === 1).length,
             forHauling: marketingTransactions.filter((transaction) => transaction.statusId === 2).length,
             forReceiving: marketingTransactions.filter((transaction) => transaction.statusId === 3).length,
             forWarehousing: marketingTransactions.filter((transaction) => transaction.statusId === 4).length,
@@ -58,8 +59,9 @@ async function getMarketingDashboardController(req, res) {
             forTreatment: marketingTransactions.filter((transaction) => transaction.statusId === 6).length,
             forCertification: marketingTransactions.filter((transaction) => transaction.statusId === 7).length,
             forBilling: marketingTransactions.filter((transaction) => transaction.statusId === 8).length,
-            forCollection: marketingTransactions.filter((transaction) => transaction.statusId === 9).length,
-            finished: marketingTransactions.filter((transaction) => transaction.statusId === 10).length,
+            forBillingDistribution: marketingTransactions.filter((transaction) => transaction.statusId === 9).length,
+            forCollection: marketingTransactions.filter((transaction) => transaction.statusId === 10).length,
+            finished: marketingTransactions.filter((transaction) => transaction.statusId === 11).length,
         };
         
         // Render the dashboard view with data

@@ -19,6 +19,15 @@
                     </div>
                     <div class="card">
                         <div class="card-content">
+                            <div class="number" id="for_schedule"><%= counts.forSchedule %></div>
+                            <div class="card-name">For Schedule</div>
+                        </div>
+                        <div class="icon-box">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
                             <div class="number" id="for_hauling"><%= counts.forHauling %></div>
                             <div class="card-name">For Hauling</div>
                         </div>
@@ -82,11 +91,20 @@
                     </div>
                     <div class="card">
                         <div class="card-content">
+                            <div class="number" id="for_billing_distribution"><%= counts.forBillingDistribution %></div>
+                            <div class="card-name">For Billing Distribution</div>
+                        </div>
+                        <div class="icon-box">
+                            <i class="fa-solid fa-motorcycle"></i>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
                             <div class="number" id="for_collection"><%= counts.forCollection %></div>
                             <div class="card-name">For Collection</div>
                         </div>
                         <div class="icon-box">
-                            <i class="fa-solid fa-sack-dollar"></i>
+                            <i class="fa-solid fa-money-bill-wave"></i>
                         </div>
                     </div>
                     <div class="card">
@@ -96,6 +114,15 @@
                         </div>
                         <div class="icon-box">
                             <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="number" id="generated_income"><%= counts.finished %></div>
+                            <div class="card-name">Generated Income</div>
+                        </div>
+                        <div class="icon-box">
+                            <i class="fa-solid fa-sack-dollar"></i>
                         </div>
                     </div>
                 </div>
@@ -148,6 +175,7 @@
     });
 
     function generatePieChart() {
+        const for_schedule = parseInt(document.getElementById("for_schedule").innerText);
         const for_hauling = parseInt(document.getElementById("for_hauling").innerText);
         const for_receiving = parseInt(document.getElementById("for_receiving").innerText);
         const for_warehousing = parseInt(document.getElementById("for_warehousing").innerText);
@@ -155,11 +183,12 @@
         const for_treatment = parseInt(document.getElementById("for_treatment").innerText);
         const for_certification = parseInt(document.getElementById("for_certification").innerText);
         const for_billing = parseInt(document.getElementById("for_billing").innerText);
+        const for_billing_distribution = parseInt(document.getElementById("for_billing_distribution").innerText);
         const for_collection = parseInt(document.getElementById("for_collection").innerText);
         const finished = parseInt(document.getElementById("finished").innerText);
 
         var options = {
-            series: [for_hauling, for_receiving, for_warehousing, for_sorting, for_treatment, for_certification, for_billing, for_collection, finished],
+            series: [for_schedule, for_hauling, for_receiving, for_warehousing, for_sorting, for_treatment, for_certification, for_billing, for_billing_distribution, for_collection, finished],
             chart: {
                 type: 'pie',
             },
@@ -189,8 +218,20 @@
                     useSeriesColors: false,
                 },
             },
-            labels: ["For Hauling", "For Receiving", "For Warehousing", "For Sorting", "For Treatment", "For Certification", "For Billing", "For Collection", "Finished"],
-            colors: ["#FFC0CB", "#FFDAB9", "#FFB6C1", "#FFE4B5", "#AFEEEE", "#D8BFD8", "#98FB98", "#B0C4DE", "#C1FFC1"],
+            labels: ["For Schedule", "For Hauling", "For Receiving", "For Warehousing", "For Sorting", "For Treatment", "For Certification", "For Billing", "For Billing Distribution", "For Collection", "Finished"],
+            colors: [
+                "#FF6961", // Pastel Red
+                "#FFB347", // Pastel Orange
+                "#FFD1DC", // Pastel Pink
+                "#FFFACD", // Pastel Yellow
+                "#98FF98", // Pastel Mint
+                "#ADD8E6", // Pastel Blue
+                "#AFEEEE", // Pastel Turquoise
+                "#B19CD9", // Pastel Purple
+                "#E6E6FA", // Pastel Lavender
+                "#FFDAB9", // Pastel Peach
+                "#98FB98"  // Pastel Green
+                ],
             responsive: [{
                 breakpoint: 500,
                 options: {
