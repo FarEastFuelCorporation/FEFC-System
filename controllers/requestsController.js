@@ -154,9 +154,13 @@ async function getVehicleLogs(req, res) {
 async function getMarketingTransactions(req, res) {
     try {
         const marketingTransaction = await MarketingTransaction.findAll({
-            include: [{ model: QuotationTransportation, as: 'QuotationTransportation',
-                include: [{ model: VehicleType, as: 'VehicleType' }]
-            }],
+            include: [
+                { model: Client, as: 'Client', },
+                { model: QuotationWaste, as: 'QuotationWaste' },
+                { model: QuotationTransportation, as: 'QuotationTransportation',
+                    include: [{ model: VehicleType, as: 'VehicleType' }]
+                }
+            ],
         });
         res.json(marketingTransaction);
     } catch (error) {

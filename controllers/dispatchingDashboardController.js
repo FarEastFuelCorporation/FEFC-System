@@ -350,16 +350,9 @@ async function deleteScheduleTransactionsController(req, res) {
         // Find the LogisticsTransaction record to get the mtfId
         const logisticsTransaction = await LogisticsTransaction.findOne({
             where: {
-                id: logisticsTransactionId,
+                mtfId: logisticsTransactionId,
             },
         });
-
-        if (!logisticsTransaction) {
-            return res.status(404).json({ error: 'LogisticsTransaction not found' });
-        }
-
-        // Delete the LogisticsTransaction
-        await logisticsTransaction.destroy();
 
         // Update the MarketingTransaction status
         const marketingTransaction = await MarketingTransaction.findOne({
@@ -370,9 +363,14 @@ async function deleteScheduleTransactionsController(req, res) {
 
         if (marketingTransaction) {
             await marketingTransaction.update({
-                statusId: 2,
+                statusId: 1,
             });
         }
+
+        // Delete the LogisticsTransaction
+        await logisticsTransaction.destroy();
+
+
 
         res.redirect('/dispatching_dashboard/dispatching_transactions?success=deleteSchedule');
     } catch (error) {

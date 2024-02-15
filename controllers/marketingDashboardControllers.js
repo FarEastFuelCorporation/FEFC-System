@@ -338,14 +338,14 @@ async function postBookedTransactionsController(req, res) {
 
         // Process dynamic fields
         for (let i = 1; i <= vehicleCounter; i++) {
-            const typeOfVehicle =  req.body[`typeOfVehicle${i}`];
+            const vehicleId =  req.body[`vehicleId${i}`];
 
             // Creating a new MarketingTransaction
             await MarketingTransaction.create({
-                mtfNumber: mtfNumber,
+                mtfNumber: `MTF${(parseInt(mtfNumber.slice(3))-1)+i}`,
                 clientId: clientId,
                 quotationWasteId: wasteId,
-                quotationTransportationId: typeOfVehicle,
+                quotationTransportationId: vehicleId,
                 wasteCategoryId: wasteCategory,
                 haulingDate: haulingDate,
                 haulingTime: haulingTime,
@@ -358,6 +358,57 @@ async function postBookedTransactionsController(req, res) {
                 submittedBy: employeeId,
             });
         }
+
+        // Redirect back to the quotation route with a success message
+        res.redirect('/marketing_dashboard/booked_transactions?success=new');
+    } catch (error) {
+        // Handling errors
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+async function updateBookedTransactionsController(req, res) {
+    try {
+        const {
+            mtfNumber,
+            status,
+            haulingDate,
+            haulingTime,
+            clientId,
+            submitTo,
+            wasteId,
+            wasteCategory,
+            vehicleId,
+            ptt,
+            manifest,
+            pull_out_form,
+            remarks,
+        } = req.body;
+
+        const mtfId = req.params.id;
+        
+        const employeeId = req.session.employeeId;
+
+        // Updating MarketingTransaction
+        await MarketingTransaction.update({
+            mtfNumber: mtfNumber,
+            clientId: clientId,
+            quotationWasteId: wasteId,
+            quotationTransportationId: vehicleId,
+            wasteCategoryId: wasteCategory,
+            haulingDate: haulingDate,
+            haulingTime: haulingTime,
+            pullOutFormNumber: pull_out_form,
+            pttNumber: ptt,
+            manifestNumber: manifest,
+            remarks: remarks,
+            submitTo: submitTo,
+            statusId: status,
+            submittedBy: employeeId,
+        },            
+        {
+            where: { id: mtfId },
+        });
 
         // Redirect back to the quotation route with a success message
         res.redirect('/marketing_dashboard/booked_transactions?success=new');
@@ -1059,6 +1110,7 @@ module.exports = {
     getMarketingDashboardController,
     getBookedTransactionsController,
     postBookedTransactionsController,
+    updateBookedTransactionsController,
     getClientsController,
     getClientDetails,
     getNewClientController,
