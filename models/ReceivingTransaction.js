@@ -16,6 +16,10 @@ const ReceivingTransaction = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        dispatchLogisticsTransactionId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         receivingDate: {
             type: DataTypes.DATEONLY,
             allowNull: false,
