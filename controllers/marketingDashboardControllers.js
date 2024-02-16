@@ -114,6 +114,8 @@ async function getBookedTransactionsController(req, res) {
             successMessage = 'Transaction created successfully!';
         } else if (req.query.success === 'update'){
             successMessage = 'Transaction updated successfully!';
+        } else if (req.query.success === 'delete'){
+            successMessage = 'Transaction deleted successfully!';
         }
 
         // Fetch all clients from the database
@@ -416,6 +418,28 @@ async function updateBookedTransactionsController(req, res) {
         // Handling errors
         console.error('Error:', error);
         res.status(500).json({ message: 'Internal server error' });
+    }
+};
+async function delete_booked_transactionsController(req, res) {
+    try {
+        const id = req.params.id;
+        console.log(id)
+        // Update the MarketingTransaction status
+        const marketingTransaction = await MarketingTransaction.findOne({
+            where: {
+                id: id,
+            },
+        });
+
+        // Delete the LogisticsTransaction
+        await marketingTransaction.destroy();
+
+
+
+        res.redirect('/marketing_dashboard/booked_transactions?success=delete');
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
@@ -1111,6 +1135,7 @@ module.exports = {
     getBookedTransactionsController,
     postBookedTransactionsController,
     updateBookedTransactionsController,
+    delete_booked_transactionsController,
     getClientsController,
     getClientDetails,
     getNewClientController,

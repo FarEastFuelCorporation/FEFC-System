@@ -90,6 +90,9 @@
                                                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#updateTransactionModal" onclick="updateData('<%= transaction.id %>')">
                                                         <h6>Update</h6>
                                                     </button>
+                                                    <button type="button" class="btn btn-danger" onclick="deleteData('<%= transaction.id %>')">
+                                                        <h6>Delete</h6>
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div class="timeline-line"></div>
@@ -696,8 +699,8 @@
         var clientIdInput = updateTransactionModal.querySelector('#clientId');
         var wasteNameInput = updateTransactionModal.querySelector('#wasteName');
         var wasteIdInput = updateTransactionModal.querySelector('#wasteId');
-        var QuotationWasteList = updateTransactionModal.querySelector('#QuotationWasteList');
-        var QuotationTransportationList = updateTransactionModal.querySelector('#QuotationTransportationList');
+        var QuotationWasteList2 = updateTransactionModal.querySelector('#QuotationWasteList2');
+        var QuotationTransportationList2 = updateTransactionModal.querySelector('#QuotationTransportationList2');
         var type_of_vehicle_row = updateTransactionModal.querySelector('#type_of_vehicle_row')
         var inputFields = type_of_vehicle_row.querySelectorAll('input')
         // Find the selected option in the client datalist
@@ -716,8 +719,8 @@
         } else {
             // The entered value is not in the list
             clientIdInput.value = '';
-            QuotationWasteList.innerHTML = '';
-            QuotationTransportationList.innerHTML = '';
+            QuotationWasteList2.innerHTML = '';
+            QuotationTransportationList2.innerHTML = '';
             wasteIdInput.value = '';
             wasteNameInput.value = '';
 
@@ -859,19 +862,19 @@
             })
             .then(wastes => {
                 // Update the QuotationWasteList datalist options accordingly
-                const QuotationWasteList = updateTransactionModal.querySelector('#QuotationWasteList2');
+                const QuotationWasteList2 = updateTransactionModal.querySelector('#QuotationWasteList2');
                 const wasteNameInput = updateTransactionModal.querySelector('#wasteName');
                 const wasteIdInput = updateTransactionModal.querySelector('#wasteId');
 
                 // Clear existing options
-                QuotationWasteList.innerHTML = '<option value="" disabled selected>Select Waste</option>';
+                QuotationWasteList2.innerHTML = '<option value="" disabled selected>Select Waste</option>';
 
                 // Add new options based on the fetched data
                 wastes.forEach(waste => {
                     const option = document.createElement('option');
                     option.value = waste.wasteName;
                     option.setAttribute('data-wasteId', waste.id);
-                    QuotationWasteList.appendChild(option);
+                    QuotationWasteList2.appendChild(option);
                 });
             })
             .catch(error => {
@@ -892,7 +895,6 @@
             })
             .then(transportation => {
                 // Update the QuotationTransportationList datalist options accordingly
-                console.log(transportation)
                 const QuotationTransportationList = bookedTransactionModal.querySelector('#QuotationTransportationList');
                 const typeOfVehicle = bookedTransactionModal.querySelector('#typeOfVehicle1');
                 const vehicleIdInput = bookedTransactionModal.querySelector('#vehicleId1');
@@ -908,7 +910,6 @@
                 }
                 // Add new options based on the fetched data
                 transportation.forEach(vehicle => {
-                    console.log*(vehicle)
                     const option = document.createElement('option');
                     option.value = vehicle.VehicleType.typeOfVehicle;
                     option.setAttribute('data-vehicleId', vehicle.id);
@@ -933,17 +934,17 @@
             })
             .then(transportation => {
                 // Update the QuotationTransportationList datalist options accordingly
-                const QuotationTransportationList = updateTransactionModal.querySelector('#QuotationTransportationList2');
+                const QuotationTransportationList2 = updateTransactionModal.querySelector('#QuotationTransportationList2');
                 const typeOfVehicle = updateTransactionModal.querySelector('#typeOfVehicle');
                 const vehicleIdInput = updateTransactionModal.querySelector('#vehicleId');
                 const submitTo = updateTransactionModal.querySelector('#submitTo').value;
 
                 // Clear existing options
                 if (submitTo === 'LOGISTICS') {
-                    QuotationTransportationList.innerHTML = 
+                    QuotationTransportationList2.innerHTML = 
                     '<option value="" disabled selected>Select Waste</option>';
                 } else {        
-                    QuotationTransportationList.innerHTML = 
+                    QuotationTransportationList2.innerHTML = 
                     '<option value="CLIENT VEHICLE" data-vehicleId="V000"></option>';
                 }
                 // Add new options based on the fetched data
@@ -951,7 +952,7 @@
                     const option = document.createElement('option');
                     option.value = vehicle.VehicleType.typeOfVehicle;
                     option.setAttribute('data-vehicleId', vehicle.id);
-                    QuotationTransportationList.appendChild(option);
+                    QuotationTransportationList2.appendChild(option);
                 });
             })
             .catch(error => {
@@ -1033,9 +1034,9 @@
                     <i class="fa-solid fa-truck"></i>
                     Type of Vehicle 1
                 </label>
-                <input class="form-control" list="QuotationTransportationList" id="typeOfVehicle" name="typeOfVehicle" autocomplete="off" required placeholder="Type to search Type of Vehicle..." onchange="updateVehicleId2()">
+                <input class="form-control" list="QuotationTransportationList2" id="typeOfVehicle" name="typeOfVehicle" autocomplete="off" required placeholder="Type to search Type of Vehicle..." onchange="updateVehicleId2()">
                 <input type="hidden" id="vehicleId" name="vehicleId">
-                <datalist id="QuotationTransportationList"></datalist>
+                <datalist id="QuotationTransportationList2"></datalist>
             </div>
             `
 
@@ -1497,7 +1498,7 @@
                 updateTransactionModal.querySelector("#wasteName").value = marketingTransactionsData[x].QuotationWaste.wasteName;
                 updateTransactionModal.querySelector("#wasteId").value = marketingTransactionsData[x].QuotationWaste.id;
                 updateTransactionModal.querySelector("#typeOfVehicle").value = marketingTransactionsData[x].QuotationTransportation.VehicleType.typeOfVehicle;
-                updateTransactionModal.querySelector("#vehicleId").value = marketingTransactionsData[x].QuotationTransportation.vehicleId;
+                updateTransactionModal.querySelector("#vehicleId").value = marketingTransactionsData[x].QuotationTransportation.id;
                 updateTransactionModal.querySelector("#wasteCategory").value = marketingTransactionsData[x].wasteCategoryId;
                 updateWasteCategory ();
                 updateTransactionModal.querySelector("#ptt").value = marketingTransactionsData[x].pttNumber;
@@ -1505,6 +1506,31 @@
                 updateTransactionModal.querySelector("#pull_out_form").value = marketingTransactionsData[x].pullOutFormNumber;
                 updateTransactionModal.querySelector("#remarks").value = marketingTransactionsData[x].remarks;
             }
+        }
+    }
+    function deleteData(id) {
+        const confirmation = confirm('Are you sure you want to delete this Transaction?');
+
+        if (confirmation) {
+            fetch(`/marketing_dashboard/delete_booked_transactions/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) {
+                    alert(`Error: ${result.error}`);
+                } else {
+                    alert(result.message);
+                    // Optionally, you can update the UI or perform other actions after successful deletion.
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An unexpected error occurred.');
+            });
         }
     }
 </script>

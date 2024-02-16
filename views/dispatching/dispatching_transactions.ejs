@@ -685,7 +685,7 @@ function performSearch() {
         }
     }
     function deleteLTFData(logisticsTransactionId) {
-        const confirmation = confirm('Are you sure you want to delete this Transaction?' + `${logisticsTransactionId}`);
+        const confirmation = confirm('Are you sure you want to delete this Transaction?');
 
         if (confirmation) {
             fetch(`/dispatching_dashboard/delete_schedule_transactions/${logisticsTransactionId}`, {
@@ -694,19 +694,6 @@ function performSearch() {
                     'Content-Type': 'application/json',
                 },
             })
-            .then(response => response.json())
-            .then(result => {
-                if (result.error) {
-                    alert(`Error: ${result.error}`);
-                } else {
-                    alert(result.message);
-                    // Optionally, you can update the UI or perform other actions after successful deletion.
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An unexpected error occurred.');
-            });
         }
     }
 </script>

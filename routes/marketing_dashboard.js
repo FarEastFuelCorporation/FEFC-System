@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { getMarketingDashboardController, getBookedTransactionsController, getClientsController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, postBookedTransactionsController, getCommissionsController, updateBookedTransactionsController } = require('../controllers/marketingDashboardControllers');
+const { getMarketingDashboardController, getBookedTransactionsController, getClientsController, postNewClientController, postUpdateClientController, getTypeOfWasteController, getQuotationsController, getNewQuotationController, postNewQuotationController, getUpdateQuotationController, postUpdateQuotationController, postBookedTransactionsController, getCommissionsController, updateBookedTransactionsController, delete_booked_transactionsController } = require('../controllers/marketingDashboardControllers');
 
 // Dashboard route
 router.get('/', getMarketingDashboardController);
@@ -11,6 +11,7 @@ router.get('/', getMarketingDashboardController);
 router.get('/booked_transactions', getBookedTransactionsController);
 router.post('/booked_transactions', postBookedTransactionsController);
 router.post('/update_booked_transactions/:id', updateBookedTransactionsController);
+router.delete('/delete_booked_transactions/:id', delete_booked_transactionsController);
 
 // Clients route
 router.get('/clients', getClientsController);

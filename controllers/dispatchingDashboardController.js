@@ -354,12 +354,16 @@ async function deleteScheduleTransactionsController(req, res) {
             },
         });
 
+        console.log('Found logistics transaction:', logisticsTransaction);
+
         // Update the MarketingTransaction status
         const marketingTransaction = await MarketingTransaction.findOne({
             where: {
                 id: logisticsTransaction.mtfId,
             },
         });
+
+        console.log('Found marketing transaction:', marketingTransaction);
 
         if (marketingTransaction) {
             await marketingTransaction.update({
@@ -370,9 +374,9 @@ async function deleteScheduleTransactionsController(req, res) {
         // Delete the LogisticsTransaction
         await logisticsTransaction.destroy();
 
-
-
-        res.redirect('/dispatching_dashboard/dispatching_transactions?success=deleteSchedule');
+        console.log('Logistics transaction deleted successfully.');
+        console.log('Before redirection');
+        res.redirect('/dispatching_dashboard/dispatching_transactions?success=updateSchedule');
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
