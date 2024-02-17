@@ -434,8 +434,6 @@ async function delete_booked_transactionsController(req, res) {
         // Delete the LogisticsTransaction
         await marketingTransaction.destroy();
 
-
-
         res.redirect('/marketing_dashboard/booked_transactions?success=delete');
     } catch (error) {
         console.error(error);
