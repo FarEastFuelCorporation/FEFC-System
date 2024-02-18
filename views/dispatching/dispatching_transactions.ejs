@@ -533,65 +533,65 @@
             'Content-Type': 'application/json',
         },
     })
-    .then(response => response.text())
-    .then(data => {
-        // Update the content of the container with the new data
-        const section = document.querySelector('section');
-        if (section) {
-            section.innerHTML = data;
+        .then(response => response.text())
+        .then(data => {
+            // Update the content of the container with the new data
+            const section = document.querySelector('section');
+            if (section) {
+                section.innerHTML = data;
 
-            document.querySelector('.content').style.marginLeft = '0';
-            document.querySelector('.content').style.width = '100%';
-            document.querySelector('.content').style.padding = '0%';
-            updateActiveClass()
-        }
+                document.querySelector('.content').style.marginLeft = '0';
+                document.querySelector('.content').style.width = '100%';
+                document.querySelector('.content').style.padding = '0%';
+                updateActiveClass()
+            }
 
-        // Update the URL to reflect the current page
-        const newUrl = `/dispatching_dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`;
-        history.pushState({ page: pageNumber, entriesPerPage }, '', newUrl);
-        window.location.reload()
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Handle errors as needed
-    });
-}
+            // Update the URL to reflect the current page
+            const newUrl = `/dispatching_dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}`;
+            history.pushState({ page: pageNumber, entriesPerPage }, '', newUrl);
+            window.location.reload()
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle errors as needed
+        });
+    }
 
-function changeEntriesPerPage(selectElement) {
-    const selectedValue = selectElement.value;
-    const currentPage = <%= currentPage %> // Get the current page
-    window.location.href = `/dispatching_dashboard/<%= route %>?page=${currentPage}&entriesPerPage=${selectedValue}`;
-}
+    function changeEntriesPerPage(selectElement) {
+        const selectedValue = selectElement.value;
+        const currentPage = <%= currentPage %> // Get the current page
+        window.location.href = `/dispatching_dashboard/<%= route %>?page=${currentPage}&entriesPerPage=${selectedValue}`;
+    }
 
-function performSearch() {
-    const searchInput = document.getElementById('searchInput');
-    const searchQuery = searchInput.value.trim(); // Get the trimmed search query
-    const pageNumber = 1;
-    const entriesPerPage = document.getElementById('showEntries').value;
+    function performSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const searchQuery = searchInput.value.trim(); // Get the trimmed search query
+        const pageNumber = 1;
+        const entriesPerPage = document.getElementById('showEntries').value;
 
-    // Make an AJAX request to the server with the search query and current page
-    fetch(`/dispatching_dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}&search=${searchQuery}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => response.text())
-    .then(data => {
-        // Update the content of the container with the new data
-        const section = document.querySelector('section');
-        if (section) {
-            section.innerHTML = data;
+        // Make an AJAX request to the server with the search query and current page
+        fetch(`/dispatching_dashboard/<%= route %>?page=${pageNumber}&entriesPerPage=${entriesPerPage}&search=${searchQuery}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.text())
+        .then(data => {
+            // Update the content of the container with the new data
+            const section = document.querySelector('section');
+            if (section) {
+                section.innerHTML = data;
 
-            document.querySelector('.content').style.marginLeft = '0';
-            document.querySelector('.content').style.width = '100%';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Handle errors as needed
-    });
-}
+                document.querySelector('.content').style.marginLeft = '0';
+                document.querySelector('.content').style.width = '100%';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle errors as needed
+        });
+    }
 </script>
 <script>
     document.getElementById("closeNewScheduleBtn").addEventListener("click", () => {
