@@ -2,10 +2,10 @@
 
 const twilio = require('twilio');
 require('dotenv').config();
-const accountSid = process.env.accountSid;
-const authToken = process.env.authToken;
-const client = new twilio(accountSid, authToken);
-const from = process.env.twilio_number;
+// const accountSid = process.env.accountSid;
+// const authToken = process.env.authToken;
+// const client = new twilio(accountSid, authToken);
+// const from = process.env.twilio_number;
 const { Op, Sequelize } = require('sequelize');
 const moment = require('moment-timezone');
 const desiredTimezone = 'Asia/Shanghai';
@@ -368,39 +368,39 @@ async function postBookedTransactionsController(req, res) {
             });
         }
         
-        const clientName = await Client.findByPk(clientId)
-        const employeeName = await Employee.findByPk(employeeId)
-        const wasteName = await QuotationWaste.findByPk(wasteId)
-        const vehicle = await QuotationTransportation.findByPk(vehicleId, {
-            include: [
-                { model: VehicleType, as: 'VehicleType'  }
-            ]
-        });
+        // const clientName = await Client.findByPk(clientId)
+        // const employeeName = await Employee.findByPk(employeeId)
+        // const wasteName = await QuotationWaste.findByPk(wasteId)
+        // const vehicle = await QuotationTransportation.findByPk(vehicleId, {
+        //     include: [
+        //         { model: VehicleType, as: 'VehicleType'  }
+        //     ]
+        // });
 
-        const toNumbers = [
-            '+639369481844',
-            '+639915126568', // Add more numbers as needed
-            '+639455223999'
-        ];
-        const messageTemplate = `Booked Transaction:
-                        Hauling Date: ${haulingDate}
-                        Hauling Time: ${haulingTime}
-                        Client: ${clientName.clientName}
-                        Waste Name: ${wasteName.wasteName}
-                        Vehicle: ${vehicle.VehicleType.typeOfVehicle}
-                        Booked By: ${employeeName.firstName} ${employeeName.lastName}
-                        `;
+        // const toNumbers = [
+        //     '+639369481844',
+        //     '+639915126568', // Add more numbers as needed
+        //     '+639455223999'
+        // ];
+        // const messageTemplate = `Booked Transaction:
+        //                 Hauling Date: ${haulingDate}
+        //                 Hauling Time: ${haulingTime}
+        //                 Client: ${clientName.clientName}
+        //                 Waste Name: ${wasteName.wasteName}
+        //                 Vehicle: ${vehicle.VehicleType.typeOfVehicle}
+        //                 Booked By: ${employeeName.firstName} ${employeeName.lastName}
+        //                 `;
 
-        toNumbers.forEach(to => {
-            client.messages
-                .create({
-                    body: messageTemplate,
-                    from: from,
-                    to: to
-                })
-            .then(message => console.log(`Message SID ${message.sid} sent.`))
-            .catch(error => console.error('Error sending message:', error));
-        });
+        // toNumbers.forEach(to => {
+        //     client.messages
+        //         .create({
+        //             body: messageTemplate,
+        //             from: from,
+        //             to: to
+        //         })
+        //     .then(message => console.log(`Message SID ${message.sid} sent.`))
+        //     .catch(error => console.error('Error sending message:', error));
+        // });
 
         // Redirect back to the quotation route with a success message
         res.redirect('/marketing_dashboard/booked_transactions?success=new');
