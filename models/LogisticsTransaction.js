@@ -26,6 +26,13 @@ const LogisticsTransaction = sequelize.define(
         },
         plateNumber: {
             type: DataTypes.STRING,
+            // Add an index to the plateNumber column
+            indexes: [
+                {
+                    unique: true, // adjust based on your requirements
+                    fields: ['plateNumber'],
+                },
+            ],
         },
         driverId: {
             type: DataTypes.STRING,

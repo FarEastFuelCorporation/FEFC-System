@@ -116,4 +116,9 @@ module.exports = {
     MarketingTransaction,
     WasteCategory,
     TransactionStatus,
+    LogisticsTransaction,
+    LogisticsTransactionHelper,
+    DispatchLogisticsTransaction,
+    VehicleStatus,
+    VehicleLog,
 };
