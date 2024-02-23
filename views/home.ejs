@@ -1,48 +1,40 @@
 <!-- views/home.ejs -->
 
 <%- include('head.ejs') %>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container-fluid">
-            <a href="#" style="height: 60px; background-color: #303030" class="d-flex">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between w-100">
+            <!-- Left side with logo and brand name -->
+            <a href="#" style="height: 40px; background-color: #303030; text-decoration: none;" class="d-flex">
                 <img src="/images/logo.png" alt="Logo">
                 <span>
                     <h6 class="d-flex align-center ps-2 fw-bold" style="color: #ffbf00; font-family: Times New Roman;">FAR EAST FUEL<br>CORPORATION</h6>
                 </span>
             </a>
+
+            <!-- Right side with navigation links -->
             <div class="collapse navbar-collapse" id="navbarScroll">
-                <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px; width: 100%;">
+                <ul class="navbar-nav" style="margin-left: auto;">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a href="/signup" class="nav-link">Sign Up</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Link
-                        </a>
-                        <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" aria-disabled="true">Link</a>
+                        <a href="/login" class="nav-link">Log In</a>
                     </li>
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
+
+
+
+
 
     <div class="container-fluid">
         <div class="row m-0">
             <div class="col-12 text-center">
                 <h2>Welcome to FAR EAST FUEL CORPORATION</h2>
-                <p>Choose an action:</p>
-                <a href="/signup" class="btn btn-primary">Sign Up</a>
-                <a href="/login" class="btn btn-primary">Log In</a>
             </div>
         </div>
     </div>
