@@ -311,7 +311,7 @@ async function postBookedTransactionsController(req, res) {
         });
         
         const employeeId = req.session.employeeId;
-        console.log(wasteId)
+        
         // Get the current year and month
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear().toString();
