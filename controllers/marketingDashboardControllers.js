@@ -311,7 +311,7 @@ async function postBookedTransactionsController(req, res) {
         });
         
         const employeeId = req.session.employeeId;
-
+        console.log(wasteId)
         // Get the current year and month
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear().toString();
@@ -885,7 +885,7 @@ async function postNewQuotationController(req, res) {
             remarks: remarks,
             submittedBy: userId,
         });
-        
+        console.log(quotation.quotationId)
         // Process dynamic fields
         for (let i = 1; i <= list_counter; i++) {
             const waste_code =  req.body[`waste_code${i}`];
@@ -898,7 +898,7 @@ async function postNewQuotationController(req, res) {
 
             // Creating a new QuotationWaste
             await QuotationWaste.create({
-                quotationId: quotation.id,
+                quotationId: quotation.quotationId,
                 wasteId: waste_code,
                 wasteName: waste_name,
                 mode: mode,
@@ -921,7 +921,7 @@ async function postNewQuotationController(req, res) {
 
             // Creating a new QuotationTransportation
             await QuotationTransportation.create({
-                quotationId: quotation.id,
+                quotationId: quotation.quotationId,
                 vehicleId: type_of_vehicle,
                 haulingArea: hauling_area,
                 mode: tf_mode,
