@@ -42,7 +42,6 @@ const Employee = sequelize.define(
         },
         birthDate: {
             type: DataTypes.DATEONLY,
-            allowNull: false,
         },
         birthPlace: {
             type: DataTypes.STRING,
