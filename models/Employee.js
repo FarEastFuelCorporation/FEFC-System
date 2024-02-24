@@ -101,7 +101,6 @@ const Employee = sequelize.define(
         },
         dateHire: {
             type: DataTypes.DATEONLY,
-            allowNull: false,
         },
         employeeType: {
             type: DataTypes.STRING,
