@@ -874,7 +874,7 @@ async function postNewQuotationController(req, res) {
         } = req.body;
 
         // Creating a new Quotation
-        await Quotation.create({
+        const quotation = await Quotation.create({
             quotationCode: quotation_no,
             revisionNumber: revision_no,
             validity: validity,
@@ -897,8 +897,8 @@ async function postNewQuotationController(req, res) {
             const fix_price =  req.body[`fix_price${i}`];
 
             // Creating a new QuotationWaste
-            const newQuotationWaste = await QuotationWaste.create({
-                quotationCode: quotation_no,
+            await QuotationWaste.create({
+                quotationId: quotation.id,
                 wasteId: waste_code,
                 wasteName: waste_name,
                 mode: mode,
@@ -920,8 +920,8 @@ async function postNewQuotationController(req, res) {
             const max_capacity =  req.body[`max_capacity${i}`];
 
             // Creating a new QuotationTransportation
-            const newQuotationTransportation = await QuotationTransportation.create({
-                quotationCode: quotation_no,
+            await QuotationTransportation.create({
+                quotationId: quotation.id,
                 vehicleId: type_of_vehicle,
                 haulingArea: hauling_area,
                 mode: tf_mode,
