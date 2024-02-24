@@ -3,17 +3,12 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// const sequelize = new Sequelize({
-//     dialect: 'mysql',
-//     host: process.env.DB_HOST,
-//     username: process.env.DB_USERNAME,
-//     password: process.env.DB_PASSWORD,
-//     database: process.env.DB_DBNAME,
-// });
-
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize({
     dialect: 'mysql',
-    logging: console.log, // or false to disable logging
+    host: process.env.DB_HOST,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DBNAME,
 });
 
 sequelize.options.logging = console.log;
