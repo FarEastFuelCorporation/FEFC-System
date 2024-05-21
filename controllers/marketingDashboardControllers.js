@@ -471,12 +471,13 @@ async function delete_booked_transactionsController(req, res) {
                 id: id,
             },
         });
-
         // Delete the LogisticsTransaction
         await marketingTransaction.destroy();
+        console.log(marketingTransaction)
 
-        res.redirect('/marketing_dashboard/booked_transactions?success=delete');
-    } catch (error) {
+        // Respond with success
+        res.status(200).json({ success: true });
+    } catch (error) { 
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }

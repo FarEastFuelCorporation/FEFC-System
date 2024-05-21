@@ -1523,7 +1523,17 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            })
+            }) .then(response => {
+            if (response.ok) {
+                window.location.href = '/marketing_dashboard/booked_transactions?success=delete';
+            } else {
+                console.error('Failed to delete transaction');
+                alert('Failed to delete transaction');
+            }
+        })  .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting transaction');
+            });
         }
     }
 </script>

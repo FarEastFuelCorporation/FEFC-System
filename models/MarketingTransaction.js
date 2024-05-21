@@ -3,7 +3,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/config');
 
-const MarketingTransaction = sequelize.define(
+const MarketingTransaction = sequelize.define( 
     'MarketingTransaction', 
     {
         id: {
