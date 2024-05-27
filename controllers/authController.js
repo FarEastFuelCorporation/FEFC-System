@@ -82,35 +82,57 @@ async function postLoginController(req, res) {
         const user = await User.findOne({ 
             where: { employeeId },
         });
-        const employeeRoleId = await EmployeeRolesEmployee.findOne({ 
-            where: { employeeId },
-        });
 
-
-        // Check if the user exists and the password is correct (implement your authentication logic)
-        if (user && await bcrypt.compare(password, user.password)) {
-            // Check the employeeRoleId
-            if (employeeRoleId === 2) {
-                req.session.employeeId = user.employeeId;
-                res.redirect(`/marketing_dashboard`);
-            } else if (employeeRoleId === 3) {
-                req.session.employeeId = user.employeeId;
-                res.redirect(`/dispatching_dashboard`);
-            } else if (employeeRoleId === 4) {
-                req.session.employeeId = user.employeeId;
-                res.redirect(`/receiving_dashboard`);
-            } else {
-                // Redirect to a different route if needed
-                res.redirect(`/`);
-            }
-        } else {
-            // Display an error message for incorrect credentials
+        // Check if the user exists
+        if (!user) {
             const viewsData = {
                 pageTitle: 'Login',
                 error: 'Invalid employee ID or password',
             };
-            res.render('login', viewsData);
+            return res.render('login', viewsData);
         }
+
+        // Check if the password is correct
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            const viewsData = {
+                pageTitle: 'Login',
+                error: 'Invalid employee ID or password',
+            };
+            return res.render('login', viewsData);
+        }
+
+        // Find the user's role(s) from the EmployeeRolesEmployee table
+        const employeeRoles = await EmployeeRolesEmployee.findAll({ 
+            where: { employeeId },
+        });
+
+        // Assuming a user can have multiple roles, handle each role accordingly
+        let redirected = false;
+        for (const role of employeeRoles) {
+            if (role.employeeRoleId === 2) {
+                req.session.employeeId = user.employeeId;
+                res.redirect(`/marketing_dashboard`);
+                redirected = true;
+                break;
+            } else if (role.employeeRoleId === 3) {
+                req.session.employeeId = user.employeeId;
+                res.redirect(`/dispatching_dashboard`);
+                redirected = true;
+                break;
+            } else if (role.employeeRoleId === 4) {
+                req.session.employeeId = user.employeeId;
+                res.redirect(`/receiving_dashboard`);
+                redirected = true;
+                break;
+            }
+        }
+
+        // If no role matched, redirect to a default route
+        if (!redirected) {
+            res.redirect(`/`);
+        }
+
     } catch (error) {
         console.error('Error:', error);
         // Handle errors gracefully, redirect to an error page, or display a generic error message
