@@ -4,12 +4,13 @@ const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL,{
+    host: 'localhost',
     dialect: 'mysql',
     pool: {
-        max: 10, // Maximum number of connections
-        min: 0,  // Minimum number of connections
-        acquire: 30000, // Maximum time in milliseconds to acquire a connection before throwing an error
-        idle: 10000 // Maximum time in milliseconds that a connection can be idle before being released
+      max: 10, // maximum number of connection in pool
+      min: 0, // minimum number of connection in pool
+      acquire: 30000, // maximum time (in milliseconds) that pool will try to get connection before throwing error
+      idle: 10000 // maximum time (in milliseconds) that a connection can be idle before being released
     }
 });
 
