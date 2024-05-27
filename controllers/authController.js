@@ -1,6 +1,7 @@
 // controllers/authController.js
 
 const Employee = require("../models/Employee");
+const EmployeeRolesEmployee = require("../models/EmployeeRolesEmployee ");
 const User = require("../models/User");
 const bcrypt = require('bcrypt')
 
@@ -80,19 +81,22 @@ async function postLoginController(req, res) {
         // Find the user with the provided employee ID
         const user = await User.findOne({ 
             where: { employeeId },
-            include: [{ model: Employee, as: 'Employee' }],
         });
+        const employeeRoleId = await EmployeeRolesEmployee.findOne({ 
+            where: { employeeId },
+        });
+
 
         // Check if the user exists and the password is correct (implement your authentication logic)
         if (user && await bcrypt.compare(password, user.password)) {
             // Check the employeeRoleId
-            if (user.Employee.employeeRoleId === 2) {
+            if (employeeRoleId === 2) {
                 req.session.employeeId = user.employeeId;
                 res.redirect(`/marketing_dashboard`);
-            } else if (user.Employee.employeeRoleId === 3) {
+            } else if (employeeRoleId === 3) {
                 req.session.employeeId = user.employeeId;
                 res.redirect(`/dispatching_dashboard`);
-            } else if (user.Employee.employeeRoleId === 4) {
+            } else if (employeeRoleId === 4) {
                 req.session.employeeId = user.employeeId;
                 res.redirect(`/receiving_dashboard`);
             } else {

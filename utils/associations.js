@@ -19,13 +19,28 @@ const LogisticsTransactionHelper = require('../models/LogisticsTransactionHelper
 const DispatchLogisticsTransaction = require('../models/DispatchLogisticsTransaction');
 const VehicleStatus = require('../models/VehicleStatus');
 const VehicleLog = require('../models/VehicleLog');
+const EmployeeRolesEmployee = require('../models/EmployeeRolesEmployee ');
 
 // Define associations
 Employee.hasMany(User, { as: 'User', foreignKey: 'employeeId', sourceKey: 'employeeId' });
 User.belongsTo(Employee, { as: 'Employee', foreignKey: 'employeeId', targetKey: 'employeeId' });
 
-EmployeeRole.hasMany(Employee, { as: 'Employee', foreignKey: 'employeeRoleId', sourceKey: 'employeeRoleId', });
-Employee.belongsTo(EmployeeRole, { as: 'EmployeeRole', foreignKey: 'employeeRoleId', targetKey: 'employeeRoleId' });
+// EmployeeRole.hasMany(Employee, { as: 'Employee', foreignKey: 'employeeRoleId', sourceKey: 'employeeRoleId', });
+// Employee.belongsTo(EmployeeRole, { as: 'EmployeeRole', foreignKey: 'employeeRoleId', targetKey: 'employeeRoleId' });
+
+EmployeeRole.belongsToMany(Employee, {
+    through: EmployeeRolesEmployee,
+    foreignKey: 'employeeRoleId',
+    otherKey: 'employeeId',
+    as: 'Employees',
+  });
+  
+  Employee.belongsToMany(EmployeeRole, {
+    through: EmployeeRolesEmployee,
+    foreignKey: 'employeeId',
+    otherKey: 'employeeRoleId',
+    as: 'EmployeeRoles',
+  });
 
 Employee.hasMany(Quotation, { as: 'Quotation', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
 Quotation.belongsTo(Employee, { as: 'Employee', foreignKey: 'submittedBy', targetKey: 'employeeId' });
