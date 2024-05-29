@@ -44,7 +44,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Use express-session middleware
 app.use(
   session({
-    secret: "your-secret-key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -75,6 +75,7 @@ const { isAuthenticated } = require("./middlewares/auth");
 app.use("/requests", isAuthenticated);
 app.use("/marketing_dashboard", isAuthenticated);
 app.use("/dispatching_dashboard", isAuthenticated);
+app.use("/hr_dashboard", isAuthenticated);
 
 // Include your routes
 const authRoutes = require("./routes/auth");
@@ -83,6 +84,7 @@ const requestsRoutes = require("./routes/requests");
 const marketingDashboardRoutes = require("./routes/marketing_dashboard");
 const dispatchingDashboardRoutes = require("./routes/dispatching_dashboard");
 const receivingDashboardRoutes = require("./routes/receiving_dashboard");
+const hrDashboardRoutes = require("./routes/hr_dashboard");
 const { error404Controller } = require("./controllers/othersController");
 
 app.use(authRoutes);
@@ -91,6 +93,7 @@ app.use("/requests", requestsRoutes);
 app.use("/marketing_dashboard", marketingDashboardRoutes);
 app.use("/dispatching_dashboard", dispatchingDashboardRoutes);
 app.use("/receiving_dashboard", receivingDashboardRoutes);
+app.use("/hr_dashboard", hrDashboardRoutes);
 
 app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(error404Controller);

@@ -125,6 +125,11 @@ async function postLoginController(req, res) {
                 res.redirect(`/receiving_dashboard`);
                 redirected = true;
                 break;
+            } else if (role.employeeRoleId === 9) {
+                req.session.employeeId = user.employeeId;
+                res.redirect(`/hr_dashboard`);
+                redirected = true;
+                break;
             }
         }
 
