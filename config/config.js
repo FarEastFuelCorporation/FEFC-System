@@ -3,7 +3,8 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-const sequelize = new Sequelize(process.env.DATABASE_URL,{
+// const sequelize = new Sequelize(process.env.DATABASE_URL,{
+const sequelize = new Sequelize(process.env.DB_DBNAME2, process.env.DB_USERNAME2, process.env.DB_PASSWORD2, {
     host: 'localhost',
     dialect: 'mysql',
     pool: {

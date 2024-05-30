@@ -69,14 +69,14 @@ QuotationTransportation.belongsTo(VehicleType, { as: 'VehicleType', foreignKey: 
 VehicleStatus.hasMany(VehicleLog, { as: 'VehicleLog', foreignKey: 'vehicleStatusId', sourceKey: 'id' });
 VehicleLog.belongsTo(VehicleStatus, { as: 'VehicleStatus', foreignKey: 'vehicleStatusId', targetKey: 'id' });
 
-Vehicle.belongsTo(LogisticsTransaction, { as: 'LogisticsTransaction', foreignKey: 'plateNumber', targetKey: 'plateNumber' });
-LogisticsTransaction.hasMany(Vehicle, { as: 'Vehicle', foreignKey: 'plateNumber', sourceKey: 'plateNumber' });
+Vehicle.hasMany(LogisticsTransaction, { as: 'LogisticsTransaction', foreignKey: 'plateNumber', sourceKey: 'plateNumber' });
+LogisticsTransaction.belongsTo(Vehicle, { as: 'Vehicle', foreignKey: 'plateNumber', targetKey: 'plateNumber' });
 
 Vehicle.hasMany(VehicleLog, { as: 'VehicleLog', foreignKey: 'plateNumber', sourceKey: 'plateNumber' });
 VehicleLog.belongsTo(Vehicle, { as: 'Vehicle', foreignKey: 'plateNumber', targetKey: 'plateNumber' });
 
-VehicleLog.belongsTo(DispatchLogisticsTransaction, { as: 'DispatchLogisticsTransaction', foreignKey: 'dispatchId', targetKey: 'id' });
 DispatchLogisticsTransaction.hasMany(VehicleLog, { as: 'VehicleLog', foreignKey: 'dispatchId', sourceKey: 'id', onDelete: 'CASCADE' }); 
+VehicleLog.belongsTo(DispatchLogisticsTransaction, { as: 'DispatchLogisticsTransaction', foreignKey: 'dispatchId', targetKey: 'id' });
 
 Client.hasMany(Quotation, { as: 'Quotation', foreignKey: 'clientId', sourceKey: 'clientId' });
 Quotation.belongsTo(Client, { as: 'Client', foreignKey: 'clientId', targetKey: 'clientId' });
