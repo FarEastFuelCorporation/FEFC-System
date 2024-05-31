@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // const sequelize = new Sequelize(process.env.DATABASE_URL,{
 const sequelize = new Sequelize(process.env.DB_DBNAME2, process.env.DB_USERNAME2, process.env.DB_PASSWORD2, {
-    host: process.env.DB_HOST2,
+    host: '122.2.117.19',
     dialect: 'mysql',
     pool: {
       max: 10, // maximum number of connection in pool
