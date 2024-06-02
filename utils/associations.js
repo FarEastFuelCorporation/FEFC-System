@@ -29,18 +29,18 @@ User.belongsTo(Employee, { as: 'Employee', foreignKey: 'employeeId', targetKey: 
 // Employee.belongsTo(EmployeeRole, { as: 'EmployeeRole', foreignKey: 'employeeRoleId', targetKey: 'employeeRoleId' });
 
 EmployeeRole.belongsToMany(Employee, {
-    through: EmployeeRolesEmployee,
-    foreignKey: 'employeeRoleId',
-    otherKey: 'employeeId',
-    as: 'Employees',
-  });
+  through: EmployeeRolesEmployee,
+  foreignKey: 'employeeRoleId',
+  otherKey: 'employeeId',
+  as: 'Employees',
+});
   
-  Employee.belongsToMany(EmployeeRole, {
-    through: EmployeeRolesEmployee,
-    foreignKey: 'employeeId',
-    otherKey: 'employeeRoleId',
-    as: 'EmployeeRoles',
-  });
+Employee.belongsToMany(EmployeeRole, {
+  through: EmployeeRolesEmployee,
+  foreignKey: 'employeeId',
+  otherKey: 'employeeRoleId',
+  as: 'EmployeeRoles',
+});
 
 Employee.hasMany(Quotation, { as: 'Quotation', foreignKey: 'submittedBy', sourceKey: 'employeeId', });
 Quotation.belongsTo(Employee, { as: 'Employee', foreignKey: 'submittedBy', targetKey: 'employeeId' });
