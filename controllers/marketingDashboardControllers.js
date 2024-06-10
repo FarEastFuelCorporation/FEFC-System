@@ -24,13 +24,14 @@ const LogisticsTransaction = require('../models/LogisticsTransaction');
 const LogisticsTransactionHelper = require('../models/LogisticsTransactionHelper');
 const DispatchLogisticsTransaction = require('../models/DispatchLogisticsTransaction');
 const Vehicle = require('../models/Vehicle');
+const IdInformation = require('../models/IdInformation');
 
 // Dashboard controller
 async function getMarketingDashboardController(req, res) {
     try {
         // Retrieve data from the database or perform other logic
         const employeeId = req.session.employeeId;
-        const employee = await Employee.findOne({ where: { employeeId } });
+        const employeeDetails = await IdInformation.findOne({ where: { employee_id: employeeId } });
         
         // Filter marketingTransactions for the current month
         const currentMonthStart = new Date();
@@ -76,7 +77,7 @@ async function getMarketingDashboardController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/marketing_dashboard',
             route: 'marketing_dashboard',
-            employee,
+            employeeDetails,
             marketingTransactions,
             counts,
         };
@@ -91,6 +92,7 @@ async function getMarketingDashboardController(req, res) {
 async function getBookedTransactionsController(req, res) {
     try {
         const employeeId = req.session.employeeId;
+        const employeeDetails = await IdInformation.findOne({ where: { employee_id: employeeId } });
 
         // Fetch all clients from the database
         const clients = await Client.findAll();
@@ -269,6 +271,7 @@ async function getBookedTransactionsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/booked_transactions',
             route: 'booked_transactions',
+            employeeDetails,
             paginatedTransactions: paginatedTransactions,
             vehicles,
             drivers,
@@ -311,6 +314,7 @@ async function postBookedTransactionsController(req, res) {
         });
         
         const employeeId = req.session.employeeId;
+        const employeeDetails = await IdInformation.findOne({ where: { employee_id: employeeId } });
         
         // Get the current year and month
         const currentDate = new Date();
@@ -486,6 +490,9 @@ async function delete_booked_transactionsController(req, res) {
 // Clients controller
 async function getClientsController(req, res) {
     try {
+        const employeeId = req.session.employeeId;
+        const employeeDetails = await IdInformation.findOne({ where: { employee_id: employeeId } });
+
         // Fetch all clients from the database
         const clients = await Client.findAll();
 
@@ -526,6 +533,7 @@ async function getClientsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/clients',
             route: 'clients',
+            employeeDetails,
             clients: paginatedClients,
             currentPage,
             totalPages,
@@ -691,6 +699,9 @@ async function postUpdateClientController(req, res) {
 // Type of Waste controller
 async function getTypeOfWasteController(req, res) {
     try {
+        const employeeId = req.session.employeeId;
+        const employeeDetails = await IdInformation.findOne({ where: { employee_id: employeeId } });
+
         // Fetch all types of wastes from the database
         const typesOfWaste = await TypeOfWaste.findAll({
             include: [{ model: TreatmentProcess, as: 'TreatmentProcess' }],
@@ -725,6 +736,7 @@ async function getTypeOfWasteController(req, res) {
             content: 'marketing/type_of_waste',
             route: 'type_of_waste',
             typesOfWaste: paginatedTypesOfWaste,
+            employeeDetails,
             currentPage,
             totalPages,
             entriesPerPage,
@@ -740,6 +752,9 @@ async function getTypeOfWasteController(req, res) {
 // Quotations controller
 async function getQuotationsController(req, res) {
     try {
+        const employeeId = req.session.employeeId;
+        const employeeDetails = await IdInformation.findOne({ where: { employee_id: employeeId } });
+
         // Fetch all quotations from the database
         const quotations = await Quotation.findAll({
             include: [
@@ -785,6 +800,7 @@ async function getQuotationsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/quotations',
             route: 'quotations',
+            employeeDetails,
             quotations: paginatedQuotations,
             currentPage,
             totalPages,
@@ -1109,6 +1125,9 @@ async function postUpdateQuotationController(req, res) {
 // Commissions controller
 async function getCommissionsController(req, res) {
     try {
+        const employeeId = req.session.employeeId;
+        const employeeDetails = await IdInformation.findOne({ where: { employee_id: employeeId } });
+
         // Fetch all quotations from the database
         const quotations = await Quotation.findAll({
             include: [
@@ -1156,6 +1175,7 @@ async function getCommissionsController(req, res) {
             sidebar: 'marketing/marketing_sidebar',
             content: 'marketing/commissions',
             route: 'commissions',
+            employeeDetails,
             quotations: paginatedQuotations,
             currentPage,
             totalPages,
